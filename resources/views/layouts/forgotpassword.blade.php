@@ -30,7 +30,7 @@
                     <div class="mt-6">
                         <a href="resendotp"
                             class="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 block text-center">Kirim
-                            Tautan</a>
+                            Kode OTP</a>
                     </div>
                     <div class="mt-6">
                         <!-- Tombol kembali yang sekarang berfungsi sebagai link menuju halaman login -->
