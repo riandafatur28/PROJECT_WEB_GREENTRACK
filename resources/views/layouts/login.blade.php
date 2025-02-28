@@ -11,20 +11,20 @@
 
 <body class="flex h-screen">
     <!-- Bagian Kiri: Form Login -->
-    <div class="w-full md:w-1/2 flex items-center justify-center bg-white-100 p-6">
+    <div class="w-full md:w-3/5 flex items-center justify-center bg-white-100 p-6">
         <div class="w-full max-w-lg p-8">
             <h1 class="text-4xl font-bold text-left text-gray-700 mb-6">Selamat Datang 👋</h1>
-            <h3 class="text-1xl  text-left text-gray-700 mb-12">Silahkan Login Terlebih Dahulu</h3>
-            <form method="POST" action="#">
+            <h3 class="text-xl text-left text-gray-700 mb-12">Silahkan Login Terlebih Dahulu</h3>
+            <form method="POST" action="#" autocomplete="off">
                 <div>
                     <label class="block text-l font-medium text-gray-700 mb-1" for="email">Email</label>
                     <input class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none"
-                        id="email" type="email" name="email" required aria-label="Email">
+                        id="email" type="email" name="email" value="" required aria-label="Email">
                 </div>
                 <div class="mt-4">
                     <label class="block text-l font-medium text-gray-700 mb-1" for="password">Password</label>
                     <input class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none"
-                        id="password" type="password" name="password" required aria-label="Password">
+                        id="password" type="password" name="password" value="" required aria-label="Password">
                 </div>
                 <div class="mt-4 flex items-center">
                     <input type="checkbox" id="remember_me" name="remember" class="mr-2 cursor-pointer">
@@ -49,7 +49,7 @@
     </div>
 
     <!-- Bagian Kanan: Gambar hanya muncul di layar besar -->
-    <div class="hidden md:block md:w-1/2 w-full h-screen flex items-center justify-center bg-white-100 p-4">
+    <div class="hidden md:flex md:w-2/5 w-full h-screen flex items-center justify-center bg-white-100 p-4">
         <!-- Menambahkan padding di semua sisi -->
         <div class="w-full h-full bg-cover bg-center bg-no-repeat rounded-xl"
             style="background-image: url('/build/assets/images/Art.svg');">
