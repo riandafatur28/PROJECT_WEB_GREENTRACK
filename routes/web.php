@@ -1,15 +1,11 @@
 <?php
 
-<<<<<<< HEAD
 use App\Http\Controllers\LoginController;
-=======
->>>>>>> 850b15a7fa3f55b7db7e78908d138f1ac6af5019
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
-<<<<<<< HEAD
 
 Route::get('/dashboard', function () {
     return view('layouts.dashboard');
@@ -20,5 +16,4 @@ Route::get('/login', function () {
 });
 
 Route::post('/login', [LoginController::class, 'login']);
-=======
->>>>>>> 850b15a7fa3f55b7db7e78908d138f1ac6af5019
+
