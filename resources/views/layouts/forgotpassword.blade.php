@@ -16,7 +16,7 @@
         <div class="w-full sm:w-11/12 md:w-9/12 lg:w-1/2 xl:w-1/3 p-8 sm:p-10 bg-white rounded-lg shadow-lg">
             <div class="w-full max-w-sm sm:max-w-xs md:max-w-lg lg:max-w-xl xl:max-w-2xl p-8 overflow-auto">
                 <h2 class="text-lg sm:text-xl font-bold">Lupa Kata Sandi? 🔐</h2>
-                <p class="text-sm sm:text-base text-gray-600 mt-4 mb-12">Jangan khawatir! Masukkan email atau nomor Hp
+                <p class="text-sm sm:text-base text-gray-600 mt-4 mb-12">Jangan khawatir! Masukkan email
                     yang terdaftar, dan kami akan mengirimkan tautan
                     untuk mengatur ulang kata sandi Anda.</p>
                 <form method="POST" action="#" autocomplete="off">
