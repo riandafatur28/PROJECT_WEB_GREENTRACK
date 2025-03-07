@@ -693,8 +693,6 @@
             "time": "2024-12-07T21:18:45+00:00"
         },
         {
-=======
->>>>>>> 850b15a7fa3f55b7db7e78908d138f1ac6af5019
             "name": "doctrine/inflector",
             "version": "2.0.10",
             "source": {
