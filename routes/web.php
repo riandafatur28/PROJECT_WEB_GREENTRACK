@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ManajemenPohonBibitController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,6 +24,8 @@ Route::get('/resendotp', function () {
     return view('layouts.resendotp'); // This assumes your Blade view is located in resources/views/login.blade.php
 });
 
+
+Route::get('/manajemen-pohon-bibit', [ManajemenPohonBibitController::class, 'index']);
 
 Route::post('/login', [LoginController::class, 'login']);
 
