@@ -23,7 +23,7 @@
         </div>
 
         <!-- Tabs -->
-        <div class="flex flex-row border-b mb-4 mt-8">
+        <div class="flex flex-row border-b mb-4">
             <button class="tab-btn px-3 py-2 text-gray-500 hover:text-gray-800 border-b-2 border-gray-800"
                 data-tab="bibit">Bibit</button>
             <button class="tab-btn px-3 py-2 text-gray-500 hover:text-gray-800" data-tab="kayu">Kayu</button>

@@ -9,8 +9,9 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('layouts.dashboard');
-});
+    return view('dashboard');
+})->name('dashboard');
+
 
 Route::get('/login', function () {
     return view('layouts.login'); // This assumes your Blade view is located in resources/views/login.blade.php
@@ -25,10 +26,9 @@ Route::get('/resendotp', function () {
 });
 
 
-Route::get('/manajemen-pohon-bibit', [ManajemenPohonBibitController::class, 'index']);
+Route::get('/manajemen-pohon-bibit', [ManajemenPohonBibitController::class, 'index'])
+    ->name('manajemenkayubibit');
 
-    return view('layouts.manajemenkayubibit');
-})->name('manajemenkayubibit');
 
 Route::post('/login', [LoginController::class, 'login']);
 
