@@ -23,27 +23,27 @@
         <ul id="menu-list" class="mt-6">
             <li data-menu="dashboard"
                 class="p-3 rounded-lg flex justify-between items-center w-[85%] mx-auto cursor-pointer">
-                <a href="#">Dashboard</a>
+                <a href="{{ route('dashboard') }}">Dashboard</a>
                 <button class="text-gray-500">></button>
             </li>
             <li data-menu="manajemen-kayu"
                 class="p-3 rounded-lg flex justify-between items-center w-[85%] mx-auto cursor-pointer">
-                <a href="#">Manajemen Kayu & Bibit</a>
+                <a href="{{ route('manajemenkayubibit') }}">Manajemen Kayu & Bibit</a>
                 <button class="text-gray-500">></button>
             </li>
             <li data-menu="manajemen-pengguna"
                 class="p-3 rounded-lg flex justify-between items-center w-[85%] mx-auto cursor-pointer">
-                <a href="#">Manajemen Pengguna</a>
+                {{-- <a href="{{ route('manajemenpengguna') }}">Manajemen Pengguna</a> --}}
                 <button class="text-gray-500">></button>
             </li>
             <li data-menu="histori-scan"
                 class="p-3 rounded-lg flex justify-between items-center w-[85%] mx-auto cursor-pointer">
-                <a href="#">Histori Scan Barcode</a>
+                {{-- <a href="{{ route('historybarcode') }}">History Scan Barcode</a> --}}
                 <button class="text-gray-500">></button>
             </li>
             <li data-menu="manajemen-profil"
                 class="p-3 rounded-lg flex justify-between items-center w-[85%] mx-auto cursor-pointer">
-                <a href="#">Manajemen Profil</a>
+                {{-- <a href="{{ route('manajemenprofil') }}">Manajemen Profil</a> --}}
                 <button class="text-gray-500">></button>
             </li>
         </ul>

@@ -27,5 +27,8 @@ Route::get('/resendotp', function () {
 
 Route::get('/manajemen-pohon-bibit', [ManajemenPohonBibitController::class, 'index']);
 
+    return view('layouts.manajemenkayubibit');
+})->name('manajemenkayubibit');
+
 Route::post('/login', [LoginController::class, 'login']);
 
