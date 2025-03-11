@@ -12,6 +12,13 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
+Route::get('/manajemen-pengguna', function () {
+    return view('manajemenpengguna');
+})->name('manajemen pengguna');
+
+Route::get('/history-scan-barcode', function () {
+    return view('historyscan');
+})->name('history scan barcode');
 
 Route::get('/login', function () {
     return view('layouts.login'); // This assumes your Blade view is located in resources/views/login.blade.php
