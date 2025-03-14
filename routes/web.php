@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ManajemenPenggunaController;
 use App\Http\Controllers\ManajemenPohonBibitController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,15 +10,11 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view('layouts.dashboard');
 })->name('dashboard');
 
-Route::get('/manajemen-pengguna', function () {
-    return view('manajemenpengguna');
-})->name('manajemen pengguna');
-
 Route::get('/history-scan-barcode', function () {
-    return view('historyscan');
+    return view('layouts.historyscan');
 })->name('history scan barcode');
 
 Route::get('/login', function () {
@@ -33,9 +30,11 @@ Route::get('/resendotp', function () {
 });
 
 
-Route::get('/manajemen-pohon-bibit', [ManajemenPohonBibitController::class, 'index'])
+Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])
     ->name('manajemenkayubibit');
 
+
+Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna');
 
 Route::post('/login', [LoginController::class, 'login']);
 
