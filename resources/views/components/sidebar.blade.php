@@ -52,73 +52,83 @@
         </ul>
     </div>
 
-    <!-- Profil di bagian bawah -->
-    <div class="p-4 border-t flex items-center w-[90%] mx-auto mb-6">
+    <a href="{{ route('profile') }}"
+        class="block p-4 border-t flex items-center w-[90%] mx-auto mb-6 hover:bg-gray-100 rounded-lg transition"
+        data-menu="profile">
         <img src="https://via.placeholder.com/50" alt="Profile" class="w-12 h-12 rounded-full">
         <div class="ml-3">
-            <p class="text-gray-800 font-semibold">Nama Pengguna</p>
+            <p class="text-gray-800 font-semibold menu-text">Nama Pengguna</p>
             <p class="text-gray-600 text-sm">Role Pengguna</p>
         </div>
-    </div>
+    </a>
 </aside>
 
-<!-- Script -->
 <script>
-    const menuBtn = document.getElementById('menu-btn');
-    const closeBtn = document.getElementById('close-btn');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    const body = document.body;
-    const menuItems = document.querySelectorAll("#menu-list li");
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuBtn = document.getElementById('menu-btn');
+        const closeBtn = document.getElementById('close-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const body = document.body;
+        const menuItems = document.querySelectorAll("#menu-list li");
 
-    function showSidebar() {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('opacity-0', 'pointer-events-none');
-        menuBtn.classList.add('hidden');
-        body.classList.add('overflow-hidden');
-    }
-
-    function hideSidebar() {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('opacity-0', 'pointer-events-none');
-        menuBtn.classList.remove('hidden');
-        body.classList.remove('overflow-hidden');
-    }
-
-    function setActiveMenu(menuName) {
-        menuItems.forEach(item => {
-            item.classList.remove('bg-green-500', 'text-white', 'font-bold');
-            item.querySelector('.menu-text').classList.remove('text-white');
-            item.querySelector('.menu-text').classList.add('text-gray-600');
-            item.querySelector('.icon').style.filter = "brightness(1)"; // Ikon normal
-        });
-
-        const activeItem = document.querySelector(`[data-menu="${menuName}"]`);
-        if (activeItem) {
-            activeItem.classList.add('bg-green-500', 'font-bold');
-            activeItem.querySelector('.menu-text').classList.remove('text-gray-600');
-            activeItem.querySelector('.menu-text').classList.add('text-white');
-            activeItem.querySelector('.icon').style.filter = "brightness(0) invert(1)"; // Ikon putih
+        function showSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            menuBtn.classList.add('hidden');
+            body.classList.add('overflow-hidden');
         }
 
-        localStorage.setItem("activeMenu", menuName);
-    }
+        function hideSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+            menuBtn.classList.remove('hidden');
+            body.classList.remove('overflow-hidden');
+        }
 
-    menuBtn.addEventListener('click', showSidebar);
-    closeBtn.addEventListener('click', hideSidebar);
-    overlay.addEventListener('click', hideSidebar);
+        function setActiveMenu(menuName) {
+            console.log("Menu aktif:", menuName); // Debugging untuk cek menu yang aktif
 
-    // Event listener untuk menetapkan menu aktif saat diklik
-    menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const menuName = item.getAttribute('data-menu');
-            setActiveMenu(menuName);
-        });
-    });
+            // Hapus semua class aktif dari menu lainnya
+            menuItems.forEach(item => {
+                item.classList.remove('bg-green-500', 'text-white', 'font-bold');
+                item.querySelector('.menu-text').classList.remove('text-white');
+                item.querySelector('.menu-text').classList.add('text-gray-600');
+                if (item.querySelector('.icon')) {
+                    item.querySelector('.icon').style.filter = "brightness(1)";
+                }
+            });
 
-    // Ambil menu aktif dari localStorage saat halaman dimuat
-    document.addEventListener("DOMContentLoaded", () => {
+            // Aktifkan menu yang dipilih
+            const activeItem = document.querySelector(`[data-menu="${menuName}"]`);
+            if (activeItem) {
+                activeItem.classList.add('bg-green-500', 'font-bold');
+                activeItem.querySelector('.menu-text').classList.remove('text-gray-600');
+                activeItem.querySelector('.menu-text').classList.add('text-white');
+                if (activeItem.querySelector('.icon')) {
+                    activeItem.querySelector('.icon').style.filter = "brightness(0) invert(1)";
+                }
+            }
+
+            // Simpan menu aktif di localStorage
+            localStorage.setItem("activeMenu", menuName);
+        }
+
+        // Set menu aktif saat halaman dimuat
         const savedMenu = localStorage.getItem("activeMenu") || "dashboard";
         setActiveMenu(savedMenu);
+
+        // Event listener untuk klik menu
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const menuName = item.getAttribute('data-menu');
+                setActiveMenu(menuName);
+            });
+        });
+
+        // Event listener untuk sidebar
+        menuBtn.addEventListener('click', showSidebar);
+        closeBtn.addEventListener('click', hideSidebar);
+        overlay.addEventListener('click', hideSidebar);
     });
 </script>

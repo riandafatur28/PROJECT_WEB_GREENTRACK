@@ -8,9 +8,9 @@
         <h1 class="text-lg md:text-2xl font-semibold text-gray-800 mb-4">Hello Fitri 👋,</h1>
 
         <div class="bg-white p-6 rounded-3xl shadow-md">
-            <div class="grid grid-cols-3 divide-x divide-gray-300">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-gray-300">
                 <!-- Total Bibit -->
-                <div class="flex items-center justify-center px-4">
+                <div class="flex flex-col items-center justify-center text-center px-4 py-4 md:py-0">
                     <div class="bg-green-100 p-3 rounded-full">
                         <svg class="w-8 h-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
@@ -18,10 +18,10 @@
                                 d="M12 4v16m-4-4h8m-8-4h8m-8-4h8" />
                         </svg>
                     </div>
-                    <div class="ml-3">
+                    <div class="mt-3">
                         <p class="text-gray-600 text-sm">Total Bibit</p>
                         <h2 class="text-xl font-bold text-green-600">{{ number_format(count($bibit)) }}</h2>
-                        <p class="text-xs text-green-500 mt-1 flex items-center">
+                        <p class="text-xs text-green-500 mt-1 flex items-center justify-center">
                             <svg class="w-4 h-4 text-green-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
@@ -32,7 +32,7 @@
                 </div>
 
                 <!-- Total Kayu -->
-                <div class="flex items-center justify-center px-4">
+                <div class="flex flex-col items-center justify-center text-center px-4 py-4 md:py-0">
                     <div class="bg-red-100 p-3 rounded-full">
                         <svg class="w-8 h-8 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
@@ -40,10 +40,10 @@
                                 d="M12 4v16m-4-4h8m-8-4h8m-8-4h8" />
                         </svg>
                     </div>
-                    <div class="ml-3 flex flex-col">
+                    <div class="mt-3">
                         <p class="text-gray-600 text-sm">Total Kayu</p>
                         <h2 class="text-xl font-bold text-red-600">{{ number_format(count($kayu)) }}</h2>
-                        <p class="text-xs text-red-500 mt-1 flex items-center">
+                        <p class="text-xs text-red-500 mt-1 flex items-center justify-center">
                             <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -53,9 +53,8 @@
                     </div>
                 </div>
 
-
                 <!-- Admin Aktif -->
-                <div class="flex items-center justify-center px-4">
+                <div class="flex flex-col items-center justify-center text-center px-4 py-4 md:py-0">
                     <div class="bg-blue-100 p-3 rounded-full">
                         <svg class="w-8 h-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
@@ -63,11 +62,10 @@
                                 d="M12 4v16m-4-4h8m-8-4h8m-8-4h8" />
                         </svg>
                     </div>
-                    <div class="ml-3">
+                    <div class="mt-3">
                         <p class="text-gray-600 text-sm">Admin Aktif</p>
                         <h2 class="text-xl font-bold text-blue-600">9</h2>
-                        <!-- Daftar Admin -->
-                        <div class="flex mt-1">
+                        <div class="flex mt-1 justify-center">
                             <img class="w-6 h-6 rounded-full border-2 border-white -ml-2 first:ml-0"
                                 src="https://randomuser.me/api/portraits/women/1.jpg" alt="Admin 1">
                             <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
@@ -83,6 +81,8 @@
                 </div>
             </div>
         </div>
+
+
 
 
         <!-- Tabs -->

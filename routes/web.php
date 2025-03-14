@@ -26,6 +26,9 @@ Route::get('/resendotp', function () {
     return view('layouts.resendotp'); // This assumes your Blade view is located in resources/views/login.blade.php
 });
 
+Route::get('/profile', function () {
+    return view('layouts.profile');
+})->name('profile');
 
 Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])
     ->name('manajemenkayubibit');

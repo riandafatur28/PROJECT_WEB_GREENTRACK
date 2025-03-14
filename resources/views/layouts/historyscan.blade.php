@@ -34,34 +34,41 @@
         <div id="table-aktivitas" class="bg-white shadow-md rounded-3xl p-5 mt-5">
             <h2 class="text-xl font-semibold text-gray-800">Aktivitas Terbaru</h2>
 
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between mt-4">
-                <div class="relative w-full md:w-64">
+            <!-- Bagian Pencarian & Filter -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mt-4 space-y-3 md:space-y-0">
+                <!-- Input Pencarian -->
+                <div class="relative w-full md:w-auto transition-all duration-300 peer-checked:hidden">
+                    <label for="sidebarToggle" class="absolute"></label> <!-- Tambahkan peer -->
                     <input type="text" placeholder="Cari"
-                        class="pl-10 pr-3 py-2 w-full border rounded-lg bg-gray-100 focus:outline-none">
-                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                        class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
+                    <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
                 </div>
 
-                <select class="ml-3 px-3 py-2 bg-gray-100 border rounded-lg">
-                    <option value="30">30 hari terakhir</option>
-                    <option value="7">7 hari terakhir</option>
-                    <option value="1">Hari ini</option>
-                </select>
+                <div class="flex items-center space-x-3">
+                    <label class="text-gray-600 text-sm">Urutkan Berdasarkan:</label>
+                    <select class="px-3 py-2 bg-gray-100 border rounded-lg">
+                        <option value="30">30 hari terakhir</option>
+                        <option value="7">7 hari terakhir</option>
+                        <option value="1">Hari ini</option>
+                    </select>
+                </div>
             </div>
 
+            <!-- Tabel Aktivitas -->
             <div class="overflow-x-auto mt-4">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b">
-                            <th class="py-3 text-left">Profil Admin</th>
-                            <th class="py-3 text-left">Jenis Aktivitas</th>
-                            <th class="py-3 text-left">Waktu</th>
-                            <th class="py-3 text-left">Detail</th>
+                        <tr class="border-b bg-gray-100">
+                            <th class="py-3 text-left px-4">Profil Admin</th>
+                            <th class="py-3 text-left px-4">Jenis Aktivitas</th>
+                            <th class="py-3 text-left px-4">Waktu</th>
+                            <th class="py-3 text-left px-4">Detail</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($paginatedHistory as $data)
-                            <tr class="border-b">
-                                <td class="py-3 flex items-center">
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="py-3 px-4 flex items-center">
                                     <img src="{{ $data['foto'] ?? asset('images/default.png') }}"
                                         class="w-10 h-10 rounded-full mr-3" alt="Profil">
                                     <div>
@@ -69,18 +76,21 @@
                                         <p class="text-xs text-gray-500">{{ $data['jabatan'] }}</p>
                                     </div>
                                 </td>
-                                <td class="py-3">{{ $data['aktivitas'] }}</td>
-                                <td class="py-3">{{ \Carbon\Carbon::parse($data['waktu'])->diffForHumans() }}</td>
-                                <td class="py-3">{{ $data['detail'] }}</td>
+                                <td class="py-3 px-4">{{ $data['aktivitas'] }}</td>
+                                <td class="py-3 px-4">{{ \Carbon\Carbon::parse($data['waktu'])->diffForHumans() }}</td>
+                                <td class="py-3 px-4">{{ $data['detail'] }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-            <div class="mt-5">
+
+            <!-- Pagination -->
+            <div class="mt-5 flex justify-center">
                 {{ $paginatedHistory->links() }}
             </div>
         </div>
+
     </div>
 @endsection
 
