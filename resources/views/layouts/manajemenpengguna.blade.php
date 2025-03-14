@@ -1,84 +1,137 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="bg-gray-100 p-6">
-        <div class="max-w-6xl mx-auto bg-white p-6 rounded-xl shadow-md">
-            <div class="flex items-center justify-between mb-4">
-                <h1 class="text-2xl font-bold">Hello Fitri 👋,</h1>
-                <div class="bg-green-100 p-4 rounded-lg text-center">
-                    <p class="text-sm text-gray-500">Sedang Aktif</p>
-                    <p class="text-3xl font-semibold">9</p>
+    <div class="w-full p-4 md:p-6 mt-8">
+        <h1 class="text-lg md:text-2xl font-semibold text-gray-800 mb-4">Hello Fitri 👋,</h1>
+
+        <div class="bg-white p-4 rounded-3xl shadow-md text-left w-56">
+            <div class="flex items-center">
+                <!-- Ikon di sebelah kiri -->
+                <div class="bg-green-100 p-3 rounded-full flex items-center justify-center">
+                    <svg class="w-10 h-10 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.75 3.75h4.5A2.25 2.25 0 0116.5 6v12a2.25 2.25 0 01-2.25 2.25h-4.5A2.25 2.25 0 017.5 18V6a2.25 2.25 0 012.25-2.25z" />
+                    </svg>
+                </div>
+
+                <!-- Teks di sebelah kanan ikon -->
+                <div class="ml-4 flex flex-col items-center">
+                    <p class="text-gray-500 text-sm">Sedang Aktif</p>
+                    <p class="text-3xl font-semibold text-center w-full">9</p>
+
+                    <!-- Daftar gambar pengguna berada di bawah angka -->
+                    <div class="flex mt-2">
+                        <img class="w-6 h-6 rounded-full border-2 border-white -ml-2 first:ml-0"
+                            src="https://randomuser.me/api/portraits/women/1.jpg" alt="User 1">
+                        <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
+                            src="https://randomuser.me/api/portraits/men/2.jpg" alt="User 2">
+                        <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
+                            src="https://randomuser.me/api/portraits/women/3.jpg" alt="User 3">
+                        <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
+                            src="https://randomuser.me/api/portraits/men/4.jpg" alt="User 4">
+                        <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
+                            src="https://randomuser.me/api/portraits/women/5.jpg" alt="User 5">
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <h2 class="text-xl font-semibold mb-3">Data Admin</h2>
-            <div class="flex justify-between mb-4">
-                <input type="text" placeholder="Cari" class="border p-2 rounded-lg w-1/3">
-                <div class="flex space-x-2">
-                    <button class="bg-green-500 text-white px-4 py-2 rounded-lg">Tambah Admin</button>
-                    <select class="border p-2 rounded-lg">
-                        <option>Urutkan berdasarkan: Terlama</option>
-                    </select>
+
+        <div id="table-admin" class="bg-white shadow-md rounded-3xl p-3 mt-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 space-y-3 md:space-y-0">
+                <h2 class="text-lg font-semibold text-gray-800 text-center md:text-left">Data Admin</h2>
+
+                <div class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-3 md:space-y-0">
+                    <!-- Input Pencarian -->
+                    <div class="relative w-full md:w-auto transition-all duration-300 peer-checked:hidden">
+                        <label for="sidebarToggle" class="absolute"></label> <!-- Tambahkan peer -->
+                        <input type="text" placeholder="Cari"
+                            class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
+                        <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row md:items-center">
+                        <label class="text-gray-600 text-sm">Urutkan Berdasarkan :</label>
+                        <select
+                            class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto">
+                            <option value="terbaru">Terbaru</option>
+                            <option value="terlama">Terlama</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full border rounded-lg">
+                <table class="w-full text-xs md:text-sm">
                     <thead>
-                        <tr class="bg-gray-200">
-                            <th class="p-3 text-left">ID</th>
-                            <th class="p-3 text-left">Nama</th>
-                            <th class="p-3 text-left">Email</th>
-                            <th class="p-3 text-left">Peran Admin</th>
-                            <th class="p-3 text-left">Status Akun</th>
-                            <th class="p-3 text-left">Aksi</th>
+                        <tr class="bg-white">
+                            <th class="px-2 py-1 text-left">ID</th>
+                            <th class="px-2 py-1 text-left">Nama</th>
+                            <th class="px-2 py-1 text-left">Email</th>
+                            <th class="px-2 py-1 text-left">Peran Admin</th>
+                            <th class="px-2 py-1 text-left">Status Akun</th>
+                            <th class="px-2 py-1 text-left">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="border-b">
-                            <td class="p-3">001</td>
-                            <td class="p-3">Fitri</td>
-                            <td class="p-3">@email.com</td>
-                            <td class="p-3">TPK</td>
-                            <td class="p-3">
-                                <select class="bg-green-500 text-white px-3 py-1 rounded-lg">
-                                    <option>Aktif</option>
-                                </select>
-                            </td>
-                            <td class="p-3">
-                                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg">Lihat Selengkapnya</button>
-                            </td>
-                        </tr>
-                        <tr class="border-b">
-                            <td class="p-3">002</td>
-                            <td class="p-3">Gita</td>
-                            <td class="p-3">@email.com</td>
-                            <td class="p-3">TPK</td>
-                            <td class="p-3">
-                                <select class="bg-red-500 text-white px-3 py-1 rounded-lg">
-                                    <option>Nonaktif</option>
-                                </select>
-                            </td>
-                            <td class="p-3">
-                                <button class="bg-blue-500 text-white px-4 py-2 rounded-lg">Lihat Selengkapnya</button>
-                            </td>
-                        </tr>
+                        @foreach ($admin as $init)
+                            <tr class="border-b">
+                                <td class="px-2 py-1">{{ $init['id'] }}</td>
+                                <td class="px-2 py-1">{{ $init['nama'] }}</td>
+                                <td class="px-2 py-1">{{ $init['email'] }}</td>
+                                <td class="px-2 py-1">{{ $init['peran_admin'] }}</td>
+                                <td class="px-2 py-1">
+                                    <select
+                                        class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm {{ $init['status'] == 'Aktif' ? 'bg-green-300' : 'bg-red-300' }}"
+                                        data-id="{{ $init['id'] }}" onchange="updateBackground(this)">
+                                        <option value="Aktif" {{ $init['status'] == 'Aktif' ? 'selected' : '' }}>Aktif
+                                        </option>
+                                        <option value="Nonaktif" {{ $init['status'] == 'Nonaktif' ? 'selected' : '' }}>
+                                            Nonaktif</option>
+                                    </select>
+                                </td>
+                                <td class="px-2 py-1">
+                                    <a href="/detail-admin/{{ $init['id'] }}"
+                                        class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block">
+                                        Lihat Selengkapnya
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
-
-            <div class="flex justify-between mt-4">
+            <div class="flex justify-between mt-8">
                 <p class="text-sm text-gray-500">Menampilkan data 1 hingga 8 dari 256 entri</p>
-                <div class="flex space-x-2">
-                    <button class="px-3 py-1 bg-gray-300 rounded-lg">&lt;</button>
-                    <button class="px-3 py-1 bg-green-500 text-white rounded-lg">1</button>
-                    <button class="px-3 py-1 bg-gray-300 rounded-lg">2</button>
-                    <button class="px-3 py-1 bg-gray-300 rounded-lg">3</button>
-                    <button class="px-3 py-1 bg-gray-300 rounded-lg">...</button>
-                    <button class="px-3 py-1 bg-gray-300 rounded-lg">40</button>
-                    <button class="px-3 py-1 bg-gray-300 rounded-lg">&gt;</button>
+                <div class="flex space-x-1">
+                    <button
+                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</button>
+                    <button
+                        class="px-2 py-0.5 bg-green-500 text-white border border-green-500 rounded-md text-xs">1</button>
+                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">2</button>
+                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">3</button>
+                    <button
+                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">...</button>
+                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">40</button>
+                    <button
+                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</button>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
+<script>
+    function updateBackground(selectElement) {
+        if (selectElement.value === "Aktif") {
+            selectElement.style.backgroundColor = "#86efac"; // Hijau
+        } else {
+            selectElement.style.backgroundColor = "#f87171"; // Merah
+        }
+    }
+
+    document.querySelectorAll(".status-dropdown").forEach(select => {
+        updateBackground(select);
+    });
+</script>
