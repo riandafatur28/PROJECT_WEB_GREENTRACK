@@ -9,7 +9,7 @@
 
 <!-- Sidebar -->
 <aside id="sidebar"
-    class="w-64 md:w-80 bg-white h-screen shadow-md fixed top-0 left-0 transform -translate-x-full transition-transform duration-300 flex flex-col justify-between">
+    class="w-64 md:w-80 bg-white h-screen shadow-md fixed top-0 left-0 transform -translate-x-full transition-transform duration-300 flex flex-col justify-between z-50">
 
     <div>
         <!-- Header dengan Logo -->
@@ -37,7 +37,7 @@
             </li>
             <li data-menu="manajemen-pengguna"
                 class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
-                <a href="#" class="flex items-center gap-2">
+                <a href="{{ route('manajemenpengguna') }}" class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/pengguna.svg') }}" alt="Manajemen Pengguna" class="icon w-6 h-6">
                     <span class="menu-text">Manajemen Pengguna</span>
                 </a>
@@ -80,12 +80,9 @@
 
     function hideSidebar() {
         sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
         menuBtn.classList.remove('hidden');
         body.classList.remove('overflow-hidden');
-
-        setTimeout(() => {
-            overlay.classList.add('opacity-0', 'pointer-events-none');
-        }, 300);
     }
 
     function setActiveMenu(menuName) {
