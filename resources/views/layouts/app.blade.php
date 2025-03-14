@@ -17,7 +17,7 @@
 
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-sky-50">
     <div class="flex">
         @include('components.sidebar') <!-- Sidebar akan tampil di semua halaman -->
 
