@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Manajemen Pengguna')
+
 @section('content')
     <div class="w-full p-4 md:p-6 mt-8">
         <h1 class="text-lg md:text-2xl font-semibold text-gray-800 mb-4">Hello Fitri 👋,</h1>
