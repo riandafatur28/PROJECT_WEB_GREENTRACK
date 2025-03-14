@@ -44,7 +44,7 @@
             </li>
             <li data-menu="history-scan"
                 class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
-                <a href="#" class="flex items-center gap-2">
+                <a href="{{ route('historyscanbarcode') }}" class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/history.svg') }}" alt="History Scan Barcode" class="icon w-6 h-6">
                     <span class="menu-text">History Scan Barcode</span>
                 </a>
