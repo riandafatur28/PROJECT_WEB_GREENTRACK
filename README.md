@@ -1,8 +1,6 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
+PROJECT WEBSITE DENGAN BAHASA PEMROGRAMAN PHP DAN FRAMEWORK LARAVEL
 # GreenTrackWeb
-=======
-=======
+
 >>>>>>> 850b15a7fa3f55b7db7e78908d138f1ac6af5019
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
