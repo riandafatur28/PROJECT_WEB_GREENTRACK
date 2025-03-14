@@ -1,5 +1,6 @@
 @extends('layouts.app')
 
+@section('title', 'Manajemen Kayu & Bibit')
 
 @section('content')
     <div class="w-full p-4 md:p-6 mt-8">
