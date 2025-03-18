@@ -10,11 +10,7 @@
             <div class="flex items-center">
                 <!-- Ikon di sebelah kiri -->
                 <div class="bg-green-100 p-3 rounded-full flex items-center justify-center">
-                    <svg class="w-10 h-10 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9.75 3.75h4.5A2.25 2.25 0 0116.5 6v12a2.25 2.25 0 01-2.25 2.25h-4.5A2.25 2.25 0 017.5 18V6a2.25 2.25 0 012.25-2.25z" />
-                    </svg>
+                    <img src="/assets/images/admin.svg" alt="New Icon" class="w-8 h-8">
                 </div>
 
                 <!-- Teks di sebelah kanan ikon -->
