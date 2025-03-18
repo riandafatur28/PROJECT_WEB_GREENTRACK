@@ -14,7 +14,7 @@
     <div>
         <!-- Header dengan Logo -->
         <div class="p-4 font-bold text-green-600 text-xl flex justify-between items-center">
-            <img src="{{ asset('assets/images/forest.svg') }}" alt="Logo" class="mr-2">
+            <img src="{{ asset('assets/images/logo.svg') }}" alt="Logo" class="mr-2">
             GreenTrack
             <button id="close-btn" class="text-gray-700 text-2xl">✕</button>
         </div>
