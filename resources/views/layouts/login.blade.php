@@ -78,7 +78,7 @@
 
     <div class="hidden lg:block lg:w-2/5 w-full h-screen flex items-center justify-center bg-white-100 p-4">
         <div class="w-full h-full bg-cover bg-center bg-no-repeat rounded-xl"
-            style="background-image: url('/build/assets/images/Art.svg');">
+            style="background-image: url('/assets/images/Art.svg');">
         </div>
     </div>
 
