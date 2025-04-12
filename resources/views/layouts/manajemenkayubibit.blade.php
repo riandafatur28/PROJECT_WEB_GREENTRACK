@@ -10,14 +10,14 @@
         <div class="bg-white p-6 rounded-3xl shadow-md">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-gray-300">
                 <!-- Total Bibit -->
-                <div class="flex flex-col items-center justify-center text-center px-4 py-4 md:py-0">
-                    <div class="bg-green-100 p-3 rounded-full">
+                <div class="flex items-center px-4 py-4 md:py-0">
+                    <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
                         <img src="/assets/images/bibit.svg" alt="New Icon" class="w-8 h-8">
                     </div>
-                    <div class="mt-3">
+                    <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Bibit</p>
                         <h2 class="text-xl font-bold text-black-600">{{ number_format(count($bibit)) }}</h2>
-                        <p class="text-xs text-green-500 mt-1 flex items-center justify-center">
+                        <p class="text-xs text-green-500 mt-1 flex items-center">
                             <svg class="w-4 h-4 text-green-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
@@ -28,14 +28,14 @@
                 </div>
 
                 <!-- Total Kayu -->
-                <div class="flex flex-col items-center justify-center text-center px-4 py-4 md:py-0">
-                    <div class="bg-green-100 p-3 rounded-full">
+                <div class="flex items-center px-4 py-4 md:py-0">
+                    <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
                         <img src="/assets/images/kayu.svg" alt="New Icon" class="w-8 h-8">
                     </div>
-                    <div class="mt-3">
+                    <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Kayu</p>
                         <h2 class="text-xl font-bold text-black-600">{{ number_format(count($kayu)) }}</h2>
-                        <p class="text-xs text-red-500 mt-1 flex items-center justify-center">
+                        <p class="text-xs text-red-500 mt-1 flex items-center">
                             <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -46,14 +46,14 @@
                 </div>
 
                 <!-- Admin Aktif -->
-                <div class="flex flex-col items-center justify-center text-center px-4 py-4 md:py-0">
-                    <div class="bg-green-100 p-3 rounded-full">
+                <div class="flex items-center px-4 py-4 md:py-0">
+                    <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
                         <img src="/assets/images/admin.svg" alt="New Icon" class="w-8 h-8">
                     </div>
-                    <div class="mt-3">
+                    <div class="ml-4">
                         <p class="text-gray-600 text-sm">Admin Aktif</p>
                         <h2 class="text-xl font-bold text-black-600">9</h2>
-                        <div class="flex mt-1 justify-center">
+                        <div class="flex mt-1">
                             <img class="w-6 h-6 rounded-full border-2 border-white -ml-2 first:ml-0"
                                 src="https://randomuser.me/api/portraits/women/1.jpg" alt="Admin 1">
                             <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
@@ -69,9 +69,6 @@
                 </div>
             </div>
         </div>
-
-
-
 
         <!-- Tabs -->
         <div class="flex border-b mb-4 mt-8 space-x-2">
