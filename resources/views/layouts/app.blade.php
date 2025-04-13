@@ -26,6 +26,8 @@
             @yield('content') <!-- Tempat untuk konten halaman -->
         </div>
     </div>
+
+    @yield('scripts')
 </body>
 
 </html>
