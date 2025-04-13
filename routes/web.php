@@ -31,6 +31,10 @@ Route::get('/profile', function () {
     return view('layouts.profile');
 })->name('profile');
 
+Route::get('/dashboard', function () {
+    return view('layouts.dashboard');
+})->name('dashboard');
+
 Route::get('/test-firebase', function () {
     $firebaseCredentials = Config::get('firebase.credentials');
 
