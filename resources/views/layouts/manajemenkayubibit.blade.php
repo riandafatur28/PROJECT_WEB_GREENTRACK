@@ -3,11 +3,14 @@
 @section('title', 'Manajemen Kayu & Bibit')
 
 @section('content')
-    <div class="w-full p-4 md:p-6 mt-8">
+    <div class="container mx-auto px-4 py-6">
         <!-- Header -->
-        <h1 class="text-lg md:text-2xl font-semibold text-gray-800 mb-4">Hello Fitri 👋,</h1>
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold text-gray-800">Halo Fitri 👋</h1>
+        </div>
 
-        <div class="bg-white p-6 rounded-3xl shadow-md">
+        <!-- Card Statistik -->
+        <div class="bg-white p-6 rounded-3xl shadow-md mb-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-gray-300">
                 <!-- Total Bibit -->
                 <div class="flex items-center px-4 py-4 md:py-0">
@@ -16,7 +19,9 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Bibit</p>
-                        <h2 class="text-xl font-bold text-black-600">{{ number_format(count($bibit)) }}</h2>
+                        <h2 class="text-xl font-bold text-black-600">
+                            {{ number_format(count($bibit ?? [])) }}
+                        </h2>
                         <p class="text-xs text-green-500 mt-1 flex items-center">
                             <svg class="w-4 h-4 text-green-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -25,24 +30,29 @@
                             16% bulan ini
                         </p>
                     </div>
+
                 </div>
 
                 <!-- Total Kayu -->
                 <div class="flex items-center px-4 py-4 md:py-0">
-                    <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
-                        <img src="/assets/images/kayu.svg" alt="New Icon" class="w-8 h-8">
+                    <div class="flex items-center px-4 py-4 md:py-0">
+                        <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
+                            <img src="/assets/images/kayu.svg" alt="New Icon" class="w-8 h-8">
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-gray-600 text-sm">Total Kayu</p>
+                            <h2 class="text-xl font-bold text-black-600">{{ number_format(count($kayu ?? [])) }}</h2>
+                            <p class="text-xs text-red-500 mt-1 flex items-center">
+                                <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                                1% bulan ini
+                            </p>
+                        </div>
                     </div>
-                    <div class="ml-4">
-                        <p class="text-gray-600 text-sm">Total Kayu</p>
-                        <h2 class="text-xl font-bold text-black-600">{{ number_format(count($kayu)) }}</h2>
-                        <p class="text-xs text-red-500 mt-1 flex items-center">
-                            <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                            1% bulan ini
-                        </p>
-                    </div>
+
                 </div>
 
                 <!-- Admin Aktif -->
@@ -171,7 +181,7 @@
         <div id="table-kayu" class="bg-white shadow-md rounded-3xl p-3 hidden">
             <!-- Header Data Bibit dengan Search dan Sort -->
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 space-y-3 md:space-y-0">
-                <h2 class="text-lg font-semibold text-gray-800 text-center md:text-left">Data Bibit</h2>
+                <h2 class="text-lg font-semibold text-gray-800 text-center md:text-left">Data Kayu</h2>
 
                 <div class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-3 md:space-y-0">
                     <!-- Input Pencarian -->
@@ -200,6 +210,7 @@
                             <th class="px-2 py-1 text-left">Jenis Kayu</th>
                             <th class="px-2 py-1 text-left">Jumlah</th>
                             <th class="px-2 py-1 text-left">Lokasi</th>
+                            <th class="px-2 py-1 text-left">Batch Panen</th>
                             <th class="px-2 py-1 text-left">Status</th>
                             <th class="px-2 py-1 text-left">Aksi</th>
                         </tr>
@@ -211,6 +222,7 @@
                                 <td class="px-2 py-1">{{ $item['jenis'] }}</td>
                                 <td class="px-2 py-1">{{ $item['jumlah'] }} Batang</td>
                                 <td class="px-2 py-1">{{ $item['lokasi'] }}</td>
+                                <td class="px-2 py-1">batch panen</td>
                                 <td class="px-2 py-1">
                                     <select
                                         class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm bg-green-300"
@@ -218,9 +230,8 @@
                                         <option value="Tersedia" {{ $item['status'] == 'Tersedia' ? 'selected' : '' }}>
                                             Tersedia
                                         </option>
-                                        <option value="Siap Potong"
-                                            {{ $item['status'] == 'Siap Potong' ? 'selected' : '' }}>
-                                            Siap Potong
+                                        <option value="Kosong" {{ $item['status'] == 'Kosong' ? 'selected' : '' }}>
+                                            Kosong
                                         </option>
                                     </select>
                                 </td>
@@ -297,8 +308,8 @@
     function updateBackground(selectElement) {
         if (selectElement.value === "Tersedia") {
             selectElement.setAttribute("style", "background-color: green-400 !important;"); // Hijau
-        } else if (selectElement.value === "Siap Potong") {
-            selectElement.setAttribute("style", "background-color: #fde047 !important;"); // Kuning
+        } else if (selectElement.value === "Kosong") {
+            selectElement.setAttribute("style", "background-color: #f48fb1 !important;"); // Kuning
         } else if (selectElement.value === "Siap Tanam") {
             selectElement.setAttribute("style", "background-color: #fde047 !important;"); // Kuning
         }
