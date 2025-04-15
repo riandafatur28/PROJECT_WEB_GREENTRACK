@@ -1,5 +1,5 @@
 <!-- Tombol Hamburger -->
-<button id="menu-btn" class="p-5 text-3xl bg-transparent text-green-600 rounded-lg fixed top-4 left-2 z-50">
+<button id="menu-btn" class="p-5 text-3xl bg-transparent text-green-600 rounded-lg fixed top-6 left-2 z-50">
     ☰
 </button>
 
@@ -46,7 +46,15 @@
                 class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
                 <a href="{{ route('historyscanbarcode') }}" class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/history.svg') }}" alt="History Scan Barcode" class="icon w-6 h-6">
-                    <span class="menu-text">History Scan Barcode</span>
+                    <span class="menu-text">Riwayat Pindai Barcode</span>
+                </a>
+            </li>
+            <li data-menu="jadwal-perawatan-bibit"
+                class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
+                <a href="{{ route('historyperawatanbibit') }}" class="flex items-center gap-2">
+                    <img src="{{ asset('assets/images/monitoring.svg') }}" alt="Jadwal Perawatan Bibit"
+                        class="icon w-6 h-6">
+                    <span class="menu-text">Riwayat Perawatan Bibit</span>
                 </a>
             </li>
         </ul>
