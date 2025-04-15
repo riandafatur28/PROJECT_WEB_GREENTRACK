@@ -9,7 +9,7 @@ class ManajemenPohonBibitController extends Controller
     public function index()
     {
         $kayu = [
-            ['id' => '001', 'nama' => 'Jati', 'jenis' => 'kayu', 'usia' => '14 Hari', 'jumlah' => '100', 'lokasi' => 'Bagor', 'status' => 'Penyemaian'],
+            ['id' => '001', 'nama' => 'Jati', 'jenis' => 'kayu', 'usia' => '14 Hari', 'jumlah' => '100', 'lokasi' => 'Bagor',  'status' => 'Penyemaian'],
             ['id' => '002', 'nama' => 'Mahoni', 'jenis' => 'kayu', 'usia' => '30 Hari', 'jumlah' => '100', 'lokasi' => 'Rejoso', 'status' => 'Penyemaian'],
             ['id' => '003', 'nama' => 'Jati', 'jenis' => 'kayu', 'usia' => '3 Hari', 'jumlah' => '100', 'lokasi' => 'Bagor', 'status' => 'Penyemaian'],
             ['id' => '004', 'nama' => 'Mahoni', 'jenis' => 'kayu', 'usia' => '5 Hari', 'jumlah' => '100', 'lokasi' => 'Bagor', 'status' => 'Penyemaian'],
