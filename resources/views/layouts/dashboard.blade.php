@@ -1,11 +1,11 @@
 @extends('layouts.app')
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 @section('content')
     <div class="container mx-auto px-4 py-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-800">Hello Fitri 👋</h1>
-            <img src="{{ asset('assets/images/forest.svg') }}" alt="logo" class="h-10">
+            <h1 class="text-2xl font-semibold text-gray-800">Halo Fitri 👋</h1>
         </div>
 
         <!-- Card Statistik -->
@@ -97,12 +97,35 @@
                 </div>
             </div>
 
-            <!-- Aktivitas -->
             <div class="md:col-span-2 bg-white p-6 rounded-lg shadow">
-                <h3 class="text-xl font-semibold mb-4">Aktifitas Terbaru</h3>
-                <table class="w-full text-sm text-left text-gray-600">
-                    <thead class="text-gray-700 font-semibold">
-                        <tr>
+                <div class="flex justify-between items-center mb-4">
+                    <!-- Teks Aktifitas Terbaru -->
+                    <h3 class="text-xl font-semibold">Aktifitas Terbaru</h3>
+
+                    <!-- Kontainer untuk Input Pencarian dan Dropdown Urutkan Berdasarkan -->
+                    <div class="flex gap-4 items-center">
+                        <!-- Input Pencarian -->
+                        <div class="relative w-full md:w-48">
+                            <input type="text" placeholder="Cari"
+                                class="pl-8 pr-3 py-1 w-full border rounded-lg bg-gray-100 text-gray-800 focus:outline-none">
+                            <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                        </div>
+
+                        <!-- Urutkan Berdasarkan -->
+                        <div>
+                            <!-- <label class="text-gray-600 text-sm">Urutkan Berdasarkan:</label> -->
+                            <select class="px-3 py-2 bg-gray-100 border rounded-lg">
+                                <option value="30">30 hari terakhir</option>
+                                <option value="7">7 hari terakhir</option>
+                                <option value="1">Hari ini</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="w-full text-sm text-left text-gray-600 border-collapse">
+                    <thead>
+                        <tr class="text-[#B5B7C0] border-b border-[#B5B7C0]">
                             <th class="py-2">Nama</th>
                             <th class="py-2">Aktifitas</th>
                             <th class="py-2">Waktu</th>
@@ -111,127 +134,168 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="py-2">Fitri Meydayani</td>
-                            <td class="py-2">Tambah Data Bibit</td>
-                            <td class="py-2">5 menit lalu</td>
-                            <td class="py-2">20</td>
+                            <td class="py-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://i.pravatar.cc/64?u=fitri" alt="Fitri"
+                                        class="w-12 h-12 rounded-full">
+                                    <div class="ml-6">
+                                        <div class="text-xl font-semibold">Fitri Meydayani</div>
+                                        <div class="text-sm text-gray-400">Admin Penyemaian</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4">Tambah Data Bibit</td>
+                            <td class="py-4 font-semibold">5 menit lalu</td>
+                            <td class="py-4">20</td>
                         </tr>
                         <tr>
-                            <td class="py-2">Rianda</td>
-                            <td class="py-2">Scan Barcode Kayu</td>
-                            <td class="py-2">1 jam lalu</td>
-                            <td class="py-2">20</td>
+                            <td class="py-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://i.pravatar.cc/64?u=rianda" alt="Rianda"
+                                        class="w-12 h-12 rounded-full">
+                                    <div class="ml-6">
+                                        <div class="text-xl font-semibold">Rianda</div>
+                                        <div class="text-sm text-gray-400">Admin Penyemaian</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4">Scan Barcode Kayu</td>
+                            <td class="py-4">1 jam lalu</td>
+                            <td class="py-4">20</td>
                         </tr>
                         <tr>
-                            <td class="py-2">Yulia Gita</td>
-                            <td class="py-2">Cetak Barcode Bibit</td>
-                            <td class="py-2">Hari ini</td>
-                            <td class="py-2">20</td>
+                            <td class="py-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://i.pravatar.cc/64?u=yulia" alt="Yulia"
+                                        class="w-12 h-12 rounded-full">
+                                    <div class="ml-6">
+                                        <div class="text-xl font-semibold">Yulia Gita</div>
+                                        <div class="text-sm text-gray-400">Admin Penyemaian</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4">Cetak Barcode Bibit</td>
+                            <td class="py-4">Hari ini</td>
+                            <td class="py-4">20</td>
                         </tr>
                         <tr>
-                            <td class="py-2">Huda</td>
-                            <td class="py-2">Scan Barcode Kayu</td>
-                            <td class="py-2">1 hari lalu</td>
-                            <td class="py-2">20</td>
+                            <td class="py-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://i.pravatar.cc/64?u=huda" alt="Huda"
+                                        class="w-12 h-12 rounded-full">
+                                    <div class="ml-6">
+                                        <div class="text-xl font-semibold">Huda</div>
+                                        <div class="text-sm text-gray-400">Admin Penyemaian</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4">Scan Barcode Kayu</td>
+                            <td class="py-4">1 hari lalu</td>
+                            <td class="py-4">20</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-@endsection
+        @endsection
 
-@section('scripts')
-    <!-- CDN Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- CDN ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        @section('scripts')
+            <!-- CDN Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <!-- CDN ApexCharts -->
+            <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-    <!-- Script Kayu TPK Chart -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dataKayuTPK = {
-                labels: ['Tersedia', 'Terjual', 'Rusak'],
-                datasets: [{
-                    data: [500, 250, 50],
-                    backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
-                    hoverOffset: 4
-                }]
-            };
+            <!-- Script Kayu TPK Chart -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const dataKayuTPK = {
+                        labels: ['Tersedia', 'Terjual', 'Rusak'],
+                        datasets: [{
+                            data: [500, 250, 50],
+                            backgroundColor: ['#4CAF50', '#F1EFFB', '#604008'],
+                            hoverOffset: 4
+                        }]
+                    };
 
-            const configKayuTPK = {
-                type: 'doughnut',
-                data: dataKayuTPK,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
+                    const configKayuTPK = {
+                        type: 'doughnut',
+                        data: dataKayuTPK,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
                         }
+                    };
+
+                    const ctxKayuTPK = document.getElementById('kayuTPKChart');
+                    if (ctxKayuTPK) {
+                        new Chart(ctxKayuTPK, configKayuTPK);
                     }
+                });
+            </script>
+
+            <style>
+                /* Tambahkan gaya ini agar bar berubah warna saat hover */
+                #bibitChart .apexcharts-bar-series .apexcharts-series path:hover {
+                    fill: #8DD88D !important;
                 }
-            };
+            </style>
 
-            const ctxKayuTPK = document.getElementById('kayuTPKChart');
-            if (ctxKayuTPK) {
-                new Chart(ctxKayuTPK, configKayuTPK);
-            }
-        });
-    </script>
-
-    <!-- Script Bibit Chart -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var options = {
-                series: [{
-                    name: 'Jumlah Bibit',
-                    data: [500, 400, 350, 250, 600, 700, 450, 380, 520, 610, 330, 410]
-                }],
-                chart: {
-                    type: 'bar',
-                    height: 400
-                },
-                plotOptions: {
-                    bar: {
-                        horizontal: false,
-                        columnWidth: '75%',
-                        borderRadius: 10
-                    }
-                },
-                dataLabels: {
-                    enabled: true,
-                    style: {
-                        colors: ['#000']
-                    }
-                },
-                stroke: {
-                    show: false
-                },
-                xaxis: {
-                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
-                        'Dec'
-                    ]
-                },
-                yaxis: {
-                    title: {
-                        text: 'Jumlah Bibit'
-                    }
-                },
-                fill: {
-                    opacity: 1
-                },
-                tooltip: {
-                    y: {
-                        formatter: function(val) {
-                            return val + " bibit";
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var options = {
+                        series: [{
+                            name: 'Jumlah Bibit',
+                            data: [500, 400, 350, 250, 600, 700, 450, 380, 520, 610, 330, 410]
+                        }],
+                        chart: {
+                            type: 'bar',
+                            height: 400
+                        },
+                        colors: ['#F2FCF1'], // Warna dasar chart
+                        plotOptions: {
+                            bar: {
+                                horizontal: false,
+                                columnWidth: '75%',
+                                borderRadius: 10,
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false,
+                            style: {
+                                colors: ['#000']
+                            }
+                        },
+                        stroke: {
+                            show: false
+                        },
+                        xaxis: {
+                            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
+                                'Dec'
+                            ]
+                        },
+                        yaxis: {
+                            title: {
+                                text: 'Jumlah Bibit'
+                            }
+                        },
+                        fill: {
+                            opacity: 1
+                        },
+                        tooltip: {
+                            y: {
+                                formatter: function(val) {
+                                    return val + " bibit";
+                                }
+                            }
                         }
-                    }
-                }
-            };
+                    };
 
-            var chart = new ApexCharts(document.querySelector("#bibitChart"), options);
-            chart.render();
-        });
-    </script>
-@endsection
+                    var chart = new ApexCharts(document.querySelector("#bibitChart"), options);
+                    chart.render();
+                });
+            </script>
+        @endsection
