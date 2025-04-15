@@ -5,11 +5,12 @@
 
 <!-- Overlay -->
 <div id="overlay"
-    class="fixed inset-0 bg-black bg-opacity-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+    class="fixed inset-0 bg-black bg-opacity-50 opacity-0 pointer-events-none transition-opacity duration-100 ease-out">
+</div>
 
 <!-- Sidebar -->
 <aside id="sidebar"
-    class="w-64 md:w-80 bg-white h-screen shadow-md fixed top-0 left-0 transform -translate-x-full transition-transform duration-300 flex flex-col justify-between z-50">
+    class="w-64 md:w-80 bg-white h-screen shadow-md fixed top-0 left-0 transform -translate-x-full transition-transform duration-100 ease-out flex flex-col justify-between z-50">
 
     <div>
         <!-- Header dengan Logo -->
@@ -95,9 +96,6 @@
         }
 
         function setActiveMenu(menuName) {
-            console.log("Menu aktif:", menuName); // Debugging untuk cek menu yang aktif
-
-            // Hapus semua class aktif dari menu lainnya
             menuItems.forEach(item => {
                 item.classList.remove('bg-green-500', 'text-white', 'font-bold');
                 item.querySelector('.menu-text').classList.remove('text-white');
@@ -107,7 +105,6 @@
                 }
             });
 
-            // Aktifkan menu yang dipilih
             const activeItem = document.querySelector(`[data-menu="${menuName}"]`);
             if (activeItem) {
                 activeItem.classList.add('bg-green-500', 'font-bold');
@@ -118,23 +115,23 @@
                 }
             }
 
-            // Simpan menu aktif di localStorage
             localStorage.setItem("activeMenu", menuName);
         }
 
-        // Set menu aktif saat halaman dimuat
         const savedMenu = localStorage.getItem("activeMenu") || "dashboard";
         setActiveMenu(savedMenu);
 
-        // Event listener untuk klik menu
         menuItems.forEach(item => {
             item.addEventListener('click', () => {
                 const menuName = item.getAttribute('data-menu');
                 setActiveMenu(menuName);
+
+                if (window.innerWidth < 768) {
+                    hideSidebar();
+                }
             });
         });
 
-        // Event listener untuk sidebar
         menuBtn.addEventListener('click', showSidebar);
         closeBtn.addEventListener('click', hideSidebar);
         overlay.addEventListener('click', hideSidebar);
