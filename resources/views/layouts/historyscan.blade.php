@@ -1,10 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'History Scan Barcode')
+@section('title', 'Riwayat Scan Barcode')
 
 @section('content')
-    <div class="w-full p-4 md:p-6 mt-8">
-        <h1 class="text-lg md:text-2xl font-semibold text-gray-800 mb-4">Hello Fitri 👋,</h1>
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex items-center mb-6">
+            <!-- Hamburger dan teks Halo Fitri dalam satu baris -->
+            <h1 class="text-2xl font-semibold text-gray-800 ml-4">Halo Fitri 👋</h1>
+        </div>
 
         <div class="bg-white p-4 rounded-3xl shadow-md text-left w-56">
             <div class="flex items-center">
