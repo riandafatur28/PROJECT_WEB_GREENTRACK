@@ -35,6 +35,7 @@ Route::get('/dashboard', function () {
     return view('layouts.dashboard');
 })->name('dashboard');
 
+
 Route::get('/test-firebase', function () {
     $firebaseCredentials = Config::get('firebase.credentials');
 
@@ -50,6 +51,9 @@ Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'inde
 
 Route::get('/history-scan-barcode', [HistoryBarcodeController::class, 'index'])
     ->name('historyscanbarcode');
+
+Route::get('/history-perawatan-bibit', [HistoryBarcodeController::class, 'index'])
+    ->name('historyperawatanbibit');
 
 Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna');
 
