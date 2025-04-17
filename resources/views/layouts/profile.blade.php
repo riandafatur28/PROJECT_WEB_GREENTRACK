@@ -13,8 +13,11 @@
 
         <!-- Foto Profil -->
         <div class="relative flex flex-col items-center">
-            <div class="w-52 h-52 bg-gray-200 rounded-full flex justify-center items-center">
-                <img src="https://via.placeholder.com/200" alt="Profile" class="w-48 h-48 rounded-full object-cover">
+            <div class="w-52 h-52 bg-gray-200 rounded-full flex justify-center items-center cursor-not-allowed"
+                id="imageContainer">
+                <img id="profileImage" src="https://via.placeholder.com/200" alt="Profile"
+                    class="w-48 h-48 rounded-full object-cover">
+                <input type="file" id="profileImageInput" accept="image/*" class="hidden">
             </div>
             <h2 class="text-2xl font-bold mt-6">FITRI MEYDAYANI</h2>
         </div>
@@ -58,7 +61,11 @@
 
 @push('scripts')
     <script>
+        let editMode = false;
+
         document.getElementById('editButton').addEventListener('click', function() {
+            editMode = true;
+
             document.querySelectorAll('.editable-input').forEach(input => {
                 input.removeAttribute('readonly');
                 input.removeAttribute('disabled');
@@ -67,12 +74,37 @@
             });
 
             document.getElementById('saveButton').removeAttribute('disabled');
+
+            // Aktifkan klik gambar
+            const imageContainer = document.getElementById('imageContainer');
+            imageContainer.classList.remove('cursor-not-allowed');
+            imageContainer.classList.add('cursor-pointer');
+
+            imageContainer.addEventListener('click', function() {
+                if (editMode) {
+                    document.getElementById('profileImageInput').click();
+                }
+            });
         });
 
+        // Preview gambar
+        document.getElementById('profileImageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImage').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Logout
         document.getElementById('logoutButton').addEventListener('click', function() {
             window.location.href = '{{ route('login') }}';
         });
 
+        // Kembali
         function closeProfile() {
             window.history.back();
         }
