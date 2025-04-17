@@ -17,7 +17,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/login', function () {
     return view('layouts.login'); // This assumes your Blade view is located in resources/views/login.blade.php
-});
+})->name('login');
 
 Route::get('/forgotpassword', function () {
     return view('layouts.forgotpassword'); // This assumes your Blade view is located in resources/views/login.blade.php
