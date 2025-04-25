@@ -9,31 +9,6 @@
             <h1 class="text-2xl font-semibold text-gray-800 ml-4">Halo Fitri 👋</h1>
         </div>
 
-        <div class="bg-white p-4 rounded-3xl shadow-md text-left w-56">
-            <div class="flex items-center">
-                <div class="bg-green-100 p-3 rounded-full flex items-center justify-center">
-                    <svg class="w-10 h-10 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9.75 3.75h4.5A2.25 2.25 0 0116.5 6v12a2.25 2.25 0 01-2.25 2.25h-4.5A2.25 2.25 0 017.5 18V6a2.25 2.25 0 012.25-2.25z" />
-                    </svg>
-                </div>
-
-                <div class="ml-4 flex flex-col items-center">
-                    <p class="text-gray-500 text-sm">Sedang Aktif</p>
-                    <p class="text-3xl font-semibold text-center w-full">9</p>
-
-                    <div class="flex mt-2">
-                        @for ($i = 1; $i <= 5; $i++)
-                            <img class="w-6 h-6 rounded-full border-2 border-white -ml-2 first:ml-0"
-                                src="https://randomuser.me/api/portraits/women/{{ $i }}.jpg"
-                                alt="User {{ $i }}">
-                        @endfor
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div id="table-aktivitas" class="bg-white shadow-md rounded-3xl p-5 mt-5">
             <h2 class="text-xl font-semibold text-gray-800">Aktivitas Terbaru</h2>
 
@@ -88,9 +63,21 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="mt-5 flex justify-center">
-                {{ $paginatedHistory->links() }}
+            <div class="flex justify-between mt-8">
+                <p class="text-sm text-gray-500">Menampilkan data 1 hingga 8 dari 256 entri</p>
+                <div class="flex space-x-1">
+                    <button
+                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</button>
+                    <button
+                        class="px-2 py-0.5 bg-green-500 text-white border border-green-500 rounded-md text-xs">1</button>
+                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">2</button>
+                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">3</button>
+                    <button
+                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">...</button>
+                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">40</button>
+                    <button
+                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</button>
+                </div>
             </div>
         </div>
 
