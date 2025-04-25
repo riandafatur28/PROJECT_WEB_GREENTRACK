@@ -236,16 +236,40 @@
                                     </select>
                                 </td>
                                 <td class="px-2 py-1">
-                                    <a href="/detail-kayu/{{ $item['id'] }}"
-                                        class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block">
-                                        Lihat Selengkapnya
-                                    </a>
+                                    <<td class="px-2 py-1">
+                                        <button
+                                            class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block detail-btn"
+                                            data-id="{{ $item['id'] }}" data-nama="{{ $item['nama'] }}"
+                                            data-jenis="{{ $item['jenis'] }}" data-usia="{{ $item['usia'] }}"
+                                            data-jumlah="{{ $item['jumlah'] }}" data-lokasi="{{ $item['lokasi'] }}"
+                                            data-status="{{ $item['status'] }}">
+                                            Lihat Selengkapnya
+                                        </button>
+                                </td>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
+            <!-- Modal -->
+            <div id="detailModal"
+                class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+                <div class="bg-white rounded-lg shadow-lg w-96 p-6 relative">
+                    <button id="closeModal" class="absolute top-2 right-2 text-gray-500 hover:text-black">&times;</button>
+                    <h2 class="text-xl font-bold mb-4">Detail Pohon/Bibit</h2>
+                    <ul class="space-y-2 text-sm">
+                        <li><strong>ID:</strong> <span id="detailId"></span></li>
+                        <li><strong>Nama:</strong> <span id="detailNama"></span></li>
+                        <li><strong>Jenis:</strong> <span id="detailJenis"></span></li>
+                        <li><strong>Usia:</strong> <span id="detailUsia"></span></li>
+                        <li><strong>Jumlah:</strong> <span id="detailJumlah"></span></li>
+                        <li><strong>Lokasi:</strong> <span id="detailLokasi"></span></li>
+                        <li><strong>Status:</strong> <span id="detailStatus"></span></li>
+                    </ul>
+                </div>
+            </div>
+
             <div class="flex justify-between mt-8">
                 <p class="text-sm text-gray-500">Menampilkan data 1 hingga 8 dari 256 entri</p>
                 <div class="flex space-x-1">
@@ -317,5 +341,33 @@
     // Set warna awal saat halaman dimuat
     document.querySelectorAll(".status-dropdown").forEach(select => {
         updateBackground(select);
+    });
+
+    const detailButtons = document.querySelectorAll('.detail-btn');
+    const modal = document.getElementById('detailModal');
+    const closeModal = document.getElementById('closeModal');
+
+    detailButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('detailId').textContent = btn.dataset.id;
+            document.getElementById('detailNama').textContent = btn.dataset.nama;
+            document.getElementById('detailJenis').textContent = btn.dataset.jenis;
+            document.getElementById('detailUsia').textContent = btn.dataset.usia;
+            document.getElementById('detailJumlah').textContent = btn.dataset.jumlah;
+            document.getElementById('detailLokasi').textContent = btn.dataset.lokasi;
+            document.getElementById('detailStatus').textContent = btn.dataset.status;
+            modal.classList.remove('hidden');
+        });
+    });
+
+    closeModal.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    // Optional: close when clicking outside the modal
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
     });
 </script>
