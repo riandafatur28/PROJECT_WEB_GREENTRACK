@@ -24,7 +24,7 @@
             <li class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/dashboard.svg') }}" alt="Dashboard" class="icon w-6 h-6">
-                    <span class="menu-text">Dashboard</span>
+                    <span class="menu-text">Beranda</span>
                 </a>
             </li>
             <li class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
@@ -43,14 +43,14 @@
             <li class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
                 <a href="{{ route('historyscanbarcode') }}" class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/history.svg') }}" alt="History Scan Barcode" class="icon w-6 h-6">
-                    <span class="menu-text">Riwayat Pindai Barcode</span>
+                    <span class="menu-text">Aktivitas Terbaru</span>
                 </a>
             </li>
             <li class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
                 <a href="{{ route('historyperawatanbibit') }}" class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/monitoring.svg') }}" alt="Jadwal Perawatan Bibit"
                         class="icon w-6 h-6">
-                    <span class="menu-text">Riwayat Perawatan Bibit</span>
+                    <span class="menu-text">Riwayat Perawatan</span>
                 </a>
             </li>
         </ul>
@@ -103,7 +103,7 @@
                 const icon = item.querySelector('.icon');
 
                 if (link && currentPath.startsWith(new URL(link.href, window.location.origin)
-                    .pathname)) {
+                        .pathname)) {
                     item.classList.add('bg-green-500', 'font-bold');
                     if (menuText) {
                         menuText.classList.remove('text-gray-600');
