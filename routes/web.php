@@ -6,6 +6,10 @@ use App\Http\Controllers\ManajemenPenggunaController;
 use App\Http\Controllers\ManajemenPohonBibitController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
+use App\Http\Controllers\AuthController; // Ensure this matches the actual namespace of AuthController
+
+Route::get('/register', [AuthController::class, 'showRegister']);
+Route::post('/register', [AuthController::class, 'doRegister']);
 
 Route::get('/', function () {
     return view('welcome');
