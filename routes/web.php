@@ -4,20 +4,26 @@ use App\Http\Controllers\HistoryBarcodeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ManajemenPenggunaController;
 use App\Http\Controllers\ManajemenPohonBibitController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
+
+use App\Http\Controllers\FirestoreController;
+Route::get('/akun_superadmin', [FirestoreController::class, 'showSuperAdminForm']);
+Route::post('/akun_superadmin', [FirestoreController::class, 'storeSuperAdmin']);
+Route::get('/register', [FirestoreController::class, 'showForm']);
+Route::post('/register', [FirestoreController::class, 'handleForm']);
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('layouts.dashboard');
-})->name('dashboard');
-
+Route::post('/login', [AuthController::class, 'handleLogin']);
+Route::get('/dashboard', fn() => view('layouts.dashboard'));
 Route::get('/login', function () {
     return view('layouts.login'); // This assumes your Blade view is located in resources/views/login.blade.php
 })->name('login');
+
 
 Route::get('/forgotpassword', function () {
     return view('layouts.forgotpassword'); // This assumes your Blade view is located in resources/views/login.blade.php
@@ -56,5 +62,3 @@ Route::get('/history-perawatan-bibit', [HistoryBarcodeController::class, 'index'
     ->name('historyperawatanbibit');
 
 Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna');
-
-Route::post('/login', [LoginController::class, 'login']);

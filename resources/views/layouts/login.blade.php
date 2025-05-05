@@ -19,7 +19,13 @@
             <h3 class="text-sm sm:text-lg md:text-xl text-left text-gray-700 mb-12">
                 Silahkan Login Terlebih Dahulu
             </h3>
-            <form method="POST" action="#" autocomplete="off">
+            @if ($errors->any())
+    <div style="color:red;">
+        <strong>{{ $errors->first() }}</strong>
+    </div>
+@endif
+            <form method="POST" action="/login" autocomplete="off">
+                @csrf
                 <div>
                     <label class="block text-sm sm:text-base md:text-lg font-medium text-gray-700 mb-1" for="email">
                         Email

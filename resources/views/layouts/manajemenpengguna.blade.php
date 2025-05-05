@@ -5,7 +5,7 @@
 @section('content')
     <div class="container mx-auto px-4 py-6">
         <div class="flex items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-800 ml-4">Halo Fitri 👋</h1>
+            <h1 class="text-2xl font-semibold text-gray-800 ml-4">{{ session('user_nama') }} 👋</h1>
         </div>
 
         <div id="table-admin" class="bg-white shadow-md rounded-3xl p-3 mt-8">
