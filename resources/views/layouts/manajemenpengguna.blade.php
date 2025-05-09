@@ -18,9 +18,12 @@
                         Tambah
                     </button>
                     <div class="relative w-full md:w-auto">
-                        <input type="text" placeholder="Cari"
-                            class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
-                        <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                        <form method="GET" action="{{ route('manajemenpengguna.index') }}">
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                placeholder="Cari"
+                                class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
+                            <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                        </form>
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center">
                         <label class="text-gray-600 text-sm">Urutkan Berdasarkan :</label>
@@ -54,12 +57,10 @@
                                 <td class="px-2 py-1">{{ $init['peran_admin'] }}</td>
                                 <td class="px-2 py-1">
                                     <select
-                                        class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm {{ $init['status'] == 'Aktif' ? 'bg-green-300' : 'bg-red-300' }} "
-                                        data-id="{{ $init['id'] }}" onchange="updateBackground(this)">
-                                        <option value="Aktif" {{ $init['status'] == 'Aktif' ? 'selected' : '' }}>Aktif
-                                        </option>
-                                        <option value="Nonaktif" {{ $init['status'] == 'Nonaktif' ? 'selected' : '' }}>
-                                            Nonaktif</option>
+                                        class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm {{ $init['status'] == 'Aktif' ? 'bg-green-300' : 'bg-red-300' }}"
+                                        data-id="{{ $init['id'] }}" onchange="updateStatus(this)">
+                                        <option value="Aktif" {{ $init['status'] == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                                        <option value="Nonaktif" {{ $init['status'] == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                                     </select>
                                 </td>
                                 <td class="px-2 py-1">
@@ -74,23 +75,28 @@
                         @endforeach
                     </tbody>
                 </table>
+                
+                
                 <div class="flex justify-between mt-8">
-                    <p class="text-sm text-gray-500">Menampilkan data 1 hingga 8 dari 256 entri</p>
+                    <p class="text-sm text-gray-500">Menampilkan data {{ ($currentPage - 1) * $perPage + 1 }} hingga {{ min($currentPage * $perPage, $total) }} dari {{ $total }} entri</p>
                     <div class="flex space-x-1">
-                        <button
-                            class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</button>
-                        <button
-                            class="px-2 py-0.5 bg-green-500 text-white border border-green-500 rounded-md text-xs">1</button>
-                        <button
-                            class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">2</button>
-                        <button
-                            class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">3</button>
-                        <button
-                            class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">...</button>
-                        <button
-                            class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">40</button>
-                        <button
-                            class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</button>
+                        <!-- Previous Button -->
+                        @if($currentPage > 1)
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage - 1, 'search' => request('search')]) }}"
+                                class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</a>
+                        @endif
+                
+                        <!-- Page Numbers -->
+                        @for($i = 1; $i <= ceil($total / $perPage); $i++)
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $i, 'search' => request('search')]) }}"
+                                class="px-2 py-0.5 {{ $currentPage == $i ? 'bg-green-500 text-white' : 'bg-white text-gray-500' }} border border-gray-300 rounded-md text-xs">{{ $i }}</a>
+                        @endfor
+                
+                        <!-- Next Button -->
+                        @if($currentPage < ceil($total / $perPage))
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage + 1, 'search' => request('search')]) }}"
+                                class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -127,9 +133,10 @@
                         </div>
                         <div>
                             <label class="text-gray-600 text-sm">Nama</label>
-                            <input type="text" id="modalNama" readonly
-                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
+                            <input type="text" id="modalNama"
+                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800" readonly>
                         </div>
+                        
                         <div>
                             <label class="text-gray-600 text-sm">Email</label>
                             <input type="email" id="modalEmail" readonly
@@ -137,8 +144,14 @@
                         </div>
                         <div>
                             <label class="text-gray-600 text-sm">Peran</label>
-                            <input type="text" id="modalPeran" readonly
-                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
+                            <select id="modalPeranSelect"
+                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800 hidden" disabled>
+                                <option value="admin_penyemaian">Admin Penyemaian</option>
+                                <option value="admin_tpk">Admin TPK</option>
+                            </select>
+                        
+                            <input type="text" id="modalPeranText"
+                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800" readonly>
                         </div>
                         <div>
                             <label class="text-gray-600 text-sm">Status</label>
@@ -151,9 +164,10 @@
                             <button id="editButton"
                                 class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-400"
                                 onclick="enableEdit()">Edit</button>
-                            <button
-                                class="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600">Simpan</button>
-                            <button
+                                <button
+                                class="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600"
+                                onclick="simpanPerubahan()"
+                            >Simpan</button>                            <button
                                 class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600">Hapus</button>
                         </div>
                     </div>
@@ -165,17 +179,90 @@
 
     @push('scripts')
         <script>
-            function showAdminDetail(button) {
-                document.getElementById('modalID').value = button.closest('tr').querySelector('td:first-child').innerText;
-                document.getElementById('modalNama').value = button.getAttribute('data-nama');
-                document.getElementById('modalEmail').value = button.getAttribute('data-email');
-                document.getElementById('modalPeran').value = button.getAttribute('data-peran');
-                document.getElementById('modalStatus').value = button.getAttribute('data-status');
+            function simpanPerubahan() {
+    const id = document.getElementById('modalID').value;
+    const nama = document.getElementById('modalNama').value;
+    const role = document.getElementById('modalPeranSelect').value;
 
-                const modal = document.getElementById("adminModal");
-                modal.classList.remove("hidden");
-                modal.classList.add("flex");
+    fetch('/update-admin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        },
+        body: JSON.stringify({ id, nama, role })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Berhasil disimpan!');
+            closeModal();
+            location.reload();
+        } else {
+            alert('Gagal menyimpan perubahan.');
+        }
+    })
+    .catch(() => alert('Terjadi kesalahan.'));
+}
+         function enableEdit() {
+    // Enable input Nama
+    const namaInput = document.getElementById('modalNama');
+    namaInput.removeAttribute('readonly');
+    namaInput.classList.remove('bg-gray-100');
+
+    // Tampilkan select dropdown untuk Peran
+    const peranText = document.getElementById('modalPeranText');
+    const peranSelect = document.getElementById('modalPeranSelect');
+
+    peranText.classList.add('hidden');
+    peranSelect.classList.remove('hidden');
+    peranSelect.removeAttribute('disabled');
+    peranSelect.classList.remove('bg-gray-100');
+}
+
+    document.querySelector('.bg-green-500').addEventListener('click', function () {
+        const id = document.getElementById('modalID').value;
+        const nama = document.getElementById('modalNama').value;
+        const role = document.getElementById('modalPeranSelect').value;
+
+        fetch('/update-admin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            },
+            body: JSON.stringify({ id, nama, role })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Perubahan berhasil disimpan!');
+                closeModal();
+                location.reload();
+            } else {
+                alert('Gagal menyimpan perubahan.');
             }
+        })
+        .catch(() => {
+            alert('Terjadi kesalahan.');
+        });
+    });
+
+    function showAdminDetail(button) {
+    document.getElementById('modalID').value = button.closest('tr').querySelector('td:first-child').innerText;
+    document.getElementById('modalNama').value = button.getAttribute('data-nama');
+    document.getElementById('modalEmail').value = button.getAttribute('data-email');
+    
+    const peranText = button.getAttribute('data-peran');
+    document.getElementById('modalPeranText').value = peranText;
+    document.getElementById('modalPeranSelect').value = peranText.toLowerCase().replace(' ', '_');
+
+    document.getElementById('modalStatus').value = button.getAttribute('data-status');
+
+    const modal = document.getElementById("adminModal");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
 
             function closeModal() {
                 const modal = document.getElementById("adminModal");
@@ -183,12 +270,7 @@
                 modal.classList.remove("flex");
             }
 
-            function enableEdit() {
-                document.getElementById('modalNama').removeAttribute('readonly');
-                document.getElementById('modalPeran').removeAttribute('readonly');
-                document.getElementById('modalStatus').removeAttribute('readonly');
-                document.getElementById('editButton').setAttribute('disabled', 'true'); // Disable tombol Edit saat klik
-            }
+
 
             function uploadImage() {
                 const input = document.createElement('input');
@@ -214,6 +296,24 @@
                 select.classList.toggle('bg-green-300', selectedValue === 'Aktif');
                 select.classList.toggle('bg-red-300', selectedValue === 'Nonaktif');
             }
+            function updateStatus(select) {
+        const status = select.value;
+        const id = select.dataset.id;
+
+        select.classList.toggle('bg-green-300', status === 'Aktif');
+        select.classList.toggle('bg-red-300', status === 'Nonaktif');
+
+        fetch('/update-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            },
+            body: JSON.stringify({ id, status })
+        })
+        .then(response => response.ok ? console.log('Status updated') : alert('Gagal update'))
+        .catch(() => alert('Terjadi kesalahan'));
+    }
 
             function showAddAdminModal() {
                 // Reset form inputs pada modal

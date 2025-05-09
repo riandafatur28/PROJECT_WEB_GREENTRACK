@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 
 use App\Http\Controllers\FirestoreController;
+Route::post('/update-admin', [\App\Http\Controllers\ManajemenPenggunaController::class, 'updateAdmin']);
+
+Route::post('/update-status', [ManajemenPenggunaController::class, 'updateStatus']);
 Route::get('/akun_superadmin', [FirestoreController::class, 'showSuperAdminForm']);
 Route::post('/akun_superadmin', [FirestoreController::class, 'storeSuperAdmin']);
 Route::get('/register', [FirestoreController::class, 'showForm']);
@@ -60,5 +63,5 @@ Route::get('/history-scan-barcode', [HistoryBarcodeController::class, 'index'])
 
 Route::get('/history-perawatan-bibit', [HistoryBarcodeController::class, 'index'])
     ->name('historyperawatanbibit');
-
 Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna');
+Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna.index');

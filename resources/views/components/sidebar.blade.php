@@ -35,7 +35,7 @@
                 </a>
             </li>
             <li class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
-                <a href="{{ route('manajemenpengguna') }}" class="flex items-center gap-2">
+                <a href="{{ route('manajemenpengguna.index') }}" class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/pengguna.svg') }}" alt="Manajemen Pengguna" class="icon w-6 h-6">
                     <span class="menu-text">Manajemen Pengguna</span>
                 </a>

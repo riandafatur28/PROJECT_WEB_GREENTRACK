@@ -66,3 +66,17 @@ public function storeSuperAdmin(Request $request, FirestoreService $firestore)
     return 'Super admin berhasil terdaftar!';
 }
 }
+
+/*
+untuk list bibit
+sub colection bibit/id_bibit/document 
+untuk list kayu
+sub collection kayu/id kayu/document_kayu  
+
+untuk pengguna:
+sub collection akun/ id account/ document
+
+untuk activities
+sub colelction activites/id_activities/document
+
+*/

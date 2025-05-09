@@ -1,0 +1,438 @@
+{
+  "activities": {
+    "9763fc07-b8bf-4fa4-afb7-499c6480f324": {
+      "metadata": {
+        "usia": 30,
+        "lokasi_tanam": {
+          "kph": "KPH Wilangan",
+          "rkph": "RKPH Wilangan D",
+          "bkph": "BKPH Wilangan Selatan"
+        },
+        "status_hama": "Ringan",
+        "kondisi": "Sedang",
+        "nama_bibit": "Jati Super A201",
+        "varietas": "Tectona grandis",
+        "jenis_bibit": "Kayu keras ",
+        "catatan": "Auto-generated untuk testing cepat.",
+        "media_tanam": "Polybag",
+        "tanggal_pembibitan": {
+          "_seconds": 1746690317,
+          "_nanoseconds": 202000000
+        },
+        "userName": "Yulia Gita Permata Sari",
+        "produktivitas": "Tinggi",
+        "userPhotoUrl": null,
+        "asal_bibit": "Kebun Induk Wilangan",
+        "gambar_image": [
+          "/data/user/0/com.app.green_track/cache/scaled_1000026433.jpg"
+        ],
+        "updated_at": {
+          "_seconds": 1746690362,
+          "_nanoseconds": 213000000
+        },
+        "nutrisi": "Pupuk NPK",
+        "userEmail": "yuliagita@gmail.com",
+        "barcode": "BBT-F4AC94FC",
+        "tinggi": 20,
+        "id_bibit": "BBT-F4AC94FC",
+        "timestamp": "2025-05-08 14:46:02.213486"
+      },
+      "targetId": "BBT-F4AC94FC",
+      "icon": "Icons.print_rounded",
+      "description": "Cetak Barcode Untuk Bibit Jati Super A201",
+      "id": "9763fc07-b8bf-4fa4-afb7-499c6480f324",
+      "userName": "Yulia Gita Permata Sari",
+      "userRole": "UserRole.adminPenyemaian",
+      "activityType": "PRINT_BARCODE",
+      "userId": "xq0b4Ikdddcf8xz4cOVmkrutRxo1",
+      "timestamp": {
+        "_seconds": 1746690362,
+        "_nanoseconds": 215133000
+      },
+      "createdAt": {
+        "_seconds": 1746690362,
+        "_nanoseconds": 559000000
+      },
+      "_subcollections": {}
+    },
+    "a3a0b965-03c7-4906-883a-6a3d099511d4": {
+      "metadata": {
+        "jenisPerawatan": "penyiraman",
+        "waktu": "08:00",
+        "catatan": "tolong disiram tanaman nya",
+        "userEmail": "yuliagita@gmail.com",
+        "tanggal": "2025-05-08 14:48:45.583952",
+        "userName": "Yulia Gita Permata Sari",
+        "userPhotoUrl": null,
+        "timestamp": "2025-05-08 14:49:25.351734"
+      },
+      "targetId": "BBT-F4AC94FC",
+      "icon": "Icons.calendar_month_rounded",
+      "description": "Menambahkan Jadwal Rawat Jati Super A201",
+      "id": "a3a0b965-03c7-4906-883a-6a3d099511d4",
+      "userName": "Yulia Gita Permata Sari",
+      "userRole": "UserRole.adminPenyemaian",
+      "activityType": "ADD_JADWAL_RAWAT",
+      "userId": "xq0b4Ikdddcf8xz4cOVmkrutRxo1",
+      "timestamp": {
+        "_seconds": 1746690565,
+        "_nanoseconds": 356370000
+      },
+      "createdAt": {
+        "_seconds": 1746690565,
+        "_nanoseconds": 584000000
+      },
+      "_subcollections": {}
+    }
+  },
+  "akun": {
+    "1PPso0nZjjNbwdIaMa965N9usRl2": {
+      "role": [
+        "admin_penyemaian"
+      ],
+      "kode_otp": "",
+      "last_login": null,
+      "nama_lengkap": "dontol",
+      "email": "dontol@gmail.com",
+      "updated_at": {
+        "_seconds": 1745082624,
+        "_nanoseconds": 113000000
+      },
+      "created_at": {
+        "_seconds": 1745082624,
+        "_nanoseconds": 113000000
+      },
+      "dashboard": {
+        "total_bibit_dipindai": 0,
+        "bibit_siap_tanam": 0,
+        "butuh_perhatian": 0,
+        "total_bibit": 0,
+        "last_updated": {
+          "_seconds": 1745082624,
+          "_nanoseconds": 113000000
+        }
+      },
+      "_subcollections": {}
+    },
+    "1VkII49snTf5ZnJXIM3KQCw9bEG2": {
+      "role": [
+        "admin_penyemaian"
+      ],
+      "kode_otp": "",
+      "last_login": null,
+      "nama_lengkap": "Yulia Gita",
+      "email": "gitchow@gmail.com",
+      "updated_at": {
+        "_seconds": 1746534546,
+        "_nanoseconds": 808000000
+      },
+      "created_at": {
+        "_seconds": 1746534546,
+        "_nanoseconds": 808000000
+      },
+      "dashboard": {
+        "total_bibit_dipindai": 0,
+        "bibit_siap_tanam": 0,
+        "butuh_perhatian": 0,
+        "total_bibit": 0,
+        "last_updated": {
+          "_seconds": 1746534546,
+          "_nanoseconds": 808000000
+        }
+      },
+      "_subcollections": {}
+    },
+    "bA14V5qFDlRKK7KrPbDcLASsdC03": {
+      "role": [
+        "admin_tpk"
+      ],
+      "kode_otp": "",
+      "last_login": null,
+      "nama_lengkap": "tobi tabi",
+      "email": "tobi@gmail.com",
+      "updated_at": {
+        "_seconds": 1745260334,
+        "_nanoseconds": 715000000
+      },
+      "created_at": {
+        "_seconds": 1745260334,
+        "_nanoseconds": 715000000
+      },
+      "dashboard": {
+        "total_batch": 3,
+        "total_kayu": 20,
+        "total_kayu_dipindai": 7,
+        "last_updated": {
+          "_seconds": 1745260337,
+          "_nanoseconds": 253000000
+        }
+      },
+      "_subcollections": {}
+    },
+    "pUmGKPuazoRzajmtlyQlrlrjCFo1": {
+      "role": [
+        "admin_tpk"
+      ],
+      "kode_otp": "",
+      "last_login": null,
+      "nama_lengkap": "kuntul",
+      "email": "kuntul@gmail.com",
+      "updated_at": {
+        "_seconds": 1745083295,
+        "_nanoseconds": 651000000
+      },
+      "created_at": {
+        "_seconds": 1745083295,
+        "_nanoseconds": 651000000
+      },
+      "dashboard": {
+        "total_batch": 3,
+        "total_kayu": 20,
+        "total_kayu_dipindai": 10,
+        "last_updated": {
+          "_seconds": 1745083299,
+          "_nanoseconds": 242000000
+        }
+      },
+      "_subcollections": {}
+    },
+    "xq0b4Ikdddcf8xz4cOVmkrutRxo1": {
+      "role": [
+        "admin_penyemaian"
+      ],
+      "kode_otp": "",
+      "last_login": null,
+      "nama_lengkap": "Yulia Gita Permata Sari",
+      "email": "yuliagita@gmail.com",
+      "updated_at": {
+        "_seconds": 1745260205,
+        "_nanoseconds": 525000000
+      },
+      "created_at": {
+        "_seconds": 1745260205,
+        "_nanoseconds": 525000000
+      },
+      "dashboard": {
+        "total_bibit_dipindai": 0,
+        "bibit_siap_tanam": 0,
+        "butuh_perhatian": 0,
+        "total_bibit": 0,
+        "last_updated": {
+          "_seconds": 1745260205,
+          "_nanoseconds": 525000000
+        }
+      },
+      "_subcollections": {}
+    },
+    "zg22XXHe7vMq05IfSXxHfvTf1sW2": {
+      "role": [
+        "admin_tpk"
+      ],
+      "kode_otp": "",
+      "last_login": null,
+      "nama_lengkap": "Rianda",
+      "email": "rianda@gmail.com",
+      "updated_at": {
+        "_seconds": 1745260364,
+        "_nanoseconds": 769000000
+      },
+      "created_at": {
+        "_seconds": 1745260364,
+        "_nanoseconds": 769000000
+      },
+      "dashboard": {
+        "total_batch": 3,
+        "total_kayu": 20,
+        "total_kayu_dipindai": 7,
+        "last_updated": {
+          "_seconds": 1745260367,
+          "_nanoseconds": 494000000
+        }
+      },
+      "_subcollections": {}
+    }
+  },
+  "akun_superadmin": {
+    "0PpJI9n682OAFWv4tabd": {
+      "last_login": "",
+      "email": "helloworld@gmail.com",
+      "kode_otp": "842986",
+      "created_at": "2025-05-05T08:17:29.409373Z",
+      "updated_at": "2025-05-05T08:17:29.409559Z",
+      "role": "super admin",
+      "last_login_ip": "127.0.0.1",
+      "nama_lengkap": "omaigad",
+      "_subcollections": {}
+    },
+    "3UJRfbMXTy9n6D1X1224": {
+      "updated_at": "2025-05-05T10:38:08.824040Z",
+      "last_login": "",
+      "last_login_ip": "127.0.0.1",
+      "nama_lengkap": "Rianda",
+      "created_at": "2025-05-05T10:38:08.823704Z",
+      "password": "rianda",
+      "kode_otp": "738950",
+      "role": "super admin",
+      "email": "riandafaturahman@gmail.com",
+      "_subcollections": {}
+    },
+    "COIzlqHbdDKB3u5ERxmf": {
+      "nama_lengkap": "denis caknan",
+      "email": "denis@gmail.com",
+      "updated_at": "2025-05-05T08:35:16.506926Z",
+      "last_login_ip": "127.0.0.1",
+      "role": "super admin",
+      "last_login": "",
+      "created_at": "2025-05-05T08:35:16.506716Z",
+      "kode_otp": "778443",
+      "password": "denis123",
+      "_subcollections": {}
+    }
+  },
+  "bibit": {
+    "BBT-F4AC94FC": {
+      "usia": 30,
+      "lokasi_tanam": {
+        "kph": "KPH Wilangan",
+        "luas_petak": "30 x 30",
+        "rkph": "RKPH Wilangan D",
+        "bkph": "BKPH Wilangan Selatan"
+      },
+      "status_hama": "Ringan",
+      "kondisi": "Sedang",
+      "nama_bibit": "Jati Super A201",
+      "varietas": "Tectona grandis",
+      "jenis_bibit": "Kayu keras ",
+      "catatan": "Auto-generated untuk testing cepat.",
+      "created_at": {
+        "_seconds": 1746690362,
+        "_nanoseconds": 211000000
+      },
+      "media_tanam": "Polybag",
+      "tanggal_pembibitan": {
+        "_seconds": 1746690317,
+        "_nanoseconds": 202000000
+      },
+      "id_user": "xq0b4Ikdddcf8xz4cOVmkrutRxo1",
+      "produktivitas": "Tinggi",
+      "asal_bibit": "Kebun Induk Wilangan",
+      "gambar_image": [
+        "https://iili.io/3e19o7t.jpg"
+      ],
+      "updated_at": {
+        "_seconds": 1746690362,
+        "_nanoseconds": 211000000
+      },
+      "nutrisi": "Pupuk NPK",
+      "tinggi": 20,
+      "id_bibit": "BBT-F4AC94FC",
+      "_subcollections": {}
+    }
+
+  },
+  "dashboard_informasi_admin_tpk": {
+    "zg22XXHe7vMq05IfSXxHfvTf1sW2": {
+      "total_batch": 0,
+      "updated_at": {
+        "_seconds": 1746691378,
+        "_nanoseconds": 384000000
+      },
+      "total_kayu": 0,
+      "total_kayu_dipindai": 0,
+      "_subcollections": {}
+    }
+  },
+  "jadwal_perawatan": {
+    "yo08EBo8MA6Mmghmwt6M": {
+      "nama_bibit": "Jati Super A201",
+      "selesai": false,
+      "waktu": "08:00",
+      "catatan": "tolong disiram tanaman nya",
+      "created_at": {
+        "_seconds": 1746690565,
+        "_nanoseconds": 8000000
+      },
+      "tanggal": {
+        "_seconds": 1746690525,
+        "_nanoseconds": 583000000
+      },
+      "created_by_name": "Yulia Gita Permata Sari",
+      "created_by": "xq0b4Ikdddcf8xz4cOVmkrutRxo1",
+      "bibit_id": "BBT-F4AC94FC",
+      "jenis_perawatan": "penyiraman",
+      "_subcollections": {}
+    }
+  },
+  "kayu": {
+    "3K_382033": {
+      "usia": 5,
+      "lokasi_tanam": {
+        "kph": "KPH Wilangan",
+        "luas_petak": "40 x 40",
+        "rkph": "RKPH Wilangan B",
+        "lng": 0,
+        "lat": 0,
+        "bkph": "BKPH Wilangan Utara",
+        "alamat": "KPH Wilangan - BKPH Wilangan Utara - RKPH Wilangan B - Petak 40 x 40"
+      },
+      "jumlah_stok": 60,
+      "varietas": "Tectona grandis Ngawi",
+      "id_kayu": "K_382033",
+      "catatan": "Data dummy untuk keperluan testing.",
+      "id_user": "zg22XXHe7vMq05IfSXxHfvTf1sW2",
+      "batch_panen": "2025-A",
+      "gambar_image": [
+        "https://iili.io/3e1NxTb.jpg"
+      ],
+      "jenis_kayu": "Jati",
+      "tanggal_lahir_pohon": 1711126800000,
+      "nama_kayu": "Kayu Jati Super",
+      "tinggi": 12,
+      "barcode": "KAYU-1746691426805",
+      "updated_at": {
+        "_seconds": 1746691427,
+        "_nanoseconds": 70000000
+      },
+      "created_at": {
+        "_seconds": 1746691427,
+        "_nanoseconds": 70000000
+      },
+      "_subcollections": {}
+    },
+    "K_542009": {
+      "usia": 51,
+      "lokasi_tanam": {
+        "kph": "KPH Wilangan",
+        "luas_petak": "50 x 50",
+        "rkph": "RKPH Wilangan E",
+        "lng": 0,
+        "lat": 0,
+        "bkph": "BKPH Wilangan Selatan",
+        "alamat": "KPH Wilangan - BKPH Wilangan Selatan - RKPH Wilangan E - Petak 50 x 50"
+      },
+      "jumlah_stok": 30,
+      "varietas": "Tectona grandis",
+      "id_kayu": "K_542009",
+      "catatan": "Data dummy untuk keperluan testing Omaigad.",
+      "id_user": "zg22XXHe7vMq05IfSXxHfvTf1sW2",
+      "batch_panen": "2025-C",
+      "gambar_image": [
+        "https://iili.io/3e1UIJ2.jpg"
+      ],
+      "jenis_kayu": "Mahoni",
+      "tanggal_lahir_pohon": 1737651600000,
+      "nama_kayu": "Kayu Manis Ngawi",
+      "tinggi": 12,
+      "barcode": "KAYU-1746691598176",
+      "updated_at": {
+        "_seconds": 1746691598,
+        "_nanoseconds": 499000000
+      },
+      "created_at": {
+        "_seconds": 1746691598,
+        "_nanoseconds": 499000000
+      },
+      "_subcollections": {}
+    }
+  }
+}
