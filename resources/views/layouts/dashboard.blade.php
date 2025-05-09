@@ -129,7 +129,6 @@
                             <th class="py-2">Nama</th>
                             <th class="py-2">Aktifitas</th>
                             <th class="py-2">Waktu</th>
-                            <th class="py-2">Jumlah</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -146,7 +145,6 @@
                             </td>
                             <td class="py-4">Tambah Data Bibit</td>
                             <td class="py-4 font-semibold">5 menit lalu</td>
-                            <td class="py-4">20</td>
                         </tr>
                         <tr>
                             <td class="py-4">
@@ -161,7 +159,6 @@
                             </td>
                             <td class="py-4">Scan Barcode Kayu</td>
                             <td class="py-4">1 jam lalu</td>
-                            <td class="py-4">20</td>
                         </tr>
                         <tr>
                             <td class="py-4">
@@ -176,7 +173,6 @@
                             </td>
                             <td class="py-4">Cetak Barcode Bibit</td>
                             <td class="py-4">Hari ini</td>
-                            <td class="py-4">20</td>
                         </tr>
                         <tr>
                             <td class="py-4">
@@ -191,7 +187,6 @@
                             </td>
                             <td class="py-4">Scan Barcode Kayu</td>
                             <td class="py-4">1 hari lalu</td>
-                            <td class="py-4">20</td>
                         </tr>
                     </tbody>
                 </table>
