@@ -2,43 +2,54 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use App\Services\FirestoreService;
+use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class HistoryPerawatanController extends Controller
 {
+    protected $firestore;
+
+    public function __construct(FirestoreService $firestore)
+    {
+        $this->firestore = $firestore;
+    }
+
     public function index(Request $request)
     {
-        $history = collect([
-            [
-                'foto' => asset('images/admin1.jpg'),
-                'nama' => 'Admin 1',
-                'jabatan' => 'Super Admin',
-                'aktivitas' => 'Mengedit data pengguna',
-                'waktu' => Carbon::now()->subHours(2),
-                'detail' => 'Mengubah data pengguna ID 102'
-            ],
-            [
-                'foto' => asset('images/admin2.jpg'),
-                'nama' => 'Admin 2',
-                'jabatan' => 'Moderator',
-                'aktivitas' => 'Menambahkan postingan baru',
-                'waktu' => Carbon::now()->subHours(5),
-                'detail' => 'Menambahkan artikel tentang keamanan sistem'
-            ],
+        $page = $request->input('page', 1);
+        $perPage = 5; // Tentukan jumlah data per halaman
+
+        // Ambil data perawatan bibit dari Firestore
+        $response = $this->firestore->getCollection('perawatan_bibit', [
+            'pageSize' => $perPage,
+            'pageToken' => $page > 1 ? $page : null
         ]);
 
+        $perawatan = [];
+        if (isset($response['documents'])) {
+            foreach ($response['documents'] as $document) {
+                $fields = $document['fields'] ?? [];
+
+                $perawatan[] = [
+                    'nama_bibit' => $fields['nama_bibit']['stringValue'] ?? '',
+                    'waktu' => Carbon::parse($fields['tanggal']['timestampValue'])->diffForHumans(),
+                    'catatan' => $fields['catatan']['stringValue'] ?? '',
+                    'created_by_name' => $fields['created_by_name']['stringValue'] ?? 'Admin',
+                    'jenis_perawatan' => $fields['jenis_perawatan']['stringValue'] ?? '',
+                ];
+            }
+        }
+
         // Pagination manual
-        $perPage = 5;
-        $currentPage = $request->query('page', 1);
-        $paginatedHistory = new LengthAwarePaginator(
-            $history->forPage($currentPage, $perPage),
-            $history->count(),
+        $paginatedPerawatan = new LengthAwarePaginator(
+            $perawatan,
+            count($perawatan),
             $perPage,
-            $currentPage,
-            ['path' => url('/history-perawatan-page')]
+            $page,
+            ['path' => url('/riwayat-perawatan')]
         );
 
-        return view('layouts.historyperawatan', compact('paginatedHistory'));
+        return view('layouts.historyperawatan', compact('paginatedPerawatan'));
     }
 }
