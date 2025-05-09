@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request; // Yang benar, bukan Google\Rpc\Context\AttributeContext\Request
-use App\Services\FirestoreService; // Pastikan ini ada
+use Illuminate\Http\Request; 
+use App\Services\FirestoreService;
 use Illuminate\Support\Facades\View;
 
 class HistoryBarcodeController extends Controller
