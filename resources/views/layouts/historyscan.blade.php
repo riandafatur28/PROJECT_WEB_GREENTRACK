@@ -5,19 +5,17 @@
 @section('content')
     <div class="container mx-auto px-4 py-6">
         <div class="flex items-center mb-6">
-            <!-- Hamburger dan teks {{ session('user_nama') }} dalam satu baris -->
             <h1 class="text-2xl font-semibold text-gray-800 ml-4">{{ session('user_nama') }} 👋</h1>
         </div>
 
         <div id="table-aktivitas" class="bg-white shadow-md rounded-3xl p-5 mt-5">
             <h2 class="text-xl font-semibold text-gray-800">Aktivitas Terbaru</h2>
 
-            <!-- Bagian Pencarian & Filter -->
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between mt-4 space-y-3 md:space-y-0">
-                <!-- Input Pencarian -->
-                <div class="relative w-full md:w-auto transition-all duration-300 peer-checked:hidden">
-                    <label for="sidebarToggle" class="absolute"></label> <!-- Tambahkan peer -->
-                    <input type="text" placeholder="Cari"
+            <!-- Bagian Pencarian -->
+            <form method="GET" action="{{ route('history.index') }} "
+                class="flex flex-col md:flex-row md:items-center md:justify-between mt-4 space-y-3 md:space-y-0">
+                <div class="relative w-full md:w-auto">
+                    <input type="text" name="search" placeholder="Cari deskripsi..." value="{{ $search }}"
                         class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
                     <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
                 </div>
@@ -30,7 +28,7 @@
                         <option value="1">Hari ini</option>
                     </select>
                 </div>
-            </div>
+            </form>
 
             <!-- Tabel Aktivitas -->
             <div class="overflow-x-auto mt-4">
@@ -44,39 +42,49 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($paginatedHistory as $data)
+                        @forelse ($activities as $data)
                             <tr class="border-b hover:bg-gray-50">
-                                <td class="py-3 px-4 flex items-center">
-                                    <img src="{{ $data['foto'] ?? asset('images/default.png') }}"
-                                        class="w-10 h-10 rounded-full mr-3" alt="Profil">
+                                <td class="py-3 px-4">
                                     <div>
                                         <p class="font-semibold">{{ $data['nama'] }}</p>
-                                        <p class="text-xs text-gray-500">{{ $data['jabatan'] }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">{{ $data['userRole'] }}</p>
+                                        <!-- Menambahkan Role Admin -->
                                     </div>
                                 </td>
-                                <td class="py-3 px-4">{{ $data['aktivitas'] }}</td>
-                                <td class="py-3 px-4">{{ \Carbon\Carbon::parse($data['waktu'])->diffForHumans() }}</td>
+                                <td class="py-3 px-4">{{ $data['keterangan'] }}</td>
+                                <td class="py-3 px-4">
+                                    {{ \Carbon\Carbon::parse($data['waktu'])->diffForHumans() }}
+                                </td>
                                 <td class="py-3 px-4">{{ $data['detail'] }}</td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-3 px-4 text-center text-gray-500">Tidak ada data aktivitas.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
 
+            <!-- Info Total (tanpa pagination links karena Firestore tidak support native pagination Laravel) -->
             <div class="flex justify-between mt-8">
-                <p class="text-sm text-gray-500">Menampilkan data 1 hingga 8 dari 256 entri</p>
-                <div class="flex space-x-1">
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</button>
-                    <button
-                        class="px-2 py-0.5 bg-green-500 text-white border border-green-500 rounded-md text-xs">1</button>
-                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">2</button>
-                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">3</button>
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">...</button>
-                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">40</button>
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</button>
+                <p class="text-sm text-gray-500">
+                    Menampilkan {{ count($activities) }} entri {{ $search ? 'untuk pencarian "' . $search . '"' : '' }}.
+                    Total data ditemukan: {{ $total }}
+                </p>
+
+                <!-- Navigasi halaman manual (jika mau dikembangkan lebih lanjut) -->
+                <div class="flex space-x-2">
+                    @if ($currentPage > 1)
+                        <a href="{{ route('history.index', ['page' => $currentPage - 1, 'search' => $search]) }} "
+                            class="px-3 py-1 border rounded hover:bg-gray-100">Sebelumnya</a>
+                    @endif
+
+                    @if (count($activities) === $perPage)
+                        <a href="{{ route('history.index', ['page' => $currentPage + 1, 'search' => $search]) }} "
+                            class="px-3 py-1 border rounded hover:bg-gray-100">Selanjutnya</a>
+                    @endif
                 </div>
             </div>
         </div>

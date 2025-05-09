@@ -47,7 +47,7 @@
                 </a>
             </li>
             <li class="p-3 rounded-lg flex justify-between items-center w-[90%] mx-auto cursor-pointer transition">
-                <a href="{{ route('historyperawatanbibit') }}" class="flex items-center gap-2">
+                <a href="{{ route('historyperawatan') }}" class="flex items-center gap-2">
                     <img src="{{ asset('assets/images/monitoring.svg') }}" alt="Jadwal Perawatan Bibit"
                         class="icon w-6 h-6">
                     <span class="menu-text">Riwayat Perawatan</span>
