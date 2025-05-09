@@ -37,7 +37,7 @@ Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])
 Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])->name('manajemenkayubibit');
 
 // Riwayat / History
-Route::get('/riwayat-perawatan', [HistoryPerawatanController::class, 'index'])->name('historyperawatan');
+Route::get('/history-perawatan', [HistoryPerawatanController::class, 'index'])->name('historyperawatan');
 Route::get('/history', [HistoryBarcodeController::class, 'index'])->name('history.index');
 Route::get('/history-scan-barcode', [HistoryBarcodeController::class, 'index'])->name('historyscanbarcode');
 
@@ -61,3 +61,6 @@ Route::get('/test-firebase', function () {
 
     return 'Firebase credentials file not found!';
 });
+
+Route::post('/add-admin', [ManajemenPenggunaController::class, 'store'])->name('admin.store');
+
