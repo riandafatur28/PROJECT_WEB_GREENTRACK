@@ -112,3 +112,4 @@ public function index(Request $request, FirestoreService $firestore)
         };
     }
 }
+
