@@ -19,7 +19,7 @@
                     class="w-48 h-48 rounded-full object-cover">
                 <input type="file" id="profileImageInput" accept="image/*" class="hidden">
             </div>
-            <h2 class="text-2xl font-bold mt-6">FITRI MEYDAYANI</h2>
+            <h2 class="text-2xl font-bold mt-6">{{ session('user_nama') }}</h2>
         </div>
 
         <!-- Form Input -->
@@ -28,21 +28,21 @@
                 <label class="block text-gray-700 text-lg">Nama</label>
                 <input type="text" id="nama"
                     class="editable-input w-full border px-4 py-3 rounded-lg text-lg bg-white text-gray-500"
-                    value="FITRI MEYDAYANI" readonly>
+                    value="{{ session('user_nama') }}I" readonly>
             </div>
             <div>
                 <label class="block text-gray-700 text-lg">Email</label>
                 <input type="text" id="email"
                     class="editable-input w-full border px-4 py-3 rounded-lg text-lg bg-white text-gray-500"
-                    value="fitri.meydayani@email.com" readonly>
+                    value="{{ session('email') }}" readonly>
             </div>
 
             @for ($i = 1; $i <= 4; $i++)
                 <div>
-                    <label class="block text-gray-700 text-lg">Label {{ $i }}</label>
+                    <label class="block text-gray-700 text-lg">Posisi {{ $i }}</label>
                     <input type="text"
                         class="editable-input w-full border px-4 py-3 rounded-lg text-lg bg-white text-gray-500"
-                        placeholder="Masukkan teks..." disabled>
+                        value="{{ session('role') }}" placeholder="Masukkan teks..." readonly>
                 </div>
             @endfor
         </div>
