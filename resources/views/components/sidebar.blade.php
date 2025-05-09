@@ -61,8 +61,8 @@
         id="profile-link">
         <img src="https://via.placeholder.com/50" alt="Profile" class="w-12 h-12 rounded-full">
         <div class="ml-3">
-            <p class="text-gray-800 font-semibold menu-text">Nama Pengguna</p>
-            <p class="text-gray-600 text-sm">Role Pengguna</p>
+            <p class="text-gray-800 font-semibold menu-text">{{ session('user_nama') }}</p>
+            <p class="text-gray-600 text-sm">{{ session('role') }}</p>
         </div>
     </a>
 </aside>

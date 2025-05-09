@@ -1,55 +1,111 @@
 <?php
+
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\FirestoreService;
-use Carbon\Carbon;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\View;
 
 class HistoryPerawatanController extends Controller
 {
-    protected $firestore;
-
-    public function __construct(FirestoreService $firestore)
+    public function index(Request $request, FirestoreService $firestore)
     {
-        $this->firestore = $firestore;
-    }
-
-    public function index(Request $request)
-    {
+        $search = $request->input('search', '');
+        $searchType = $request->input('search_type', 'description'); // Ambil jenis pencarian
         $page = $request->input('page', 1);
-        $perPage = 5; // Tentukan jumlah data per halaman
+        $perPage = 10;
 
-        // Ambil data perawatan bibit dari Firestore
-        $response = $this->firestore->getCollection('perawatan_bibit', [
+        // Siapkan filter jika ada pencarian
+        $filter = null;
+        if (!empty($search)) {
+            if ($searchType == 'description') {
+                $filter = [
+                    'fieldFilter' => [
+                        'field' => ['fieldPath' => 'description'],
+                        'op' => 'ARRAY_CONTAINS', // Pastikan 'description' itu array
+                        'value' => ['stringValue' => $search]
+                    ]
+                ];
+            } elseif ($searchType == 'jenis_aktivitas') {
+                $filter = [
+                    'fieldFilter' => [
+                        'field' => ['fieldPath' => 'keterangan'], // Ganti dengan field yang relevan
+                        'op' => 'ARRAY_CONTAINS',
+                        'value' => ['stringValue' => $search]
+                    ]
+                ];
+            }
+        }
+
+        // Ambil data dari Firestore
+        $response = $firestore->getCollection('jadwal_perawatan', [
+            'filter' => $filter,
             'pageSize' => $perPage,
             'pageToken' => $page > 1 ? $page : null
         ]);
 
         $perawatan = [];
+        $total = 0;
+
         if (isset($response['documents'])) {
             foreach ($response['documents'] as $document) {
                 $fields = $document['fields'] ?? [];
+                $id = basename($document['name']);
 
                 $perawatan[] = [
-                    'nama_bibit' => $fields['nama_bibit']['stringValue'] ?? '',
-                    'waktu' => Carbon::parse($fields['tanggal']['timestampValue'])->diffForHumans(),
-                    'catatan' => $fields['catatan']['stringValue'] ?? '',
-                    'created_by_name' => $fields['created_by_name']['stringValue'] ?? 'Admin',
-                    'jenis_perawatan' => $fields['jenis_perawatan']['stringValue'] ?? '',
+                    'id' => $id,
+                    'nama' => $fields['created_by_name']['stringValue'] ?? '-',
+                    // Menambahkan pengecekan untuk memformat userRole
+                    'userRole' => isset($fields['role']['arrayValue']['values'])
+                                    ? $this->formatRole($fields['role']['arrayValue']['values'])
+                                    : 'Tidak ada role', // Default jika tidak ada role
+                    'keterangan' => $fields['jenis_perawatan']['stringValue'] ?? '-',
+                    'nama_bibit' => $fields['nama_bibit']['stringValue'] ?? '-',
+                    'detail' => $fields['catatan']['stringValue'] ?? '-',
+                    'waktu' => isset($fields['created_at']['stringValue'])
+                                ? $this->formatDate($fields['tanggal']['stringValue'])
+                                : null,
                 ];
+
+                $total++;
             }
         }
 
-        // Pagination manual
-        $paginatedPerawatan = new LengthAwarePaginator(
-            $perawatan,
-            count($perawatan),
-            $perPage,
-            $page,
-            ['path' => url('/riwayat-perawatan')]
-        );
+        return view('layouts.historyperawatan', [
+            'perawatan' => $perawatan,
+            'total' => $total,
+            'currentPage' => $page,
+            'perPage' => $perPage,
+            'search' => $search,
+            'searchType' => $searchType // Menambahkan searchType agar bisa dipakai di tampilan
+        ]);
+    }
 
-        return view('layouts.historyperawatan', compact('paginatedPerawatan'));
+    // Fungsi tambahan untuk format role (asumsi sudah ada)
+    private function formatRole(array $roles): string
+    {
+        $roleNames = [];
+        foreach ($roles as $role) {
+            $roleNames[] = $role['stringValue'] ?? '';
+        }
+        return implode(', ', $roleNames);
+    }
+
+    // Fungsi untuk memformat tanggal agar sesuai dengan format yang diinginkan
+    private function formatDate($dateString)
+    {
+        try {
+            // Menghapus microdetik untuk memastikan format tanggal bisa dikenali
+            $dateString = preg_replace('/\.\d+$/', '', $dateString);
+
+            // Coba parse tanggal dengan format yang sudah diubah
+            $date = \Carbon\Carbon::parse($dateString);
+
+            return $date->format('Y-m-d H:i:s');  // Format yang diinginkan
+        } catch (\Exception $e) {
+            // Jika gagal parse, kembalikan null atau nilai default
+            return null;
+        }
     }
 }
