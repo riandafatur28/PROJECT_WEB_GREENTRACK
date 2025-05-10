@@ -19,7 +19,7 @@
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Bibit</p>
                         <h2 class="text-xl font-bold text-black-600">
-                            {{ number_format(count($bibit ?? [])) }}
+                            {{-- {{ number_format($totalBibit) }} --}}
                         </h2>
                         <p class="text-xs text-green-500 mt-1 flex items-center">
                             <svg class="w-4 h-4 text-green-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -84,7 +84,7 @@
             <!-- Bibit Chart -->
             <div class="bg-white p-6 rounded-lg shadow">
                 <h3 class="text-xl font-bold mb-2">Bibit Dalam Penyemaian</h3>
-                <p class="text-base text-gray-600 mb-4">Total Bibit 1500</p>
+                {{-- <p class="text-base text-gray-600 mb-4">Total Bibit {{ number_format($totalBibit) }}</p> --}}
                 <div id="bibitChart" style="height: 400px;"></div>
             </div>
 
@@ -132,63 +132,30 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="py-4">
-                                <div class="flex items-center gap-3">
-                                    <img src="https://i.pravatar.cc/64?u=fitri" alt="Fitri"
-                                        class="w-12 h-12 rounded-full">
-                                    <div class="ml-6">
-                                        <div class="text-xl font-semibold">Fitri Meydayani</div>
-                                        <div class="text-sm text-gray-400">Admin Penyemaian</div>
+                        @forelse ($activities as $activity)
+                            <tr>
+                                <td class="py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="https://i.pravatar.cc/64?u={{ urlencode($activity['nama']) }}"
+                                            alt="{{ $activity['nama'] }}" class="w-12 h-12 rounded-full">
+                                        <div class="ml-6">
+                                            <div class="text-xl font-semibold">{{ $activity['nama'] }}</div>
+                                            <div class="text-sm text-gray-400">{{ $activity['userRole'] }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="py-4">Tambah Data Bibit</td>
-                            <td class="py-4 font-semibold">5 menit lalu</td>
-                        </tr>
-                        <tr>
-                            <td class="py-4">
-                                <div class="flex items-center gap-3">
-                                    <img src="https://i.pravatar.cc/64?u=rianda" alt="Rianda"
-                                        class="w-12 h-12 rounded-full">
-                                    <div class="ml-6">
-                                        <div class="text-xl font-semibold">Rianda</div>
-                                        <div class="text-sm text-gray-400">Admin Penyemaian</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4">Scan Barcode Kayu</td>
-                            <td class="py-4">1 jam lalu</td>
-                        </tr>
-                        <tr>
-                            <td class="py-4">
-                                <div class="flex items-center gap-3">
-                                    <img src="https://i.pravatar.cc/64?u=yulia" alt="Yulia"
-                                        class="w-12 h-12 rounded-full">
-                                    <div class="ml-6">
-                                        <div class="text-xl font-semibold">Yulia Gita</div>
-                                        <div class="text-sm text-gray-400">Admin Penyemaian</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4">Cetak Barcode Bibit</td>
-                            <td class="py-4">Hari ini</td>
-                        </tr>
-                        <tr>
-                            <td class="py-4">
-                                <div class="flex items-center gap-3">
-                                    <img src="https://i.pravatar.cc/64?u=huda" alt="Huda"
-                                        class="w-12 h-12 rounded-full">
-                                    <div class="ml-6">
-                                        <div class="text-xl font-semibold">Huda</div>
-                                        <div class="text-sm text-gray-400">Admin Penyemaian</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-4">Scan Barcode Kayu</td>
-                            <td class="py-4">1 hari lalu</td>
-                        </tr>
+                                </td>
+                                <td class="py-4">{{ $activity['keterangan'] }}</td>
+                                <td class="py-4 font-semibold">
+                                    {{ $activity['waktu'] ? \Carbon\Carbon::parse($activity['waktu'])->diffForHumans() : '-' }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="py-4 text-center text-gray-400">Tidak ada aktivitas terbaru</td>
+                            </tr>
+                        @endforelse
                     </tbody>
+
                 </table>
             </div>
         @endsection
