@@ -37,8 +37,8 @@
                             <th class="py-3 text-left px-4">Nama Admin</th>
                             <th class="py-3 text-left px-4">Jenis Perawatan</th>
                             <th class="py-3 text-left px-4">Nama Bibit</th>
-                            <th class="py-3 text-left px-4">Catatan</th>
                             <th class="py-3 text-left px-4">Waktu</th>
+                            <th class="py-3 text-left px-4">Catatan</th>
                         </tr>
                     </thead>
                     <tbody>
