@@ -11,8 +11,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HistoryPerawatanController;
 use App\Http\Controllers\FirestoreController;
 use App\Http\Controllers\HistoryBarcodeController;
-
-
+use App\Http\Controllers\DashboardController;
 
 // Halaman Welcome (beranda)
 Route::get('/', fn() => view('welcome'))->name('welcome');
@@ -24,7 +23,7 @@ Route::get('/forgotpassword', fn() => view('layouts.forgotpassword'))->name('for
 Route::get('/resendotp', fn() => view('layouts.resendotp'))->name('resendotp');
 
 // Dashboard & Profile
-Route::get('/dashboard', fn() => view('layouts.dashboard'))->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/profile', fn() => view('layouts.profile'))->name('profile');
 
 // Manajemen Pengguna & Bibit
@@ -33,15 +32,12 @@ Route::post('/update-admin', [ManajemenPenggunaController::class, 'updateAdmin']
 Route::post('/update-status', [ManajemenPenggunaController::class, 'updateStatus']);
 Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna.index');
 
-
 Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])->name('manajemenkayubibit');
 
 // Riwayat / History
 Route::get('/history-perawatan', [HistoryPerawatanController::class, 'index'])->name('historyperawatan');
 Route::get('/history', [HistoryBarcodeController::class, 'index'])->name('history.index');
 Route::get('/history-scan-barcode', [HistoryBarcodeController::class, 'index'])->name('historyscanbarcode');
-
-
 
 // Akun Superadmin
 Route::get('/akun_superadmin', [FirestoreController::class, 'showSuperAdminForm'])->name('akun_superadmin.form');
@@ -63,4 +59,3 @@ Route::get('/test-firebase', function () {
 });
 
 Route::post('/add-admin', [ManajemenPenggunaController::class, 'store'])->name('admin.store');
-
