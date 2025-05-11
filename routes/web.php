@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 
-// Import Controller
+// Import Controllers
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ManajemenPenggunaController;
 use App\Http\Controllers\ManajemenPohonBibitController;
@@ -13,7 +13,7 @@ use App\Http\Controllers\FirestoreController;
 use App\Http\Controllers\HistoryBarcodeController;
 use App\Http\Controllers\DashboardController;
 
-// Halaman Welcome (beranda)
+// Halaman Welcome (Beranda)
 Route::get('/', fn() => view('welcome'))->name('welcome');
 
 // Login & Auth
@@ -26,13 +26,32 @@ Route::get('/resendotp', fn() => view('layouts.resendotp'))->name('resendotp');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/profile', fn() => view('layouts.profile'))->name('profile');
 
-// Manajemen Pengguna & Bibit
-Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna');
-Route::post('/update-admin', [ManajemenPenggunaController::class, 'updateAdmin']);
-Route::post('/update-status', [ManajemenPenggunaController::class, 'updateStatus']);
+// Manajemen Pengguna
 Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna.index');
+Route::post('/update-admin', [ManajemenPenggunaController::class, 'updateAdmin'])->name('manajemenpengguna.updateadmin');
+Route::post('/update-status', [ManajemenPenggunaController::class, 'updateStatus'])->name('manajemenpengguna.updatestatus');
+Route::post('/add-admin', [ManajemenPenggunaController::class, 'store'])->name('admin.store');
 
+// Manajemen Kayu & Bibit
 Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])->name('manajemenkayubibit');
+
+// Routes untuk Kayu
+Route::prefix('kayu')->name('kayu.')->group(function () {
+    Route::get('/', [ManajemenPohonBibitController::class, 'getKayu'])->name('index');
+    Route::post('/update-status', [ManajemenPohonBibitController::class, 'updateKayuStatus'])->name('update.status');
+    Route::post('/store', [ManajemenPohonBibitController::class, 'storeKayu'])->name('store');
+    Route::put('/update/{id}', [ManajemenPohonBibitController::class, 'updateKayu'])->name('update');
+    Route::delete('/delete/{id}', [ManajemenPohonBibitController::class, 'deleteKayu'])->name('delete');
+});
+
+// Routes untuk Bibit
+Route::prefix('bibit')->name('bibit.')->group(function () {
+    Route::get('/', [ManajemenPohonBibitController::class, 'getBibit'])->name('index');
+    Route::post('/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('update.status');
+    Route::post('/store', [ManajemenPohonBibitController::class, 'storeBibit'])->name('store');
+    Route::put('/update/{id}', [ManajemenPohonBibitController::class, 'updateBibit'])->name('update');
+    Route::delete('/delete/{id}', [ManajemenPohonBibitController::class, 'deleteBibit'])->name('delete');
+});
 
 // Riwayat / History
 Route::get('/history-perawatan', [HistoryPerawatanController::class, 'index'])->name('historyperawatan');
@@ -47,7 +66,7 @@ Route::post('/akun_superadmin', [FirestoreController::class, 'storeSuperAdmin'])
 Route::get('/register', [FirestoreController::class, 'showForm'])->name('register.form');
 Route::post('/register', [FirestoreController::class, 'handleForm'])->name('register.store');
 
-// Test Firebase Config (opsional debug)
+// Test Firebase Config (Opsional Debug)
 Route::get('/test-firebase', function () {
     $firebaseCredentials = Config::get('firebase.credentials');
 
@@ -57,5 +76,3 @@ Route::get('/test-firebase', function () {
 
     return 'Firebase credentials file not found!';
 });
-
-Route::post('/add-admin', [ManajemenPenggunaController::class, 'store'])->name('admin.store');

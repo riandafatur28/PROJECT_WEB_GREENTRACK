@@ -30,29 +30,24 @@
                             16% bulan ini
                         </p>
                     </div>
-
                 </div>
 
                 <!-- Total Kayu -->
                 <div class="flex items-center px-4 py-4 md:py-0">
-                    <div class="flex items-center px-4 py-4 md:py-0">
-                        <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
-                            <img src="/assets/images/kayu.svg" alt="New Icon" class="w-8 h-8">
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-gray-600 text-sm">Total Kayu</p>
-                            <h2 class="text-xl font-bold text-black-600">{{ number_format(count($kayu ?? [])) }}</h2>
-                            <p class="text-xs text-red-500 mt-1 flex items-center">
-                                <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
-                                </svg>
-                                1% bulan ini
-                            </p>
-                        </div>
+                    <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
+                        <img src="/assets/images/kayu.svg" alt="New Icon" class="w-8 h-8">
                     </div>
-
+                    <div class="ml-4">
+                        <p class="text-gray-600 text-sm">Total Kayu</p>
+                        <h2 class="text-xl font-bold text-black-600">{{ number_format(count($kayu ?? [])) }}</h2>
+                        <p class="text-xs text-red-500 mt-1 flex items-center">
+                            <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                            1% bulan ini
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Admin Aktif -->
@@ -99,7 +94,7 @@
                 <div class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-3 md:space-y-0">
                     <!-- Input Pencarian -->
                     <div class="relative w-full md:w-auto">
-                        <input type="text" placeholder="Cari"
+                        <input type="text" placeholder="Cari" id="searchBibit"
                             class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
                         <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
                     </div>
@@ -107,7 +102,7 @@
                     <!-- Dropdown Sorting -->
                     <div class="flex flex-col md:flex-row md:items-center">
                         <label class="text-gray-600 text-sm">Urutkan:</label>
-                        <select
+                        <select id="sortBibit"
                             class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto">
                             <option value="terbaru">Terbaru</option>
                             <option value="terlama">Terlama</option>
@@ -122,7 +117,7 @@
                         <tr class="bg-white">
                             <th class="px-2 py-1 text-left">ID Bibit</th>
                             <th class="px-2 py-1 text-left">Jenis Bibit</th>
-                            <th class="px-2 py-1 text-left">Jumlah</th>
+                            <th class="px-2 py-1 text-left">Tinggi</th>
                             <th class="px-2 py-1 text-left">Lokasi</th>
                             <th class="px-2 py-1 text-left">Status</th>
                             <th class="px-2 py-1 text-left">Aksi</th>
@@ -133,13 +128,14 @@
                             <tr class="border-b">
                                 <td class="px-2 py-1">{{ $item['id'] }}</td>
                                 <td class="px-2 py-1">{{ $item['jenis'] }}</td>
-                                <td class="px-2 py-1">{{ $item['jumlah'] }} Hari</td>
+                                <td class="px-2 py-1">{{ $item['jumlah'] }} cm</td>
                                 <td class="px-2 py-1">{{ $item['lokasi'] }}</td>
                                 <td class="px-2 py-1">
                                     <select
                                         class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm bg-green-300"
                                         data-id="{{ $item['id'] }}" onchange="updateBackground(this)">
-                                        <option value="Penyemaian" {{ $item['status'] == 'Penyemaian' ? 'selected' : '' }}>
+                                        <option value="Penyemaian"
+                                            {{ $item['status'] == 'Penyemaian' || $item['status'] == 'Sedang' ? 'selected' : '' }}>
                                             Persemaian
                                         </option>
                                         <option value="Siap Tanam" {{ $item['status'] == 'Siap Tanam' ? 'selected' : '' }}>
@@ -148,10 +144,20 @@
                                     </select>
                                 </td>
                                 <td class="px-2 py-1">
-                                    <a href="/detail-bibit/{{ $item['id'] }}"
-                                        class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block">
+                                    <button
+                                        class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block bibit-detail-btn"
+                                        data-id="{{ $item['id'] }}" data-jenis="{{ $item['jenis'] }}"
+                                        data-tinggi="{{ $item['jumlah'] }}" data-lokasi="{{ $item['lokasi'] }}"
+                                        data-status="{{ $item['status'] }}" data-usia="{{ $item['usia'] ?? '' }}"
+                                        data-nama="{{ $item['nama'] ?? '' }}"
+                                        data-varietas="{{ $item['varietas'] ?? '' }}"
+                                        data-tanggal="{{ $item['tanggal_pembibitan'] ?? '' }}"
+                                        data-asal="{{ $item['asal_bibit'] ?? '' }}"
+                                        data-nutrisi="{{ $item['nutrisi'] ?? '' }}"
+                                        data-media="{{ $item['media_tanam'] ?? '' }}"
+                                        data-gambar="{{ $item['gambar_image'] ?? '' }}">
                                         Lihat Selengkapnya
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach
@@ -159,7 +165,8 @@
                 </table>
             </div>
             <div class="flex justify-between mt-8">
-                <p class="text-sm text-gray-500">Menampilkan data 1 hingga 8 dari 256 entri</p>
+                <p class="text-sm text-gray-500">Menampilkan data 1 hingga {{ count($bibit) > 8 ? 8 : count($bibit) }}
+                    dari {{ count($bibit) }} entri</p>
                 <div class="flex space-x-1">
                     <button
                         class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</button>
@@ -170,7 +177,7 @@
                     <button
                         class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">...</button>
                     <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">40</button>
+                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">{{ ceil(count($bibit) / 8) }}</button>
                     <button
                         class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</button>
                 </div>
@@ -179,14 +186,14 @@
 
         <!-- Table Kayu -->
         <div id="table-kayu" class="bg-white shadow-md rounded-3xl p-3 hidden">
-            <!-- Header Data Bibit dengan Search dan Sort -->
+            <!-- Header Data Kayu dengan Search dan Sort -->
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 space-y-3 md:space-y-0">
                 <h2 class="text-lg font-semibold text-gray-800 text-center md:text-left">Data Kayu</h2>
 
                 <div class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-3 md:space-y-0">
                     <!-- Input Pencarian -->
                     <div class="relative w-full md:w-auto">
-                        <input type="text" placeholder="Cari"
+                        <input type="text" placeholder="Cari" id="searchKayu"
                             class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
                         <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
                     </div>
@@ -194,7 +201,7 @@
                     <!-- Dropdown Sorting -->
                     <div class="flex flex-col md:flex-row md:items-center">
                         <label class="text-gray-600 text-sm">Urutkan:</label>
-                        <select
+                        <select id="sortKayu"
                             class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto">
                             <option value="terbaru">Terbaru</option>
                             <option value="terlama">Terlama</option>
@@ -222,7 +229,7 @@
                                 <td class="px-2 py-1">{{ $item['jenis'] }}</td>
                                 <td class="px-2 py-1">{{ $item['jumlah'] }} Batang</td>
                                 <td class="px-2 py-1">{{ $item['lokasi'] }}</td>
-                                <td class="px-2 py-1">batch panen</td>
+                                <td class="px-2 py-1">{{ $item['batch_panen'] ?? 'Tidak tersedia' }}</td>
                                 <td class="px-2 py-1">
                                     <select
                                         class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm bg-green-300"
@@ -235,43 +242,29 @@
                                         </option>
                                     </select>
                                 </td>
+                                <!-- Tabel kolom tombol -->
                                 <td class="px-2 py-1">
-                                    <<td class="px-2 py-1">
-                                        <button
-                                            class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block detail-btn"
-                                            data-id="{{ $item['id'] }}" data-nama="{{ $item['nama'] }}"
-                                            data-jenis="{{ $item['jenis'] }}" data-usia="{{ $item['usia'] }}"
-                                            data-jumlah="{{ $item['jumlah'] }}" data-lokasi="{{ $item['lokasi'] }}"
-                                            data-status="{{ $item['status'] }}">
-                                            Lihat Selengkapnya
-                                        </button>
-                                </td>
+                                    <button
+                                        class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block detail-btn"
+                                        data-id="{{ $item['id'] }}" data-nama="{{ $item['nama'] ?? '' }}"
+                                        data-jenis="{{ $item['jenis'] }}" data-usia="{{ $item['usia'] ?? '' }}"
+                                        data-jumlah="{{ $item['jumlah'] }}" data-lokasi="{{ $item['lokasi'] }}"
+                                        data-status="{{ $item['status'] }}" data-barcode="{{ $item['barcode'] ?? '' }}"
+                                        data-batch="{{ $item['batch_panen'] ?? '' }}"
+                                        data-tanggal="{{ $item['tanggal_lahir_pohon'] ?? '' }}"
+                                        data-gambar="{{ $item['gambar_image'] ?? '' }}">
+                                        Lihat Selengkapnya
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-            <!-- Modal -->
-            <div id="detailModal"
-                class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
-                <div class="bg-white rounded-lg shadow-lg w-96 p-6 relative">
-                    <button id="closeModal" class="absolute top-2 right-2 text-gray-500 hover:text-black">&times;</button>
-                    <h2 class="text-xl font-bold mb-4">Detail Pohon/Bibit</h2>
-                    <ul class="space-y-2 text-sm">
-                        <li><strong>ID:</strong> <span id="detailId"></span></li>
-                        <li><strong>Nama:</strong> <span id="detailNama"></span></li>
-                        <li><strong>Jenis:</strong> <span id="detailJenis"></span></li>
-                        <li><strong>Usia:</strong> <span id="detailUsia"></span></li>
-                        <li><strong>Jumlah:</strong> <span id="detailJumlah"></span></li>
-                        <li><strong>Lokasi:</strong> <span id="detailLokasi"></span></li>
-                        <li><strong>Status:</strong> <span id="detailStatus"></span></li>
-                    </ul>
-                </div>
-            </div>
 
             <div class="flex justify-between mt-8">
-                <p class="text-sm text-gray-500">Menampilkan data 1 hingga 8 dari 256 entri</p>
+                <p class="text-sm text-gray-500">Menampilkan data 1 hingga {{ count($kayu) > 8 ? 8 : count($kayu) }} dari
+                    {{ count($kayu) }} entri</p>
                 <div class="flex space-x-1">
                     <button
                         class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</button>
@@ -282,92 +275,359 @@
                     <button
                         class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">...</button>
                     <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">40</button>
+                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">{{ ceil(count($kayu) / 8) }}</button>
                     <button
                         class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Detail Data Kayu -->
+        <div id="modalDetailKayu" class="fixed inset-0 bg-black bg-opacity-5 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-xl p-6 relative">
+                <!-- Close button -->
+                <button id="tutupModal"
+                    class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+
+                <!-- Title -->
+                <h2 class="text-xl font-bold text-center text-amber-800 mb-5">Detail Data Kayu</h2>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <!-- Left Column with Image and Fields -->
+                    <div class="space-y-3">
+                        <!-- Wood Image -->
+                        <img id="detail-foto" src="https://via.placeholder.com/300x220" alt="Foto Kayu"
+                            class="w-full h-52 object-cover mb-3">
+
+                        <!-- Fields below image -->
+                        <div class="outline outline-2 outline-purple-400 outline-offset-2">
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Penanggung Jawab</label>
+                            <input type="text" id="detail-penanggung" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Tanggal Kayu</label>
+                            <input type="text" id="detail-tanggal" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Right Column Form Fields -->
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">ID Barcode</label>
+                            <input type="text" id="detail-id" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Jenis Kayu</label>
+                            <input type="text" id="detail-jenis" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Volume</label>
+                            <input type="text" id="detail-volume" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Diameter</label>
+                            <input type="text" id="detail-diameter" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Panjang</label>
+                            <input type="text" id="detail-panjang" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Kondisi Kayu</label>
+                            <input type="text" id="detail-kondisi" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-2">
+                    <button class="bg-green-600 text-white px-5 py-2 rounded text-sm font-medium hover:bg-green-700">
+                        Simpan
+                    </button>
+                    <button class="bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm font-medium hover:bg-gray-300">
+                        Hapus
+                    </button>
+                    <button class="bg-gray-400 text-white px-5 py-2 rounded text-sm font-medium hover:bg-gray-500">
+                        Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Detail Data Bibit -->
+        <div id="modalDetailBibit" class="fixed inset-0 bg-black bg-opacity-5 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-xl p-6 relative">
+                <!-- Close button -->
+                <button id="tutupModalBibit"
+                    class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+
+                <!-- Title -->
+                <h2 class="text-xl font-bold text-center text-green-800 mb-5">Detail Data Bibit</h2>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <!-- Left Column with Image and Fields -->
+                    <div class="space-y-3">
+                        <!-- Seedling Image -->
+                        <img id="detail-bibit-foto" src="https://via.placeholder.com/300x220" alt="Foto Bibit"
+                            class="w-full h-52 object-cover mb-3">
+
+                        <!-- Fields below image -->
+                        <div class="outline outline-2 outline-green-400 outline-offset-2">
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Penanggung Jawab</label>
+                            <input type="text" id="detail-bibit-penanggung" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Tanggal Tanam</label>
+                            <input type="text" id="detail-bibit-tanggal" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Right Column Form Fields -->
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">ID Bibit</label>
+                            <input type="text" id="detail-bibit-id" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Jenis Bibit</label>
+                            <input type="text" id="detail-bibit-jenis" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Usia Bibit</label>
+                            <input type="text" id="detail-bibit-usia" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Tinggi</label>
+                            <input type="text" id="detail-bibit-tinggi" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Lokasi</label>
+                            <input type="text" id="detail-bibit-lokasi" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Status</label>
+                            <input type="text" id="detail-bibit-status" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-2">
+                    <button class="bg-green-600 text-white px-5 py-2 rounded text-sm font-medium hover:bg-green-700">
+                        Simpan
+                    </button>
+                    <button class="bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm font-medium hover:bg-gray-300">
+                        Hapus
+                    </button>
+                    <button class="bg-gray-400 text-white px-5 py-2 rounded text-sm font-medium hover:bg-gray-500">
+                        Edit
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 @endsection
 
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kayu Modal
+            const modalKayu = document.getElementById('modalDetailKayu');
+            const detailButtonsKayu = document.querySelectorAll('.detail-btn');
+            const tutupModalKayu = document.getElementById('tutupModal');
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const tabButtons = document.querySelectorAll(".tab-btn");
-        const tables = {
-            bibit: document.getElementById("table-bibit"),
-            kayu: document.getElementById("table-kayu"),
-        };
+            // Bibit Modal
+            const modalBibit = document.getElementById('modalDetailBibit');
+            const detailButtonsBibit = document.querySelectorAll('.bibit-detail-btn');
+            const tutupModalBibit = document.getElementById('tutupModalBibit');
 
-        tabButtons.forEach(button => {
-            button.addEventListener("click", function() {
-                const tab = this.getAttribute("data-tab");
-                console.log("Tab diklik:", tab); // Debugging
+            // Handle Kayu detail buttons click
+            detailButtonsKayu.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Get data from data-* attributes
+                    const id = this.dataset.id || '';
+                    const jenis = this.dataset.jenis || '';
+                    const nama = this.dataset.nama || '';
+                    const jumlah = this.dataset.jumlah || '';
+                    const lokasi = this.dataset.lokasi || '';
+                    const status = this.dataset.status || '';
+                    const usia = this.dataset.usia || '';
+                    const barcode = this.dataset.barcode || '';
+                    const batch = this.dataset.batch || '';
+                    const tanggal = this.dataset.tanggal || '';
+                    const gambar = this.dataset.gambar || 'https://via.placeholder.com/300x220';
 
-                if (tables[tab]) {
-                    console.log("Menampilkan tabel:", tab); // Debugging
+                    // Fill data into the modal form
+                    document.getElementById('detail-id').value = barcode || id;
+                    document.getElementById('detail-jenis').value = jenis;
+                    document.getElementById('detail-volume').value = jumlah + ' Batang';
+                    document.getElementById('detail-diameter').value = 'Data tidak tersedia';
+                    document.getElementById('detail-panjang').value = 'Data tidak tersedia';
+                    document.getElementById('detail-kondisi').value = status;
+                    document.getElementById('detail-penanggung').value = nama ||
+                        'Data tidak tersedia';
+                    document.getElementById('detail-tanggal').value = tanggal ||
+                        'Data tidak tersedia';
 
-                    // Sembunyikan semua tabel
-                    Object.values(tables).forEach(table => table?.classList.add("hidden"));
+                    // Set the image if available
+                    if (gambar && gambar !== '') {
+                        document.getElementById('detail-foto').src = gambar;
+                    }
 
-                    // Tampilkan tabel yang sesuai
-                    tables[tab].classList.remove("hidden");
-                } else {
-                    console.log("Tabel tidak ditemukan:", tab);
-                }
-
-                // Ubah tampilan tombol tab
-                tabButtons.forEach(btn => {
-                    btn.classList.remove("border-gray-800", "text-gray-800");
-                    btn.classList.add("text-gray-600", "border-transparent");
+                    // Show modal
+                    modalKayu.classList.remove('hidden');
+                    modalKayu.classList.add('flex');
                 });
+            });
 
-                this.classList.add("border-gray-800", "text-gray-800");
-                this.classList.remove("text-gray-600", "border-transparent");
+            // Handle Bibit detail buttons click
+            detailButtonsBibit.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Get data from data-* attributes
+                    const id = this.dataset.id || '';
+                    const jenis = this.dataset.jenis || '';
+                    const tinggi = this.dataset.tinggi || '';
+                    const lokasi = this.dataset.lokasi || '';
+                    const status = this.dataset.status || '';
+                    const usia = this.dataset.usia || '';
+                    const nama = this.dataset.nama || '';
+                    const tanggal = this.dataset.tanggal || '';
+                    const varietas = this.dataset.varietas || '';
+                    const asal = this.dataset.asal || '';
+                    const nutrisi = this.dataset.nutrisi || '';
+                    const media = this.dataset.media || '';
+                    const gambar = this.dataset.gambar || 'https://via.placeholder.com/300x220';
+
+                    // Fill data into the modal form
+                    document.getElementById('detail-bibit-id').value = id;
+                    document.getElementById('detail-bibit-jenis').value = jenis;
+                    document.getElementById('detail-bibit-usia').value = usia ? usia + ' hari' :
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-tinggi').value = tinggi ? tinggi + ' cm' :
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-lokasi').value = lokasi;
+                    document.getElementById('detail-bibit-status').value = status;
+                    document.getElementById('detail-bibit-penanggung').value = nama ||
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-tanggal').value = tanggal ||
+                        'Data tidak tersedia';
+
+                    // Set the image if available
+                    if (gambar && gambar !== '') {
+                        document.getElementById('detail-bibit-foto').src = gambar;
+                    }
+
+                    // Show modal
+                    modalBibit.classList.remove('hidden');
+                    modalBibit.classList.add('flex');
+                });
+            });
+
+            // Close modal Kayu
+            if (tutupModalKayu) {
+                tutupModalKayu.addEventListener('click', function() {
+                    modalKayu.classList.add('hidden');
+                    modalKayu.classList.remove('flex');
+                });
+            }
+
+            // Close modal Bibit
+            if (tutupModalBibit) {
+                tutupModalBibit.addEventListener('click', function() {
+                    modalBibit.classList.add('hidden');
+                    modalBibit.classList.remove('flex');
+                });
+            }
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modalKayu) {
+                    modalKayu.classList.add('hidden');
+                    modalKayu.classList.remove('flex');
+                }
+                if (event.target === modalBibit) {
+                    modalBibit.classList.add('hidden');
+                    modalBibit.classList.remove('flex');
+                }
+            });
+
+            // Initialize tab behavior
+            const tabButtons = document.querySelectorAll(".tab-btn");
+            const tables = {
+                bibit: document.getElementById("table-bibit"),
+                kayu: document.getElementById("table-kayu"),
+            };
+
+            // Set default active tab (bibit)
+            document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("border-gray-800", "text-gray-800");
+
+            tabButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    const tab = this.getAttribute("data-tab");
+
+                    if (tables[tab]) {
+                        // Hide all tables
+                        Object.values(tables).forEach(table => table?.classList.add("hidden"));
+
+                        // Show selected table
+                        tables[tab].classList.remove("hidden");
+                    }
+
+                    // Update tab button appearance
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove("border-gray-800", "text-gray-800");
+                        btn.classList.add("text-gray-600", "border-transparent");
+                    });
+
+                    this.classList.add("border-gray-800", "text-gray-800");
+                    this.classList.remove("text-gray-600", "border-transparent");
+                });
+            });
+
+            // Set background color for status dropdowns
+            document.querySelectorAll(".status-dropdown").forEach(select => {
+                updateBackground(select);
             });
         });
-    });
 
-    function updateBackground(selectElement) {
-        if (selectElement.value === "Tersedia") {
-            selectElement.setAttribute("style", "background-color: green-400 !important;"); // Hijau
-        } else if (selectElement.value === "Kosong") {
-            selectElement.setAttribute("style", "background-color: #f48fb1 !important;"); // Kuning
-        } else if (selectElement.value === "Siap Tanam") {
-            selectElement.setAttribute("style", "background-color: #fde047 !important;"); // Kuning
+        function updateBackground(selectElement) {
+            if (selectElement.value === "Tersedia") {
+                selectElement.style.backgroundColor = "#4ade80"; // Green
+            } else if (selectElement.value === "Kosong") {
+                selectElement.style.backgroundColor = "#f48fb1"; // Pink
+            } else if (selectElement.value === "Siap Tanam") {
+                selectElement.style.backgroundColor = "#fde047"; // Yellow
+            } else if (selectElement.value === "Persemaian" || selectElement.value === "Penyemaian") {
+                selectElement.style.backgroundColor = "#93c5fd"; // Blue
+            }
         }
-    }
-    // Set warna awal saat halaman dimuat
-    document.querySelectorAll(".status-dropdown").forEach(select => {
-        updateBackground(select);
-    });
-
-    const detailButtons = document.querySelectorAll('.detail-btn');
-    const modal = document.getElementById('detailModal');
-    const closeModal = document.getElementById('closeModal');
-
-    detailButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.getElementById('detailId').textContent = btn.dataset.id;
-            document.getElementById('detailNama').textContent = btn.dataset.nama;
-            document.getElementById('detailJenis').textContent = btn.dataset.jenis;
-            document.getElementById('detailUsia').textContent = btn.dataset.usia;
-            document.getElementById('detailJumlah').textContent = btn.dataset.jumlah;
-            document.getElementById('detailLokasi').textContent = btn.dataset.lokasi;
-            document.getElementById('detailStatus').textContent = btn.dataset.status;
-            modal.classList.remove('hidden');
-        });
-    });
-
-    closeModal.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
-
-    // Optional: close when clicking outside the modal
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.add('hidden');
-        }
-    });
-</script>
+    </script>
+    @endsectionphp
