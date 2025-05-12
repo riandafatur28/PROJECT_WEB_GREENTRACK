@@ -5,73 +5,35 @@
     <meta charset="UTF-8">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Kode OTP | GreenTrack</title>
+    <title>Pemberitahuan Pengiriman Tautan | GreenTrack</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+<body class="bg-gray-100 min-h-screen flex justify-center items-center">
+
+    <!-- Pop-up Notification -->
     <div class="bg-white p-6 rounded-lg shadow-md text-center w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl">
-        <h2 class="text-xl sm:text-2xl font-bold">Verifikasi Kode OTP 📩</h2>
-        <p class="text-sm sm:text-lg text-gray-600 mt-8 mb-16">Kami telah mengirimkan kode verifikasi ke
-            email.<br>Masukkan
-            kode di bawah ini untuk melanjutkan.</p>
-        <div class="flex justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 mt-6">
-            <input type="text" maxlength="1"
-                class="otp-input w-10 h-10 sm:w-12 sm:h-12 text-center text-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                oninput="moveToNext(this)" onkeydown="moveToPrev(event, this)" pattern="[0-9]*" inputmode="numeric">
-            <input type="text" maxlength="1"
-                class="otp-input w-10 h-10 sm:w-12 sm:h-12 text-center text-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                oninput="moveToNext(this)" onkeydown="moveToPrev(event, this)" pattern="[0-9]*" inputmode="numeric">
-            <input type="text" maxlength="1"
-                class="otp-input w-10 h-10 sm:w-12 sm:h-12 text-center text-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                oninput="moveToNext(this)" onkeydown="moveToPrev(event, this)" pattern="[0-9]*" inputmode="numeric">
-            <input type="text" maxlength="1"
-                class="otp-input w-10 h-10 sm:w-12 sm:h-12 text-center text-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                oninput="moveToNext(this)" onkeydown="moveToPrev(event, this)" pattern="[0-9]*" inputmode="numeric">
-            <input type="text" maxlength="1"
-                class="otp-input w-10 h-10 sm:w-12 sm:h-12 text-center text-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                oninput="moveToNext(this)" onkeydown="moveToPrev(event, this)" pattern="[0-9]*" inputmode="numeric">
-            <input type="text" maxlength="1"
-                class="otp-input w-10 h-10 sm:w-12 sm:h-12 text-center text-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                oninput="moveToNext(this)" onkeydown="moveToPrev(event, this)" pattern="[0-9]*" inputmode="numeric">
-        </div>
-        <div class="mt-16">
-            <button
+        <h2 class="text-xl sm:text-2xl font-bold text-green-600">Tautan Reset Kata Sandi Telah Dikirimkan 📧</h2>
+        <p class="text-sm sm:text-lg text-gray-600 mt-4 mb-12">
+            Kami telah mengirimkan tautan untuk memperbarui kata sandi ke email yang Anda masukkan sebelumnya.<br>
+            Silakan periksa email Anda dan ikuti instruksi untuk mereset kata sandi.
+        </p>
+
+        <!-- Button to Close/Go Back -->
+        <div class="mt-8">
+            <a href="login"
                 class="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
-                Kirim Ulang Kode OTP dalam [ ] Detik
-            </button>
-        </div>
-        <div class="mt-6">
-            <!-- Tombol kembali yang sekarang berfungsi sebagai link menuju halaman login -->
-            <a href="forgotpassword"
-                class="w-full bg-white text-green-600 py-3 rounded-md border border-green-600 hover:bg-green-200 hover:text-green text-center block">
-                Kembali
+                Kembali ke Halaman Login
             </a>
         </div>
+
+        <!-- Optionally, add a timer for re-sending the link -->
+        <div class="mt-6 text-sm text-gray-500">
+            <span>Jika Anda tidak menerima email, klik <a href="forgotpassword"
+                    class="text-green-600 hover:text-green-700">di sini</a> untuk mengirim ulang.</span>
+        </div>
     </div>
 
-
-    </div>
-
-    <script>
-        function moveToNext(input) {
-            if (input.value.length === 1) {
-                let next = input.nextElementSibling;
-                if (next && next.classList.contains('otp-input')) {
-                    next.focus();
-                }
-            }
-        }
-
-        function moveToPrev(event, input) {
-            if (event.key === "Backspace" && input.value === "") {
-                let prev = input.previousElementSibling;
-                if (prev && prev.classList.contains('otp-input')) {
-                    prev.focus();
-                }
-            }
-        }
-    </script>
 </body>
 
 </html>
