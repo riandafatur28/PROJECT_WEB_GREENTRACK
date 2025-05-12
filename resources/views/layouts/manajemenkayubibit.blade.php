@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Manajemen Kayu & Bibit')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 @section('content')
     <div class="container mx-auto px-4 py-6">
@@ -127,8 +128,8 @@
                         @foreach ($bibit as $item)
                             <tr class="border-b">
                                 <td class="px-2 py-1">{{ $item['id'] }}</td>
-                                <td class="px-2 py-1">{{ $item['jenis'] }}</td>
-                                <td class="px-2 py-1">{{ $item['jumlah'] }} cm</td>
+                                <td class="px-2 py-1">{{ $item['jenis_bibit'] }}</td>
+                                <td class="px-2 py-1">{{ $item['tinggi'] }} cm</td>
                                 <td class="px-2 py-1">{{ $item['lokasi'] }}</td>
                                 <td class="px-2 py-1">
                                     <select
@@ -138,7 +139,8 @@
                                             {{ $item['status'] == 'Penyemaian' || $item['status'] == 'Sedang' ? 'selected' : '' }}>
                                             Persemaian
                                         </option>
-                                        <option value="Siap Tanam" {{ $item['status'] == 'Siap Tanam' ? 'selected' : '' }}>
+                                        <option value="Siap Tanam"
+                                            {{ $item['status'] == 'Siap Tanam' ? 'selected' : '' }}>
                                             Siap Tanam
                                         </option>
                                     </select>
@@ -146,12 +148,12 @@
                                 <td class="px-2 py-1">
                                     <button
                                         class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block bibit-detail-btn"
-                                        data-id="{{ $item['id'] }}" data-jenis="{{ $item['jenis'] }}"
-                                        data-tinggi="{{ $item['jumlah'] }}" data-lokasi="{{ $item['lokasi'] }}"
+                                        data-id="{{ $item['id'] }}" data-jenis="{{ $item['jenis_bibit'] }}"
+                                        data-tinggi="{{ $item['tinggi'] }}" data-lokasi="{{ $item['lokasi'] }}"
                                         data-status="{{ $item['status'] }}" data-usia="{{ $item['usia'] ?? '' }}"
-                                        data-nama="{{ $item['nama'] ?? '' }}"
+                                        data-nama="{{ $item['nama_bibit'] ?? '' }}"
                                         data-varietas="{{ $item['varietas'] ?? '' }}"
-                                        data-tanggal="{{ $item['tanggal_pembibitan'] ?? '' }}"
+                                        data-produktivitas="{{ $item['produktivitas'] ?? '' }}"
                                         data-asal="{{ $item['asal_bibit'] ?? '' }}"
                                         data-nutrisi="{{ $item['nutrisi'] ?? '' }}"
                                         data-media="{{ $item['media_tanam'] ?? '' }}"
@@ -163,24 +165,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
-            <div class="flex justify-between mt-8">
-                <p class="text-sm text-gray-500">Menampilkan data 1 hingga {{ count($bibit) > 8 ? 8 : count($bibit) }}
-                    dari {{ count($bibit) }} entri</p>
-                <div class="flex space-x-1">
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</button>
-                    <button
-                        class="px-2 py-0.5 bg-green-500 text-white border border-green-500 rounded-md text-xs">1</button>
-                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">2</button>
-                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">3</button>
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">...</button>
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">{{ ceil(count($bibit) / 8) }}</button>
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</button>
-                </div>
             </div>
         </div>
 
@@ -209,13 +193,14 @@
                     </div>
                 </div>
             </div>
+
             <div class="overflow-x-auto">
-                <table class="w-full border-collapse text-xs md:text-sm">
+                <table class="w-full text-xs md:text-sm">
                     <thead>
                         <tr class="bg-white">
                             <th class="px-2 py-1 text-left">ID Kayu</th>
                             <th class="px-2 py-1 text-left">Jenis Kayu</th>
-                            <th class="px-2 py-1 text-left">Jumlah</th>
+                            <th class="px-2 py-1 text-left">Tinggi</th>
                             <th class="px-2 py-1 text-left">Lokasi</th>
                             <th class="px-2 py-1 text-left">Batch Panen</th>
                             <th class="px-2 py-1 text-left">Status</th>
@@ -226,8 +211,8 @@
                         @foreach ($kayu as $item)
                             <tr class="border-b">
                                 <td class="px-2 py-1">{{ $item['id'] }}</td>
-                                <td class="px-2 py-1">{{ $item['jenis'] }}</td>
-                                <td class="px-2 py-1">{{ $item['jumlah'] }} Batang</td>
+                                <td class="px-2 py-1">{{ $item['jenis_kayu'] }}</td>
+                                <td class="px-2 py-1">{{ $item['tinggi'] }} Batang</td>
                                 <td class="px-2 py-1">{{ $item['lokasi'] }}</td>
                                 <td class="px-2 py-1">{{ $item['batch_panen'] ?? 'Tidak tersedia' }}</td>
                                 <td class="px-2 py-1">
@@ -242,13 +227,12 @@
                                         </option>
                                     </select>
                                 </td>
-                                <!-- Tabel kolom tombol -->
                                 <td class="px-2 py-1">
                                     <button
                                         class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block detail-btn"
                                         data-id="{{ $item['id'] }}" data-nama="{{ $item['nama'] ?? '' }}"
-                                        data-jenis="{{ $item['jenis'] }}" data-usia="{{ $item['usia'] ?? '' }}"
-                                        data-jumlah="{{ $item['jumlah'] }}" data-lokasi="{{ $item['lokasi'] }}"
+                                        data-jenis="{{ $item['jenis_kayu'] }}" data-usia="{{ $item['usia'] ?? '' }}"
+                                        data-jumlah="{{ $item['tinggi'] }}" data-lokasi="{{ $item['lokasi'] }}"
                                         data-status="{{ $item['status'] }}" data-barcode="{{ $item['barcode'] ?? '' }}"
                                         data-batch="{{ $item['batch_panen'] ?? '' }}"
                                         data-tanggal="{{ $item['tanggal_lahir_pohon'] ?? '' }}"
@@ -260,25 +244,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
-
-            <div class="flex justify-between mt-8">
-                <p class="text-sm text-gray-500">Menampilkan data 1 hingga {{ count($kayu) > 8 ? 8 : count($kayu) }} dari
-                    {{ count($kayu) }} entri</p>
-                <div class="flex space-x-1">
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</button>
-                    <button
-                        class="px-2 py-0.5 bg-green-500 text-white border border-green-500 rounded-md text-xs">1</button>
-                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">2</button>
-                    <button class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">3</button>
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">...</button>
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">{{ ceil(count($kayu) / 8) }}</button>
-                    <button
-                        class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</button>
-                </div>
             </div>
         </div>
 
@@ -300,7 +265,7 @@
                             class="w-full h-52 object-cover mb-3">
 
                         <!-- Fields below image -->
-                        <div class="outline outline-2 outline-purple-400 outline-offset-2">
+                        <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Penanggung Jawab</label>
                             <input type="text" id="detail-penanggung" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
@@ -386,8 +351,8 @@
                             class="w-full h-52 object-cover mb-3">
 
                         <!-- Fields below image -->
-                        <div class="outline outline-2 outline-green-400 outline-offset-2">
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Penanggung Jawab</label>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1 mt-21">Nama Bibit</label>
                             <input type="text" id="detail-bibit-penanggung" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
@@ -395,6 +360,17 @@
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Tanggal Tanam</label>
                             <input type="text" id="detail-bibit-tanggal" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Nutrisi</label>
+                            <input type="text" id="detail-bibit-nutrisi" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Media Tanam</label>
+                            <input type="text" id="detail-bibit-media" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
                     </div>
@@ -436,6 +412,18 @@
                             <input type="text" id="detail-bibit-status" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Varietas</label>
+                            <input type="text" id="detail-bibit-varietas" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Asal Bibit</label>
+                            <input type="text" id="detail-bibit-asal" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
                     </div>
                 </div>
 
@@ -453,11 +441,90 @@
                 </div>
             </div>
         </div>
+
+
     </div>
 @endsection
 
 @section('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalBibit = document.getElementById('modalDetailBibit');
+            const detailButtonsBibit = document.querySelectorAll('.bibit-detail-btn');
+            const tutupModalBibit = document.getElementById('tutupModalBibit');
+
+            // Handle Bibit detail buttons click
+            detailButtonsBibit.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Get data from data-* attributes
+                    const id = this.dataset.id || '';
+                    const jenis = this.dataset.jenis || '';
+                    const tinggi = this.dataset.tinggi || '';
+                    const lokasi = this.dataset.lokasi || '';
+                    const status = this.dataset.status || '';
+                    const usia = this.dataset.usia || '';
+                    const nama = this.dataset.nama || '';
+                    const tanggal = this.dataset.tanggal || '';
+                    const varietas = this.dataset.varietas || '';
+                    const asal = this.dataset.asal || '';
+                    const nutrisi = this.dataset.nutrisi || '';
+                    const media = this.dataset.media || '';
+                    const gambar = this.dataset.gambar || 'https://via.placeholder.com/300x220';
+
+                    // Fill data into the modal form
+                    document.getElementById('detail-bibit-id').value = id;
+                    document.getElementById('detail-bibit-jenis').value = jenis;
+                    document.getElementById('detail-bibit-usia').value = usia ? usia + ' tahun' :
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-tinggi').value = tinggi ? tinggi + ' cm' :
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-lokasi').value = lokasi;
+                    document.getElementById('detail-bibit-status').value = status;
+                    document.getElementById('detail-bibit-penanggung').value = nama ||
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-tanggal').value = tanggal ||
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-varietas').value = varietas ||
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-asal').value = asal ||
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-nutrisi').value = nutrisi ||
+                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-media').value = media ||
+                        'Data tidak tersedia';
+
+                    // Set the image if available
+                    if (gambar && gambar !== '') {
+                        document.getElementById('detail-bibit-foto').src = gambar;
+                    } else {
+                        document.getElementById('detail-bibit-foto').src =
+                            'https://via.placeholder.com/300x220';
+                    }
+
+                    // Show modal
+                    modalBibit.classList.remove('hidden');
+                    modalBibit.classList.add('flex');
+                });
+            });
+
+            // Close modal Bibit
+            if (tutupModalBibit) {
+                tutupModalBibit.addEventListener('click', function() {
+                    modalBibit.classList.add('hidden');
+                    modalBibit.classList.remove('flex');
+                });
+            }
+
+            // Close modal Bibit when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modalBibit) {
+                    modalBibit.classList.add('hidden');
+                    modalBibit.classList.remove('flex');
+                }
+            });
+        });
+
+
         document.addEventListener('DOMContentLoaded', function() {
             // Kayu Modal
             const modalKayu = document.getElementById('modalDetailKayu');
@@ -535,7 +602,7 @@
                         'Data tidak tersedia';
                     document.getElementById('detail-bibit-lokasi').value = lokasi;
                     document.getElementById('detail-bibit-status').value = status;
-                    document.getElementById('detail-bibit-penanggung').value = nama ||
+                    document.getElementById('detail-bibit-penanggung').value = produktivitas ||
                         'Data tidak tersedia';
                     document.getElementById('detail-bibit-tanggal').value = tanggal ||
                         'Data tidak tersedia';
@@ -550,6 +617,7 @@
                     modalBibit.classList.add('flex');
                 });
             });
+
 
             // Close modal Kayu
             if (tutupModalKayu) {
@@ -626,8 +694,44 @@
             } else if (selectElement.value === "Siap Tanam") {
                 selectElement.style.backgroundColor = "#fde047"; // Yellow
             } else if (selectElement.value === "Persemaian" || selectElement.value === "Penyemaian") {
-                selectElement.style.backgroundColor = "#93c5fd"; // Blue
+                selectElement.style.backgroundColor = "#4ade80"; // Green
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fungsi untuk mengupdate status bibit dan kayu
+            const statusDropdowns = document.querySelectorAll('.status-dropdown');
+            statusDropdowns.forEach(select => {
+                select.addEventListener('change', function() {
+                    const id = this.dataset.id;
+                    const status = this.value;
+
+                    // Tentukan URL berdasarkan tabel (Bibit atau Kayu)
+                    const url = this.closest('table').id === "table-bibit" ?
+                        '/bibit/update-status' : '/kayu/update-status';
+
+                    fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            },
+                            body: JSON.stringify({
+                                id,
+                                status
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Status berhasil diperbarui');
+                            } else {
+                                alert('Gagal memperbarui status');
+                            }
+                        })
+                        .catch(error => alert('Terjadi kesalahan'));
+                });
+            });
+        });
     </script>
-    @endsectionphp
+@endsection
