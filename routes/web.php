@@ -34,6 +34,8 @@ Route::post('/add-admin', [ManajemenPenggunaController::class, 'store'])->name('
 
 // Manajemen Kayu & Bibit
 Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])->name('manajemenkayubibit');
+Route::post('/bibit/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('bibit.update.status');
+Route::post('/kayu/update-status', [ManajemenPohonBibitController::class, 'updateKayuStatus'])->name('kayu.update.status');
 
 // Routes untuk Kayu
 Route::prefix('kayu')->name('kayu.')->group(function () {
@@ -46,12 +48,18 @@ Route::prefix('kayu')->name('kayu.')->group(function () {
 
 // Routes untuk Bibit
 Route::prefix('bibit')->name('bibit.')->group(function () {
+    Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])->name('manajemenkayubibit');
     Route::get('/', [ManajemenPohonBibitController::class, 'getBibit'])->name('index');
     Route::post('/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('update.status');
     Route::post('/store', [ManajemenPohonBibitController::class, 'storeBibit'])->name('store');
     Route::put('/update/{id}', [ManajemenPohonBibitController::class, 'updateBibit'])->name('update');
     Route::delete('/delete/{id}', [ManajemenPohonBibitController::class, 'deleteBibit'])->name('delete');
 });
+
+// Routes untuk Update Status Bibit dan Kayu
+Route::post('/bibit/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('bibit.update.status');
+Route::post('/kayu/update-status', [ManajemenPohonBibitController::class, 'updateKayuStatus'])->name('kayu.update.status');
+
 
 // Riwayat / History
 Route::get('/history-perawatan', [HistoryPerawatanController::class, 'index'])->name('historyperawatan');
@@ -76,3 +84,25 @@ Route::get('/test-firebase', function () {
 
     return 'Firebase credentials file not found!';
 });
+
+// Pemberitahuan Pengiriman Tautan Reset Kata Sandi
+Route::get('/password-link-sent', fn() => view('layouts.password-link-sent'))->name('password-link-sent');
+
+// Halaman Lupa Sandi (Menampilkan Formulir Email)
+Route::get('/forgotpassword', fn() => view('layouts.forgotpassword'))->name('forgotpassword');
+
+// Resend OTP (Untuk Pengguna yang Tidak Menerima Email)
+Route::get('/resendotp', fn() => view('layouts.resendotp'))->name('resendotp');
+
+// Halaman Kata Sandi Berhasil Diperbarui
+Route::get('/password-reset-success', fn() => view('layouts.passwordupdate'))->name('password-reset-success');
+
+// Setelah berhasil reset kata sandi
+Route::post('/reset-password', [AuthController::class, 'handlePasswordReset'])->name('reset-password');
+
+// Routes untuk Manajemen Pengguna
+Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna.index');
+Route::post('/update-admin', [ManajemenPenggunaController::class, 'updateAdmin'])->name('manajemenpengguna.updateadmin');
+Route::post('/update-status', [ManajemenPenggunaController::class, 'updateStatus'])->name('manajemenpengguna.updatestatus');
+Route::post('/add-admin', [ManajemenPenggunaController::class, 'store'])->name('admin.store');
+Route::post('/delete-admin', [ManajemenPenggunaController::class, 'delete'])->name('admin.delete');
