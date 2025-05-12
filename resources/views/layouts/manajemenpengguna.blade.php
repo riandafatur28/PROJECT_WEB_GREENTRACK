@@ -81,15 +81,15 @@
                         {{ min($currentPage * $perPage, $total) }} dari {{ $total }} entri</p>
                     <div class="flex space-x-1">
                         @if ($currentPage > 1)
-                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage - 1, 'search' => request('search')]) }}"
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage - 1, 'search' => request('search')]) }} "
                                 class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</a>
                         @endif
                         @for ($i = 1; $i <= ceil($total / $perPage); $i++)
-                            <a href="{{ route('manajemenpengguna.index', ['page' => $i, 'search' => request('search')]) }}"
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $i, 'search' => request('search')]) }} "
                                 class="px-2 py-0.5 {{ $currentPage == $i ? 'bg-green-500 text-white' : 'bg-white text-gray-500' }} border border-gray-300 rounded-md text-xs">{{ $i }}</a>
                         @endfor
                         @if ($currentPage < ceil($total / $perPage))
-                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage + 1, 'search' => request('search')]) }}"
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage + 1, 'search' => request('search')]) }} "
                                 class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</a>
                         @endif
                     </div>
@@ -138,7 +138,9 @@
 
                         <div class="flex justify-end gap-2 pt-4">
                             <button class="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600"
-                                onclick="simpanPerubahan()">Simpan</button>
+                                onclick="simpanPerubahan()">Perbarui</button>
+                            <button class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600"
+                                onclick="hapusAdmin()">Hapus</button>
                         </div>
                     </div>
                 </div>
@@ -151,6 +153,7 @@
     <script>
         let isEditMode = false;
 
+        // Show modal to add new admin
         function showAddAdminModal() {
             isEditMode = false;
             document.getElementById('modalMode').value = 'tambah';
@@ -163,6 +166,7 @@
             openModal();
         }
 
+        // Show modal to edit admin details
         function showAdminDetail(button) {
             isEditMode = true;
             document.getElementById('modalMode').value = 'edit';
@@ -176,18 +180,21 @@
             openModal();
         }
 
+        // Open modal
         function openModal() {
             const modal = document.getElementById("adminModal");
             modal.classList.remove("hidden");
             modal.classList.add("flex");
         }
 
+        // Close modal
         function closeModal() {
             const modal = document.getElementById("adminModal");
             modal.classList.add("hidden");
             modal.classList.remove("flex");
         }
 
+        // Save changes (add or edit admin)
         function simpanPerubahan() {
             const nama = document.getElementById('modalNama').value;
             const email = document.getElementById('modalEmail').value;
@@ -200,7 +207,9 @@
                 peran,
                 status
             };
+
             if (mode === 'edit') data.id = document.getElementById('modalID').value;
+
             const url = (mode === 'edit') ? '/update-admin' : '/add-admin';
 
             fetch(url, {
@@ -220,6 +229,32 @@
                 .catch(() => alert('Terjadi kesalahan.'));
         }
 
+        // Delete admin
+        function hapusAdmin() {
+            const id = document.getElementById('modalID').value;
+
+            if (confirm('Apakah Anda yakin ingin menghapus admin ini?')) {
+                fetch('/delete-admin', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: JSON.stringify({
+                            id
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message);
+                        closeModal();
+                        location.reload();
+                    })
+                    .catch(() => alert('Terjadi kesalahan.'));
+            }
+        }
+
+        // Upload image function
         function uploadImage() {
             const input = document.createElement('input');
             input.type = 'file';
@@ -237,6 +272,7 @@
             input.click();
         }
 
+        // Update the status of admin
         function updateStatus(select) {
             const status = select.value;
             const id = select.dataset.id;
@@ -257,49 +293,5 @@
                 .then(response => response.ok ? console.log('Status updated') : alert('Gagal update'))
                 .catch(() => alert('Terjadi kesalahan'));
         }
-
-        // AJAX Live Search
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const adminTableBody = document.getElementById('adminTableBody');
-
-            searchInput.addEventListener('input', function() {
-                const query = searchInput.value.trim();
-
-                fetch(`{{ route('manajemenpengguna.index') }}?search=${encodeURIComponent(query)}`, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        adminTableBody.innerHTML = '';
-                        data.admin.forEach(function(admin) {
-                            const row = `<tr class="border-b">
-                    <td class="px-2 py-1">${admin.id}</td>
-                    <td class="px-2 py-1">${admin.nama}</td>
-                    <td class="px-2 py-1">${admin.email}</td>
-                    <td class="px-2 py-1">${admin.peran_admin}</td>
-                    <td class="px-2 py-1">
-                        <select class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm ${admin.status === 'Aktif' ? 'bg-green-300' : 'bg-red-300'}"
-                            data-id="${admin.id}" onchange="updateStatus(this)">
-                            <option value="Aktif" ${admin.status === 'Aktif' ? 'selected' : ''}>Aktif</option>
-                            <option value="Nonaktif" ${admin.status === 'Nonaktif' ? 'selected' : ''}>Nonaktif</option>
-                        </select>
-                    </td>
-                    <td class="px-2 py-1">
-                        <button onclick="showAdminDetail(this)"
-                            class="ml-1 bg-teal-300 text-teal-700 font-semibold px-3 py-1 rounded-lg border border-teal-700"
-                            data-id="${admin.id}" data-nama="${admin.nama}" data-email="${admin.email}"
-                            data-peran="${admin.peran_admin}" data-status="${admin.status}">
-                            Lihat Selengkapnya
-                        </button>
-                    </td>
-                </tr>`;
-                            adminTableBody.insertAdjacentHTML('beforeend', row);
-                        });
-                    });
-            });
-        });
     </script>
 @endpush

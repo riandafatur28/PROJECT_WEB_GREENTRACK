@@ -2,38 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\FirestoreService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class ManajemenPenggunaController extends Controller
 {
-    public function updateAdmin(Request $request, FirestoreService $firestore)
-    {
-        $id = $request->input('id');
-        $nama = $request->input('nama');
-        $role = $request->input('role'); // 'admin_penyemaian' atau 'admin_tpk'
-
-        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}?updateMask.fieldPaths=nama_lengkap&updateMask.fieldPaths=role";
-
-        $payload = [
-            'fields' => [
-                'nama_lengkap' => ['stringValue' => $nama],
-                'role' => [
-                    'arrayValue' => [
-                        'values' => [
-                            ['stringValue' => $role]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
-            ->patch($url, $payload);
-
-        return response()->json(['success' => $response->successful()]);
-    }
-
+    // Fungsi untuk menampilkan daftar admin dengan pagination dan pencarian
     public function index(Request $request, FirestoreService $firestore)
     {
         // Ambil query pencarian dari input
@@ -41,7 +16,7 @@ class ManajemenPenggunaController extends Controller
         $page = $request->input('page', 1);
         $perPage = 10; // Tentukan jumlah data per halaman
 
-        // Ambil semua data dulu
+        // Ambil semua data akun dari koleksi "akun"
         $response = $firestore->getCollection('akun');
 
         $admins = [];
@@ -57,7 +32,7 @@ class ManajemenPenggunaController extends Controller
 
                 // Filter manual pakai PHP (case-insensitive)
                 if ($search && stripos($nama, $search) === false) {
-                    continue; // Skip kalau nama tidak mengandung kata pencarian
+                    continue; // Skip jika nama tidak mengandung kata pencarian
                 }
 
                 $admins[] = [
@@ -86,6 +61,35 @@ class ManajemenPenggunaController extends Controller
         ]);
     }
 
+    // Fungsi untuk mengupdate data admin
+    public function updateAdmin(Request $request, FirestoreService $firestore)
+    {
+        $id = $request->input('id');
+        $nama = $request->input('nama');
+        $role = $request->input('role');
+
+        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}?updateMask.fieldPaths=nama_lengkap&updateMask.fieldPaths=role";
+
+        $payload = [
+            'fields' => [
+                'nama_lengkap' => ['stringValue' => $nama],
+                'role' => [
+                    'arrayValue' => [
+                        'values' => [
+                            ['stringValue' => $role]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+            ->patch($url, $payload);
+
+        return response()->json(['success' => $response->successful()]);
+    }
+
+    // Fungsi untuk mengupdate status admin
     public function updateStatus(Request $request, FirestoreService $firestore)
     {
         $id = $request->input('id');
@@ -104,16 +108,55 @@ class ManajemenPenggunaController extends Controller
         return response()->json(['success' => $response->successful()]);
     }
 
+    // Fungsi untuk menambah data admin baru
+    public function store(Request $request, FirestoreService $firestore)
+    {
+        $nama = $request->input('nama');
+        $email = $request->input('email');
+        $role = $request->input('role');
+        $status = $request->input('status');
+
+        // Format data yang akan disimpan
+        $data = [
+            'nama_lengkap' => $nama,
+            'email' => $email,
+            'role' => [
+                'arrayValue' => [
+                    'values' => [
+                        ['stringValue' => $role]
+                    ]
+                ]
+            ],
+            'status' => $status
+        ];
+
+        $response = $firestore->createDocument('akun', $data);
+
+        return response()->json(['success' => $response]);
+    }
+
+    // Fungsi untuk menghapus data admin berdasarkan ID
+    public function delete(Request $request, FirestoreService $firestore)
+    {
+        $id = $request->input('id');
+
+        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}";
+
+        $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+            ->delete($url);
+
+        return response()->json(['success' => $response->successful()]);
+    }
+
+    // Fungsi tambahan untuk format role
     private function formatRole(array $roles): string
     {
         if (empty($roles)) return '-';
 
-        // Ambil role pertama, bisa dimodifikasi kalau ingin gabungan
-        $role = $roles[0]['stringValue'] ?? '';
-        return match ($role) {
-            'admin_penyemaian' => 'Admin Persemaian',
-            'admin_tpk' => 'Admin TPK',
-            default => ucfirst(str_replace('_', ' ', $role)),
-        };
+        $roleNames = [];
+        foreach ($roles as $role) {
+            $roleNames[] = $role['stringValue'] ?? '';
+        }
+        return implode(', ', $roleNames);
     }
 }
