@@ -16,6 +16,15 @@ class DashboardController extends Controller
         $activities = [];
         $totalActivities = 0;
 
+        // Ambil total bibit
+        $bibitResponse = $firestore->getCollection('bibit');
+        $totalBibit = count($bibitResponse['documents'] ?? []);  // Menghitung total bibit
+
+        // Ambil total kayu
+        $kayuResponse = $firestore->getCollection('kayu');
+        $totalKayu = count($kayuResponse['documents'] ?? []);  // Menghitung total kayu
+
+        // Proses data activities
         if (isset($response['documents'])) {
             foreach ($response['documents'] as $document) {
                 $fields = $document['fields'] ?? [];
@@ -40,14 +49,14 @@ class DashboardController extends Controller
             }
         }
 
+        // Return view dengan data total bibit dan kayu
         return view('layouts.dashboard', [
             'activities' => $activities,
             'totalActivities' => $totalActivities,
+            'totalBibit' => $totalBibit,
+            'totalKayu' => $totalKayu,
         ]);
-
     }
-
-
 
     // Fungsi tambahan untuk format role
     private function formatRole(array $roles): string

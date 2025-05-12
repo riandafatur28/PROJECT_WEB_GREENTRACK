@@ -19,7 +19,7 @@
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Bibit</p>
                         <h2 class="text-xl font-bold text-black-600">
-                            {{-- {{ number_format($totalBibit) }} --}}
+                            {{ number_format(count($bibit ?? [])) }}
                         </h2>
                         <p class="text-xs text-green-500 mt-1 flex items-center">
                             <svg class="w-4 h-4 text-green-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -29,29 +29,24 @@
                             16% bulan ini
                         </p>
                     </div>
-
                 </div>
 
                 <!-- Total Kayu -->
                 <div class="flex items-center px-4 py-4 md:py-0">
-                    <div class="flex items-center px-4 py-4 md:py-0">
-                        <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
-                            <img src="/assets/images/kayu.svg" alt="New Icon" class="w-8 h-8">
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-gray-600 text-sm">Total Kayu</p>
-                            <h2 class="text-xl font-bold text-black-600">{{ number_format(count($kayu ?? [])) }}</h2>
-                            <p class="text-xs text-red-500 mt-1 flex items-center">
-                                <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
-                                </svg>
-                                1% bulan ini
-                            </p>
-                        </div>
+                    <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
+                        <img src="/assets/images/kayu.svg" alt="New Icon" class="w-8 h-8">
                     </div>
-
+                    <div class="ml-4">
+                        <p class="text-gray-600 text-sm">Total Kayu</p>
+                        <h2 class="text-xl font-bold text-black-600">{{ number_format(count($kayu ?? [])) }}</h2>
+                        <p class="text-xs text-red-500 mt-1 flex items-center">
+                            <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                            1% bulan ini
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Admin Aktif -->
