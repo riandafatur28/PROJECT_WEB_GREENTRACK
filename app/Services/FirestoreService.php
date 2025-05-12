@@ -32,15 +32,17 @@ class FirestoreService
 
         return $response->json();
     }
+
     public function getProjectId()
     {
         return $this->projectId;
     }
-    
+
     public function getAccessToken()
     {
         return $this->accessToken;
     }
+
     public function createDocument($collection, $data)
     {
         $url = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/{$collection}";
