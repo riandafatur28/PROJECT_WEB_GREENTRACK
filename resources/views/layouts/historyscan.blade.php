@@ -53,7 +53,7 @@
                                 </td>
                                 <td class="py-3 px-4">{{ $data['keterangan'] }}</td>
                                 <td class="py-3 px-4">
-                                    {{ \Carbon\Carbon::parse($data['waktu'])->diffForHumans() }}
+                                    {{ \Carbon\Carbon::parse($data['waktu'])->locale('id')->diffForHumans() }}
                                 </td>
                                 <td class="py-3 px-4">{{ $data['detail'] }}</td>
                             </tr>

@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\FirestoreService;
 use Illuminate\Support\Facades\View;
+use Carbon\Carbon;
 
 class HistoryBarcodeController extends Controller
 {
     public function index(Request $request, FirestoreService $firestore)
     {
+        // Set Carbon locale ke Bahasa Indonesia
+        Carbon::setLocale('id');
+
         $search = $request->input('search', '');
         $searchType = $request->input('search_type', 'description'); // Ambil jenis pencarian
         $page = $request->input('page', 1); // Halaman yang diminta
@@ -61,7 +65,7 @@ class HistoryBarcodeController extends Controller
                 $fields = $document['fields'] ?? [];
                 $id = basename($document['name']);
 
-                // Ambil waktu untuk pengurutan
+                // Ambil waktu untuk pengurutan (tetap menggunakan metode yang ada)
                 $timestamp = $this->getTimestampValue($fields);
 
                 // Ambil jenis aktivitas dari activityType
@@ -79,13 +83,16 @@ class HistoryBarcodeController extends Controller
                     ? $this->parseRole($fields['userRole']['stringValue'])
                     : 'Tidak ada role';
 
+                // Membuat objek Carbon dan langsung menghasilkan waktu relatif dalam bahasa Indonesia
+                $carbonDate = Carbon::createFromTimestamp($timestamp);
+
                 $dataForSorting[] = [
                     'id' => $id,
                     'nama' => $fields['userName']['stringValue'] ?? '-',
                     'userRole' => $userRole,
                     'keterangan' => $activityType,
                     'detail' => $description,
-                    'waktu' => $this->formatDate($timestamp),
+                    'waktu' => $carbonDate->toIso8601String(), // Format ISO8601 untuk Carbon di view
                     'timestamp' => $timestamp // untuk pengurutan
                 ];
 
@@ -126,17 +133,7 @@ class HistoryBarcodeController extends Controller
         ]);
     }
 
-    // Fungsi untuk memformat tanggal (hanya menampilkan tanggal tanpa jam)
-    private function formatDate($timestamp)
-    {
-        if (!$timestamp) {
-            return "Tanggal tidak tersedia";
-        }
-
-        return date('d F Y', $timestamp);
-    }
-
-    // Fungsi untuk mengambil nilai timestamp dari berbagai format
+    // Fungsi untuk mengambil nilai timestamp dari berbagai format - tetap disimpan untuk pengurutan
     private function getTimestampValue($fields)
     {
         // 1. Cek timestamp field (prioritas tertinggi)
@@ -157,13 +154,52 @@ class HistoryBarcodeController extends Controller
             return strtotime($timestampStr);
         }
 
-        // 4. Cek tanggal field
+        // 4. Cek created_at field
+        if (isset($fields['created_at']['timestampValue'])) {
+            $timestampStr = $fields['created_at']['timestampValue'];
+            return strtotime($timestampStr);
+        }
+
+        // 5. Cek tanggal field
         if (isset($fields['tanggal']['stringValue'])) {
             $dateStr = $fields['tanggal']['stringValue'];
             return strtotime($dateStr);
         }
 
-        // 5. Default: gunakan waktu saat ini
+        // 6. Cek format timestampValue lainnya
+        if (isset($fields['tanggal']['timestampValue'])) {
+            $timestampStr = $fields['tanggal']['timestampValue'];
+            return strtotime($timestampStr);
+        }
+
+        // 7. Cek format integerValue
+        if (isset($fields['tanggal']['integerValue'])) {
+            return (int)$fields['tanggal']['integerValue'];
+        }
+
+        if (isset($fields['created_at']['integerValue'])) {
+            return (int)$fields['created_at']['integerValue'];
+        }
+
+        // 8. Cek format tanggal di field metadata lainnya
+        $dateFields = ['waktu', 'date', 'tanggal_perawatan', 'createdAt'];
+        foreach ($dateFields as $field) {
+            if (isset($fields[$field]['timestampValue'])) {
+                $timestampStr = $fields[$field]['timestampValue'];
+                return strtotime($timestampStr);
+            }
+
+            if (isset($fields[$field]['stringValue'])) {
+                $dateStr = $fields[$field]['stringValue'];
+                return strtotime($dateStr);
+            }
+
+            if (isset($fields[$field]['integerValue'])) {
+                return (int)$fields[$field]['integerValue'];
+            }
+        }
+
+        // 9. Default: gunakan waktu saat ini
         return time();
     }
 
