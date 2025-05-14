@@ -30,6 +30,9 @@ class ManajemenPenggunaController extends Controller
                 $nama = $fields['nama_lengkap']['stringValue'] ?? '-';
                 $email = $fields['email']['stringValue'] ?? '-';
 
+                // Ambil photo_url dari Firestore
+                $photoUrl = $fields['photo_url']['stringValue'] ?? 'https://randomuser.me/api/portraits/lego/2.jpg';
+
                 // Filter manual pakai PHP (case-insensitive)
                 if ($search && stripos($nama, $search) === false) {
                     continue; // Skip jika nama tidak mengandung kata pencarian
@@ -41,6 +44,11 @@ class ManajemenPenggunaController extends Controller
                     'email' => $email,
                     'peran_admin' => $this->formatRole($fields['role']['arrayValue']['values'] ?? []),
                     'status' => $fields['status']['stringValue'] ?? 'Aktif',
+                    'photo_url' => $photoUrl, // Tambahkan photo_url ke data
+                    'created_at' => isset($fields['created_at']['timestampValue']) ?
+                        $this->formatTimestamp($fields['created_at']['timestampValue']) : '-',
+                    'updated_at' => isset($fields['updated_at']['timestampValue']) ?
+                        $this->formatTimestamp($fields['updated_at']['timestampValue']) : '-',
                 ];
             }
 
@@ -66,9 +74,10 @@ class ManajemenPenggunaController extends Controller
     {
         $id = $request->input('id');
         $nama = $request->input('nama');
-        $role = $request->input('role');
+        $peran = $request->input('peran');
+        $photoUrl = $request->input('photo_url'); // Tambahan untuk menerima photo_url
 
-        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}?updateMask.fieldPaths=nama_lengkap&updateMask.fieldPaths=role";
+        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}?updateMask.fieldPaths=nama_lengkap&updateMask.fieldPaths=role" . ($photoUrl ? "&updateMask.fieldPaths=photo_url" : "");
 
         $payload = [
             'fields' => [
@@ -76,17 +85,22 @@ class ManajemenPenggunaController extends Controller
                 'role' => [
                     'arrayValue' => [
                         'values' => [
-                            ['stringValue' => $role]
+                            ['stringValue' => $peran]
                         ]
                     ]
                 ]
             ]
         ];
 
+        // Tambahkan photo_url ke payload jika ada
+        if ($photoUrl) {
+            $payload['fields']['photo_url'] = ['stringValue' => $photoUrl];
+        }
+
         $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
             ->patch($url, $payload);
 
-        return response()->json(['success' => $response->successful()]);
+        return response()->json(['success' => $response->successful(), 'message' => 'Admin berhasil diperbarui']);
     }
 
     // Fungsi untuk mengupdate status admin
@@ -113,26 +127,39 @@ class ManajemenPenggunaController extends Controller
     {
         $nama = $request->input('nama');
         $email = $request->input('email');
-        $role = $request->input('role');
+        $peran = $request->input('peran');
         $status = $request->input('status');
+        $photoUrl = $request->input('photo_url', 'https://randomuser.me/api/portraits/lego/2.jpg'); // Default image if not provided
 
         // Format data yang akan disimpan
-        $data = [
-            'nama_lengkap' => $nama,
-            'email' => $email,
+        $fields = [
+            'nama_lengkap' => ['stringValue' => $nama],
+            'email' => ['stringValue' => $email],
             'role' => [
                 'arrayValue' => [
                     'values' => [
-                        ['stringValue' => $role]
+                        ['stringValue' => $peran]
                     ]
                 ]
             ],
-            'status' => $status
+            'status' => ['stringValue' => $status],
+            'photo_url' => ['stringValue' => $photoUrl],
+            'created_at' => ['timestampValue' => date('c')], // Format ISO 8601
+            'updated_at' => ['timestampValue' => date('c')], // Format ISO 8601
+            'kode_otp' => ['stringValue' => ''],
+            'last_login' => ['nullValue' => null]
         ];
 
-        $response = $firestore->createDocument('akun', $data);
+        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun";
+        $payload = ['fields' => $fields];
 
-        return response()->json(['success' => $response]);
+        $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+            ->post($url, $payload);
+
+        return response()->json([
+            'success' => $response->successful(),
+            'message' => $response->successful() ? 'Admin berhasil ditambahkan' : 'Gagal menambahkan admin'
+        ]);
     }
 
     // Fungsi untuk menghapus data admin berdasarkan ID
@@ -145,7 +172,28 @@ class ManajemenPenggunaController extends Controller
         $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
             ->delete($url);
 
-        return response()->json(['success' => $response->successful()]);
+        return response()->json([
+            'success' => $response->successful(),
+            'message' => $response->successful() ? 'Admin berhasil dihapus' : 'Gagal menghapus admin'
+        ]);
+    }
+
+    // Fungsi untuk mengupload gambar (jika dibutuhkan)
+    public function uploadImage(Request $request)
+    {
+        // Ini hanya contoh implementasi sederhana
+        // Dalam implementasi sebenarnya, Anda akan mengupload ke penyimpanan cloud seperti Firebase Storage
+
+        if ($request->hasFile('image')) {
+            // Untuk tujuan demonstrasi, kita hanya mengembalikan URL gambar
+            // Di aplikasi nyata, gunakan Firebase Storage atau layanan penyimpanan cloud lainnya
+            return response()->json([
+                'success' => true,
+                'url' => $request->input('temp_url', 'https://randomuser.me/api/portraits/lego/2.jpg')
+            ]);
+        }
+
+        return response()->json(['success' => false]);
     }
 
     // Fungsi tambahan untuk format role
@@ -158,5 +206,16 @@ class ManajemenPenggunaController extends Controller
             $roleNames[] = $role['stringValue'] ?? '';
         }
         return implode(', ', $roleNames);
+    }
+
+    // Fungsi untuk format timestamp
+    private function formatTimestamp(string $timestamp): string
+    {
+        try {
+            $date = new \DateTime($timestamp);
+            return $date->format('d M Y H:i:s');
+        } catch (\Exception $e) {
+            return $timestamp;
+        }
     }
 }

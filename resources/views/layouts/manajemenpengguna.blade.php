@@ -13,12 +13,15 @@
                 <h2 class="text-lg font-semibold text-gray-800 text-center md:text-left">Data Admin</h2>
                 <div class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-3 md:space-y-0">
                     <button onclick="showAddAdminModal()"
-                        class="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600">Tambah</button>
+                        class="flex items-center bg-blue-50 text-gray-500 px-4 py-1.5 rounded-lg font-semibold hover:bg-blue-200 transition-colors duration-300 w-full md:w-auto">
+                        <span class="mr-2 text-lg">+</span>
+                        <span>Tambahkan Admin</span>
+                    </button>
 
                     <div class="relative w-full md:w-auto">
                         <input type="text" id="searchInput" name="search" value="{{ request('search') }}"
                             placeholder="Cari"
-                            class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
+                            class="pl-8 pr-3 py-1.5 w-full md:w-48 border rounded-lg bg-gray-100 text-gray-800 focus:outline-none">
                         <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
                     </div>
 
@@ -34,10 +37,10 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-xs md:text-sm">
+                <table class="w-full text-xs md:text-sm mt-8">
                     <thead>
                         <tr class="bg-white">
-                            <th class="px-2 py-1 text-left">ID</th>
+                            <th class="px-2 py-1 text-left">ID Admin</th>
                             <th class="px-2 py-1 text-left">Nama</th>
                             <th class="px-2 py-1 text-left">Email</th>
                             <th class="px-2 py-1 text-left">Peran Admin</th>
@@ -67,7 +70,7 @@
                                         class="ml-1 bg-teal-300 text-teal-700 font-semibold px-3 py-1 rounded-lg border border-teal-700"
                                         data-id="{{ $init['id'] }}" data-nama="{{ $init['nama'] }}"
                                         data-email="{{ $init['email'] }}" data-peran="{{ $init['peran_admin'] }}"
-                                        data-status="{{ $init['status'] }}">
+                                        data-status="{{ $init['status'] }}" data-photo="{{ $init['photo_url'] }}">
                                         Lihat Selengkapnya
                                     </button>
                                 </td>
@@ -107,9 +110,15 @@
                 <h2 class="text-xl font-semibold text-gray-800 text-center">Data Admin</h2>
 
                 <div class="flex flex-col md:flex-row gap-6">
-                    <div class="w-full md:w-1/2 h-auto bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                        <img id="modalImage" src="https://randomuser.me/api/portraits/lego/2.jpg"
-                            class="w-full h-48 object-cover cursor-pointer" alt="Foto Admin" onclick="uploadImage()">
+                    <div class="w-full md:w-1/2 flex flex-col">
+                        <!-- Perbaikan tampilan foto di modal: Menggunakan container dan memastikan gambar sesuai proporsi asli -->
+                        <div class="bg-gray-200 rounded-lg overflow-hidden flex-grow flex justify-center items-center">
+                            <img id="modalImage" src="https://randomuser.me/api/portraits/lego/2.jpg"
+                                class="max-w-full max-h-full object-contain cursor-pointer" alt="Foto Admin"
+                                onclick="uploadImage()">
+                        </div>
+                        <p class="text-center text-sm text-gray-500 mt-2">Klik pada gambar untuk mengubah foto</p>
+                        <input type="hidden" id="modalPhotoUrl">
                     </div>
 
                     <div class="w-full md:w-1/2 space-y-3">
@@ -162,6 +171,8 @@
             document.getElementById('modalEmail').value = '';
             document.getElementById('modalPeranSelect').value = 'admin_penyemaian';
             document.getElementById('modalStatusSelect').value = 'Aktif';
+            document.getElementById('modalPhotoUrl').value = 'https://randomuser.me/api/portraits/lego/2.jpg';
+            document.getElementById('modalImage').src = 'https://randomuser.me/api/portraits/lego/2.jpg';
             document.getElementById('idField').style.display = 'none';
             openModal();
         }
@@ -176,6 +187,12 @@
             document.getElementById('modalPeranSelect').value = button.getAttribute('data-peran').toLowerCase().replace(' ',
                 '_');
             document.getElementById('modalStatusSelect').value = button.getAttribute('data-status');
+
+            // Set photo URL
+            const photoUrl = button.getAttribute('data-photo');
+            document.getElementById('modalPhotoUrl').value = photoUrl;
+            document.getElementById('modalImage').src = photoUrl;
+
             document.getElementById('idField').style.display = 'block';
             openModal();
         }
@@ -201,11 +218,14 @@
             const peran = document.getElementById('modalPeranSelect').value;
             const status = document.getElementById('modalStatusSelect').value;
             const mode = document.getElementById('modalMode').value;
+            const photoUrl = document.getElementById('modalPhotoUrl').value;
+
             const data = {
                 nama,
                 email,
                 peran,
-                status
+                status,
+                photo_url: photoUrl
             };
 
             if (mode === 'edit') data.id = document.getElementById('modalID').value;
@@ -254,7 +274,7 @@
             }
         }
 
-        // Upload image function
+        // Upload image function - Ditingkatkan untuk menyimpan URL
         function uploadImage() {
             const input = document.createElement('input');
             input.type = 'file';
@@ -262,14 +282,41 @@
             input.onchange = (e) => {
                 const file = e.target.files[0];
                 if (file) {
+                    // Untuk demo, kita hanya menampilkan preview dan menggunakan URL gambar statis
+                    // Di implementasi nyata, Anda akan mengupload ke Firebase Storage dan mendapatkan URL
+
                     const reader = new FileReader();
                     reader.onload = function(event) {
                         document.getElementById('modalImage').src = event.target.result;
+
+                        // Ini hanya untuk demo - dalam aplikasi nyata, Anda akan mengupload ke Firebase Storage
+                        // dan menggunakan URL yang dikembalikan
+                        simulateUpload(event.target.result);
                     };
                     reader.readAsDataURL(file);
                 }
             };
             input.click();
+        }
+
+        // Fungsi simulasi untuk upload (dalam implementasi nyata, ini akan mengupload ke Firebase Storage)
+        function simulateUpload(dataUrl) {
+            // Contoh URL gambar - dalam implementasi nyata, Anda akan mendapatkan URL dari Firebase Storage
+            const exampleUrls = [
+                'https://iili.io/3S3Pxqu.jpg',
+                'https://randomuser.me/api/portraits/men/1.jpg',
+                'https://randomuser.me/api/portraits/women/2.jpg',
+                'https://randomuser.me/api/portraits/lego/3.jpg'
+            ];
+
+            // Pilih URL secara acak untuk demo
+            const randomUrl = exampleUrls[Math.floor(Math.random() * exampleUrls.length)];
+
+            // Dalam aplikasi nyata, Anda akan mengirim file ke server dan mendapatkan URL dari respons
+            setTimeout(() => {
+                document.getElementById('modalPhotoUrl').value = randomUrl;
+                console.log('Photo URL set to:', randomUrl);
+            }, 500);
         }
 
         // Update the status of admin
@@ -293,5 +340,15 @@
                 .then(response => response.ok ? console.log('Status updated') : alert('Gagal update'))
                 .catch(() => alert('Terjadi kesalahan'));
         }
+
+        // Search form handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    window.location.href = '{{ route('manajemenpengguna.index') }}?search=' + this.value;
+                }
+            });
+        });
     </script>
 @endpush

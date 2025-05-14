@@ -102,7 +102,7 @@
                         <!-- Input Pencarian -->
                         <div class="relative w-full md:w-48">
                             <input type="text" placeholder="Cari"
-                                class="pl-8 pr-3 py-1 w-full border rounded-lg bg-gray-100 text-gray-800 focus:outline-none">
+                                class="pl-8 pr-3 py-1 w-full border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
                             <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
                         </div>
                     </div>
