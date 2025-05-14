@@ -8,6 +8,22 @@ use Illuminate\Support\Facades\Log;
 
 class ManajemenPohonBibitController extends Controller
 {
+    /**
+     * Helper function to safely extract location values
+     */
+    private function extractLocationValue($data, $key)
+    {
+        // Try direct access
+        if (isset($data[$key])) {
+            if (is_string($data[$key])) {
+                return $data[$key];
+            } elseif (isset($data[$key]['stringValue'])) {
+                return $data[$key]['stringValue'];
+            }
+        }
+        return 'Tidak tersedia';
+    }
+
     public function index(Request $request, FirestoreService $firestore)
     {
         $search = $request->input('search', '');
@@ -40,24 +56,62 @@ class ManajemenPohonBibitController extends Controller
                 // Penanganan gambar yang lebih baik
                 $gambarUrl = $this->extractImageUrl($fields['gambar_image'] ?? null);
 
+                // Set default location
+                $lokasi = 'Tidak tersedia';
+
+                // Check if lokasi_tanam exists and is an array
+                if (isset($fields['lokasi_tanam']) && is_array($fields['lokasi_tanam'])) {
+                    $lokasiParts = [];
+
+                    // Get BKPH
+                    $bkph = $this->extractLocationValue($fields['lokasi_tanam'], 'bkph');
+                    if ($bkph !== 'Tidak tersedia') {
+                        $lokasiParts[] = $bkph;
+                    }
+
+                    // Get KPH
+                    $kph = $this->extractLocationValue($fields['lokasi_tanam'], 'kph');
+                    if ($kph !== 'Tidak tersedia') {
+                        $lokasiParts[] = $kph;
+                    }
+
+                    // Get RKPH
+                    $rkph = $this->extractLocationValue($fields['lokasi_tanam'], 'rkph');
+                    if ($rkph !== 'Tidak tersedia') {
+                        $lokasiParts[] = $rkph;
+                    }
+
+                    // Combine parts if we have any
+                    if (!empty($lokasiParts)) {
+                        $lokasi = implode(', ', $lokasiParts);
+                    }
+                }
+
+                // Use the generated location in your array
                 $bibit[] = [
                     'id' => $id,
                     'nama_bibit' => $fields['nama_bibit']['stringValue'] ?? 'Tidak tersedia',
                     'jenis_bibit' => $fields['jenis_bibit']['stringValue'] ?? 'Tidak tersedia',
                     'status' => $fields['kondisi']['stringValue'] ?? 'Penyemaian',
-                    'lokasi' => $fields['lokasi_tanam']['bkph']['stringValue'] ?? 'Tidak tersedia',
+                    'lokasi' => $lokasi, // Use our processed location
                     'media_tanam' => $fields['media_tanam']['stringValue'] ?? '-',
                     'gambar_image' => $gambarUrl,
                     'tinggi' => $fields['tinggi']['integerValue'] ?? 0,
                     'varietas' => $fields['varietas']['stringValue'] ?? '-',
-                    // Tambahkan semua field lain yang mungkin diperlukan untuk detail
                     'tanggal_tanam' => $fields['tanggal_tanam']['timestampValue'] ?? '-',
                     'deskripsi' => $fields['deskripsi']['stringValue'] ?? '-',
-                    // Simpan struktur asli gambar untuk debugging
                     'raw_gambar' => $fields['gambar_image'] ?? null,
                 ];
+
+                // Debug log untuk melihat apakah lokasi_tanam ada
+                if (isset($fields['lokasi_tanam'])) {
+                    Log::info('Data lokasi_tanam ditemukan:', $fields['lokasi_tanam']);
+                } else {
+                    Log::info('Data lokasi_tanam tidak ditemukan');
+                }
             }
         }
+
 
         // Proses data kayu
         if (isset($kayuResponse['documents'])) {
@@ -72,28 +126,29 @@ class ManajemenPohonBibitController extends Controller
 
                 // Debug untuk melihat struktur data gambar
                 if (isset($fields['gambar_image'])) {
-                    Log::info('Struktur gambar untuk kayu ID ' . $id . ': ' . json_encode($fields['gambar_image']));
+                    Log::info('Struktur gambar untuk bibit ID ' . $id . ': ' . json_encode($fields['gambar_image']));
                 }
 
-                // Penanganan gambar yang lebih baik
-                $gambarUrl = $this->extractImageUrl($fields['gambar_image'] ?? null);
+                /// Ambil gambar kayu dari Firestore
+              $gambarUrl = $this->extractImageUrl($fields['gambar_image'] ?? null);
 
-                $kayu[] = [
-                    'id' => $id,
-                    'nama_kayu' => $fields['nama_kayu']['stringValue'] ?? '-',
-                    'jenis_kayu' => $fields['jenis_kayu']['stringValue'] ?? '-',
-                    'status' => ($fields['jumlah_stok']['integerValue'] ?? 0) > 0 ? 'Tersedia' : 'Kosong',
-                    'lokasi' => $fields['lokasi_tanam']['bkph']['stringValue'] ?? 'Tidak tersedia',
-                    'tinggi' => $fields['tinggi']['integerValue'] ?? 0,
-                    'gambar_image' => $gambarUrl,
-                    'batch_panen' => $fields['batch_panen']['stringValue'] ?? '-',
-                    'varietas' => $fields['varietas']['stringValue'] ?? '-',
-                    // Tambahkan semua field lain yang mungkin diperlukan untuk detail
-                    'tanggal_panen' => $fields['tanggal_panen']['timestampValue'] ?? '-',
-                    'deskripsi' => $fields['deskripsi']['stringValue'] ?? '-',
-                    // Simpan struktur asli gambar untuk debugging
-                    'raw_gambar' => $fields['gambar_image'] ?? null,
-                ];
+
+            // Ambil data kayu dari Firestore
+            $kayu[] = [
+    'id' => basename($document['name']), // ID dari document
+    'nama_kayu' => $fields['nama_kayu']['stringValue'] ?? '-',
+    'jenis_kayu' => $fields['jenis_kayu']['stringValue'] ?? '-',
+    'status' => ($fields['jumlah_stok']['integerValue'] ?? 0) > 0 ? 'Tersedia' : 'Kosong',
+    'lokasi' => $fields['lokasi_tanam']['stringValue'] ?? 'Tidak tersedia',
+    'tinggi' => $fields['tinggi']['doubleValue'] ?? 0,
+    'gambar_image' => $gambarUrl,  // Correctly set gambar_image
+    'batch_panen' => $fields['batch_panen']['stringValue'] ?? '-',
+    'varietas' => $fields['varietas']['stringValue'] ?? '-',
+    'tanggal_panen' => $fields['tanggal_panen']['timestampValue'] ?? '-',
+    'deskripsi' => $fields['deskripsi']['stringValue'] ?? '-',
+    'raw_gambar' => $fields['gambar_image'] ?? null,  // Store raw gambar for debugging
+];
+
             }
         }
 
