@@ -67,25 +67,19 @@
                 </table>
             </div>
 
-            <!-- Info Total (tanpa pagination links karena Firestore tidak support native pagination Laravel) -->
-            <div class="flex justify-between mt-8">
-                <p class="text-sm text-gray-500">
-                    Menampilkan {{ count($activities) }} entri {{ $search ? 'untuk pencarian "' . $search . '"' : '' }}.
-                    Total data ditemukan: {{ $total }}
-                </p>
+            <!-- Pagination -->
+            <div class="pagination">
+                @if ($currentPage > 1)
+                    <a
+                        href="?page={{ $currentPage - 1 }}&search={{ $search }}&search_type={{ $searchType }}">Previous</a>
+                @endif
 
-                <!-- Navigasi halaman manual (jika mau dikembangkan lebih lanjut) -->
-                <div class="flex space-x-2">
-                    @if ($currentPage > 1)
-                        <a href="{{ route('history.index', ['page' => $currentPage - 1, 'search' => $search]) }} "
-                            class="px-3 py-1 border rounded hover:bg-gray-100">Sebelumnya</a>
-                    @endif
+                <span>Page {{ $currentPage }} of {{ $totalPages }}</span>
 
-                    @if (count($activities) === $perPage)
-                        <a href="{{ route('history.index', ['page' => $currentPage + 1, 'search' => $search]) }} "
-                            class="px-3 py-1 border rounded hover:bg-gray-100">Selanjutnya</a>
-                    @endif
-                </div>
+                @if ($currentPage < $totalPages)
+                    <a
+                        href="?page={{ $currentPage + 1 }}&search={{ $search }}&search_type={{ $searchType }}">Next</a>
+                @endif
             </div>
         </div>
 

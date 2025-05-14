@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use App\Services\FirestoreService;
 use Illuminate\Support\Facades\View;
 
@@ -13,8 +13,8 @@ class HistoryBarcodeController extends Controller
     {
         $search = $request->input('search', '');
         $searchType = $request->input('search_type', 'description'); // Ambil jenis pencarian
-        $page = $request->input('page', 1);
-        $perPage = 10;
+        $page = $request->input('page', 1); // Halaman yang diminta
+        $perPage = 10; // Jumlah data per halaman
 
         // Siapkan filter jika ada pencarian
         $filter = null;
@@ -30,7 +30,7 @@ class HistoryBarcodeController extends Controller
             } elseif ($searchType == 'jenis_aktivitas') {
                 $filter = [
                     'fieldFilter' => [
-                        'field' => ['fieldPath' => 'keterangan'], // Ganti dengan field yang relevan
+                        'field' => ['fieldPath' => 'activityType'], // Field activityType
                         'op' => 'ARRAY_CONTAINS',
                         'value' => ['stringValue' => $search]
                     ]
@@ -38,40 +38,81 @@ class HistoryBarcodeController extends Controller
             }
         }
 
-        // Ambil data dari Firestore
+        // Menyimpan pageToken
+        $pageToken = null;
+        if ($page > 1) {
+            $pageToken = $request->session()->get('nextPageToken');
+        }
+
+        // Ambil data dari Firestore dengan pagination
         $response = $firestore->getCollection('activities', [
             'filter' => $filter,
-            'pageSize' => $perPage,
-            'pageToken' => $page > 1 ? $page : null
+            'pageSize' => $perPage, // Batasi jumlah data per halaman
+            'pageToken' => $pageToken,  // Kirimkan pageToken ke Firestore
         ]);
 
         $activities = [];
+        $dataForSorting = [];
         $total = 0;
+        $nextPageToken = null; // Menyimpan token halaman berikutnya
 
         if (isset($response['documents'])) {
             foreach ($response['documents'] as $document) {
                 $fields = $document['fields'] ?? [];
                 $id = basename($document['name']);
 
-                $activities[] = [
+                // Ambil waktu untuk pengurutan
+                $timestamp = $this->getTimestampValue($fields);
+
+                // Ambil jenis aktivitas dari activityType
+                $activityType = isset($fields['activityType']['stringValue'])
+                    ? $fields['activityType']['stringValue']
+                    : '-';
+
+                // Ambil detail dari description
+                $description = isset($fields['description']['stringValue'])
+                    ? $fields['description']['stringValue']
+                    : 'Tidak ada deskripsi';
+
+                // Parse userRole untuk menampilkan yang lebih user-friendly
+                $userRole = isset($fields['userRole']['stringValue'])
+                    ? $this->parseRole($fields['userRole']['stringValue'])
+                    : 'Tidak ada role';
+
+                $dataForSorting[] = [
                     'id' => $id,
                     'nama' => $fields['userName']['stringValue'] ?? '-',
-                    // Menambahkan pengecekan untuk memformat userRole
-                    'userRole' => isset($fields['role']['arrayValue']['values'])
-                                    ? $this->formatRole($fields['role']['arrayValue']['values'])
-                                    : 'Tidak ada role', // Default jika tidak ada role
-                    'keterangan' => $fields['description']['stringValue'] ?? '-',
-                    'detail' => isset($fields['metadata']['fields']['catatan']['stringValue'])
-                                ? $fields['metadata']['fields']['catatan']['stringValue']
-                                : 'Tidak ada catatan',
-                    'waktu' => isset($fields['tanggal']['stringValue'])
-                                ? $this->formatDate($fields['tanggal']['stringValue'])
-                                : null,
+                    'userRole' => $userRole,
+                    'keterangan' => $activityType,
+                    'detail' => $description,
+                    'waktu' => $this->formatDate($timestamp),
+                    'timestamp' => $timestamp // untuk pengurutan
                 ];
 
-                $total++;
+                $total++;  // Hitung total data yang diambil
+            }
+
+            // Urutkan berdasarkan timestamp terbaru
+            usort($dataForSorting, function($a, $b) {
+                return $b['timestamp'] - $a['timestamp'];
+            });
+
+            // Ambil data yang sudah diurutkan
+            foreach ($dataForSorting as $item) {
+                unset($item['timestamp']);
+                $activities[] = $item;
+            }
+
+            // Mendapatkan token untuk halaman berikutnya
+            $nextPageToken = $response['nextPageToken'] ?? null;
+            if ($nextPageToken) {
+                // Menyimpan token halaman berikutnya di session
+                $request->session()->put('nextPageToken', $nextPageToken);
             }
         }
+
+        // Hitung total halaman berdasarkan total data yang ada
+        $totalPages = ceil($total / $perPage);
 
         return view('layouts.historyscan', [
             'activities' => $activities,
@@ -79,34 +120,64 @@ class HistoryBarcodeController extends Controller
             'currentPage' => $page,
             'perPage' => $perPage,
             'search' => $search,
-            'searchType' => $searchType // Menambahkan searchType agar bisa dipakai di tampilan
+            'searchType' => $searchType,
+            'nextPageToken' => $nextPageToken,  // Token halaman berikutnya
+            'totalPages' => $totalPages,  // Total halaman untuk pagination
         ]);
     }
 
-    // Fungsi tambahan untuk format role (asumsi sudah ada)
-    private function formatRole(array $roles): string
+    // Fungsi untuk memformat tanggal (hanya menampilkan tanggal tanpa jam)
+    private function formatDate($timestamp)
     {
-        $roleNames = [];
-        foreach ($roles as $role) {
-            $roleNames[] = $role['stringValue'] ?? '';
+        if (!$timestamp) {
+            return "Tanggal tidak tersedia";
         }
-        return implode(', ', $roleNames);
+
+        return date('d F Y', $timestamp);
     }
 
-    // Fungsi untuk memformat tanggal agar sesuai dengan format yang diinginkan
-    private function formatDate($dateString)
+    // Fungsi untuk mengambil nilai timestamp dari berbagai format
+    private function getTimestampValue($fields)
     {
-        try {
-            // Menghapus microdetik untuk memastikan format tanggal bisa dikenali
-            $dateString = preg_replace('/\.\d+$/', '', $dateString);
-
-            // Coba parse tanggal dengan format yang sudah diubah
-            $date = \Carbon\Carbon::parse($dateString);
-
-            return $date->format('Y-m-d H:i:s');  // Format yang diinginkan
-        } catch (\Exception $e) {
-            // Jika gagal parse, kembalikan null atau nilai default
-            return null;
+        // 1. Cek timestamp field (prioritas tertinggi)
+        if (isset($fields['timestamp']['timestampValue'])) {
+            $timestampStr = $fields['timestamp']['timestampValue'];
+            return strtotime($timestampStr);
         }
+
+        // 2. Cek field timestamp yang berformat string
+        if (isset($fields['timestamp']['stringValue'])) {
+            $timestampStr = $fields['timestamp']['stringValue'];
+            return strtotime($timestampStr);
+        }
+
+        // 3. Cek createdAt field
+        if (isset($fields['createdAt']['timestampValue'])) {
+            $timestampStr = $fields['createdAt']['timestampValue'];
+            return strtotime($timestampStr);
+        }
+
+        // 4. Cek tanggal field
+        if (isset($fields['tanggal']['stringValue'])) {
+            $dateStr = $fields['tanggal']['stringValue'];
+            return strtotime($dateStr);
+        }
+
+        // 5. Default: gunakan waktu saat ini
+        return time();
+    }
+
+    // Parse role menjadi format yang lebih user-friendly
+    private function parseRole($roleString)
+    {
+        // Hapus prefix "UserRole." jika ada
+        $roleString = str_replace('UserRole.', '', $roleString);
+
+        // Convert camelCase atau snake_case menjadi kata normal dengan spasi
+        $roleString = preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $roleString); // camelCase to spaces
+        $roleString = str_replace('_', ' ', $roleString); // snake_case to spaces
+
+        // Uppercase words
+        return ucwords($roleString);
     }
 }
