@@ -21,7 +21,7 @@
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Bibit</p>
                         <h2 class="text-xl font-bold text-black-600">
-                            {{ number_format(count($bibit ?? [])) }}
+                            {{ number_format($totalBibit) }}
                         </h2>
                         <p class="text-xs text-green-500 mt-1 flex items-center">
                             <svg class="w-4 h-4 text-green-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -40,7 +40,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Kayu</p>
-                        <h2 class="text-xl font-bold text-black-600">{{ number_format(count($kayu ?? [])) }}</h2>
+                        <h2 class="text-xl font-bold text-black-600">{{ number_format($totalKayu) }}</h2>
                         <p class="text-xs text-red-500 mt-1 flex items-center">
                             <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
