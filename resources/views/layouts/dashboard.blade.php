@@ -77,14 +77,14 @@
         <!-- Chart & Aktivitas -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <!-- Bibit Chart -->
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="text-xl font-bold mb-2">Bibit Dalam Penyemaian</h3>
-                {{-- <p class="text-base text-gray-600 mb-4">Total Bibit {{ number_format($totalBibit) }}</p> --}}
+            <div class="bg-white p-6 rounded-3xl shadow">
+                <h3 class="text-xl font-bold mb-2">Bibit Dalam Persemaian</h3>
+                <p class="text-base text-gray-600 mb-4">Total Bibit {{ number_format($totalBibit) }}</p>
                 <div id="bibitChart" style="height: 400px;"></div>
             </div>
 
             <!-- Kayu TPK Chart -->
-            <div class="bg-white p-6 rounded-lg shadow">
+            <div class="bg-white p-6 rounded-3xl shadow">
                 <h3 class="text-xl font-bold mb-2">Kayu di TPK</h3>
                 <p class="text-base text-gray-600 mb-4">Total Kayu 800</p>
                 <div style="height: 300px;">
@@ -92,7 +92,7 @@
                 </div>
             </div>
 
-            <div class="md:col-span-2 bg-white p-6 rounded-lg shadow">
+            <div class="md:col-span-2 bg-white p-6 rounded-3xl shadow">
                 <div class="flex justify-between items-center mb-4">
                     <!-- Teks Aktifitas Terbaru -->
                     <h3 class="text-xl font-semibold">Aktifitas Terbaru</h3>
@@ -104,16 +104,6 @@
                             <input type="text" placeholder="Cari"
                                 class="pl-8 pr-3 py-1 w-full border rounded-lg bg-gray-100 text-gray-800 focus:outline-none">
                             <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
-                        </div>
-
-                        <!-- Urutkan Berdasarkan -->
-                        <div>
-                            <!-- <label class="text-gray-600 text-sm">Urutkan Berdasarkan:</label> -->
-                            <select class="px-3 py-2 bg-gray-100 border rounded-lg">
-                                <option value="30">30 hari terakhir</option>
-                                <option value="7">7 hari terakhir</option>
-                                <option value="1">Hari ini</option>
-                            </select>
                         </div>
                     </div>
                 </div>

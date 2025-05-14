@@ -8,27 +8,43 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index(FirestoreService $firestore)
+    public function index(FirestoreService $firestore, Request $request)
     {
-        // Ambil semua data activities dari koleksi "activities"
-        $response = $firestore->getCollection('activities');
+        // Handle filtering based on dates
+        $filter = $request->input('filter', 'all'); // Default to no filter
+        $dateFilter = $this->getDateFilter($filter);
+
+        // Get the activities data from Firestore
+        $response = $firestore->getCollection('activities', $dateFilter);
 
         $activities = [];
-        $totalActivities = 0;
 
-        // Ambil total bibit
+        // Get total bibit count
         $bibitResponse = $firestore->getCollection('bibit');
-        $totalBibit = count($bibitResponse['documents'] ?? []);  // Menghitung total bibit
+        $totalBibit = count($bibitResponse['documents'] ?? []);  // Counting total bibit
 
-        // Ambil total kayu
+        // Get total kayu count
         $kayuResponse = $firestore->getCollection('kayu');
-        $totalKayu = count($kayuResponse['documents'] ?? []);  // Menghitung total kayu
+        $totalKayu = count($kayuResponse['documents'] ?? []);  // Counting total kayu
 
-        // Proses data activities
+        // Process activities data
         if (isset($response['documents'])) {
-            foreach ($response['documents'] as $document) {
+            // Sort the documents by date (newest first)
+            usort($response['documents'], function($a, $b) {
+                $dateA = $a['fields']['tanggal']['stringValue'] ?? '';
+                $dateB = $b['fields']['tanggal']['stringValue'] ?? '';
+                return strcmp($dateB, $dateA); // Descending order
+            });
+
+            // Take only the first 10 documents
+            $documents = array_slice($response['documents'], 0, 10);
+
+            foreach ($documents as $document) {
                 $fields = $document['fields'] ?? [];
                 $id = basename($document['name']);
+
+                // Check for image
+                $imageUrl = isset($fields['image']['stringValue']) ? $fields['image']['stringValue'] : null;
 
                 $activities[] = [
                     'id' => $id,
@@ -43,22 +59,45 @@ class DashboardController extends Controller
                     'waktu' => isset($fields['tanggal']['stringValue'])
                                 ? $this->formatDate($fields['tanggal']['stringValue'])
                                 : null,
+                    'image' => $imageUrl,
                 ];
-
-                $totalActivities++;
             }
         }
 
-        // Return view dengan data total bibit dan kayu
+        // Return view without pagination
         return view('layouts.dashboard', [
             'activities' => $activities,
-            'totalActivities' => $totalActivities,
+            'totalActivities' => count($response['documents'] ?? []),
             'totalBibit' => $totalBibit,
             'totalKayu' => $totalKayu,
+            'filter' => $filter,
         ]);
     }
 
-    // Fungsi tambahan untuk format role
+    // Helper function to get the date filter based on the selected filter
+    private function getDateFilter($filter)
+    {
+        $dateFilter = [];
+
+        switch ($filter) {
+            case '30_days':
+                $dateFilter = ['start' => Carbon::now()->subDays(30)->toDateString(), 'end' => Carbon::now()->toDateString()];
+                break;
+            case '7_days':
+                $dateFilter = ['start' => Carbon::now()->subDays(7)->toDateString(), 'end' => Carbon::now()->toDateString()];
+                break;
+            case 'today':
+                $dateFilter = ['start' => Carbon::today()->toDateString(), 'end' => Carbon::today()->toDateString()];
+                break;
+            default:
+                // No date filter, get all records
+                break;
+        }
+
+        return $dateFilter;
+    }
+
+    // Format the roles into a comma-separated string
     private function formatRole(array $roles): string
     {
         $roleNames = [];
@@ -68,13 +107,13 @@ class DashboardController extends Controller
         return implode(', ', $roleNames);
     }
 
-    // Fungsi untuk memformat tanggal
+    // Format the date string into a shorter format without day information
     private function formatDate($dateString)
     {
         try {
-            $dateString = preg_replace('/\.\d+$/', '', $dateString);
+            $dateString = preg_replace('/\.\d+$/', '', $dateString); // Removing any microseconds part
             $date = Carbon::parse($dateString);
-            return $date->format('Y-m-d H:i:s');
+            return $date->format('m-Y H:i'); // Format: month-year hour:minute
         } catch (\Exception $e) {
             return null;
         }
