@@ -68,22 +68,35 @@
                         </tr>
                     @endforelse
                 </tbody>
+
+
             </table>
         </div>
         <!-- End of Table Section -->
 
-        <!-- Start of Pagination Section -->
         <div class="flex justify-between items-center mt-6">
             <p class="text-sm text-gray-500">
                 Menampilkan {{ count($activities) }} dari total {{ $total }} entri
             </p>
             <div>
-                <button class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">«</button>
-                <button class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">1</button>
-                <button class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">2</button>
-                <button class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">»</button>
+                <!-- Previous Button -->
+                <a href="{{ route('history.index', ['page' => 1, 'search' => $search, 'search_type' => $searchType]) }}"
+                    class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">«</a>
+
+                <!-- Pagination Links -->
+                @for ($i = 1; $i <= $totalPages; $i++)
+                    <a href="{{ route('history.index', ['page' => $i, 'search' => $search, 'search_type' => $searchType]) }}"
+                        class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300 {{ $i == $currentPage ? 'bg-gray-400 text-white' : '' }}">
+                        {{ $i }}
+                    </a>
+                @endfor
+
+                <!-- Next Button -->
+                <a href="{{ route('history.index', ['page' => $totalPages, 'search' => $search, 'search_type' => $searchType]) }}"
+                    class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">»</a>
             </div>
         </div>
+
         <!-- End of Pagination Section -->
     </div>
 @endsection
