@@ -102,6 +102,7 @@ Route::post('/reset-password', [AuthController::class, 'handlePasswordReset'])->
 
 // Routes untuk Manajemen Pengguna
 Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna.index');
+Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna.index');
 Route::post('/update-admin', [ManajemenPenggunaController::class, 'updateAdmin'])->name('manajemenpengguna.updateadmin');
 Route::post('/update-status', [ManajemenPenggunaController::class, 'updateStatus'])->name('manajemenpengguna.updatestatus');
 Route::post('/add-admin', [ManajemenPenggunaController::class, 'store'])->name('admin.store');
