@@ -19,7 +19,7 @@
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Bibit</p>
                         <h2 class="text-xl font-bold text-black-600">
-                            {{ number_format(count($bibit ?? [])) }}
+                            {{ number_format($totalBibit) }}
                         </h2>
                         <p class="text-xs text-green-500 mt-1 flex items-center">
                             <svg class="w-4 h-4 text-green-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -38,7 +38,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Kayu</p>
-                        <h2 class="text-xl font-bold text-black-600">{{ number_format(count($kayu ?? [])) }}</h2>
+                        <h2 class="text-xl font-bold text-black-600">{{ number_format($totalKayu) }}</h2>
                         <p class="text-xs text-red-500 mt-1 flex items-center">
                             <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -86,7 +86,7 @@
             <!-- Kayu TPK Chart -->
             <div class="bg-white p-6 rounded-3xl shadow">
                 <h3 class="text-xl font-bold mb-2">Kayu di TPK</h3>
-                <p class="text-base text-gray-600 mb-4">Total Kayu 800</p>
+                <p class="text-base text-gray-600 mb-4">Total Kayu {{ number_format($totalKayu) }}</p>
                 <div style="height: 300px;">
                     <canvas id="kayuTPKChart"></canvas>
                 </div>
@@ -95,7 +95,7 @@
             <div class="md:col-span-2 bg-white p-6 rounded-3xl shadow">
                 <div class="flex justify-between items-center mb-4">
                     <!-- Teks Aktifitas Terbaru -->
-                    <h3 class="text-xl font-semibold">Aktifitas Terbaru</h3>
+                    <h3 class="text-xl font-semibold">Aktivitas Terbaru</h3>
 
                     <!-- Kontainer untuk Input Pencarian dan Dropdown Urutkan Berdasarkan -->
                     <div class="flex gap-4 items-center">
@@ -112,7 +112,7 @@
                     <thead>
                         <tr class="text-[#B5B7C0] border-b border-[#B5B7C0]">
                             <th class="py-2">Nama</th>
-                            <th class="py-2">Aktifitas</th>
+                            <th class="py-2">Aktivitas</th>
                             <th class="py-2">Waktu</th>
                         </tr>
                     </thead>
@@ -143,106 +143,111 @@
 
                 </table>
             </div>
-        @endsection
+        </div>
+    </div>
+@endsection
 
-        @section('scripts')
-            <!-- CDN Chart.js -->
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <!-- CDN ApexCharts -->
-            <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+@section('scripts')
+    <!-- CDN Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CDN ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-            <!-- Script Kayu TPK Chart -->
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const dataKayuTPK = {
-                        labels: ['Tersedia', 'Terjual', 'Rusak'],
-                        datasets: [{
-                            data: [500, 250, 50],
-                            backgroundColor: ['#4CAF50', '#F1EFFB', '#604008'],
-                            hoverOffset: 4
-                        }]
-                    };
+    <!-- Script Kayu TPK Chart -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataKayuTPK = {
+                labels: ['Tersedia', 'Terjual', 'Rusak'],
+                datasets: [{
+                    data: [500, 250, 50],
+                    backgroundColor: ['#4CAF50', '#F1EFFB', '#604008'],
+                    hoverOffset: 4
+                }]
+            };
 
-                    const configKayuTPK = {
-                        type: 'doughnut',
-                        data: dataKayuTPK,
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom'
-                                }
-                            }
+            const configKayuTPK = {
+                type: 'doughnut',
+                data: dataKayuTPK,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
                         }
-                    };
-
-                    const ctxKayuTPK = document.getElementById('kayuTPKChart');
-                    if (ctxKayuTPK) {
-                        new Chart(ctxKayuTPK, configKayuTPK);
                     }
-                });
-            </script>
-
-            <style>
-                /* Tambahkan gaya ini agar bar berubah warna saat hover */
-                #bibitChart .apexcharts-bar-series .apexcharts-series path:hover {
-                    fill: #8DD88D !important;
                 }
-            </style>
+            };
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var options = {
-                        series: [{
-                            name: 'Jumlah Bibit',
-                            data: [500, 400, 350, 250, 600, 700, 450, 380, 520, 610, 330, 410]
-                        }],
-                        chart: {
-                            type: 'bar',
-                            height: 400
-                        },
-                        colors: ['#F2FCF1'], // Warna dasar chart
-                        plotOptions: {
-                            bar: {
-                                horizontal: false,
-                                columnWidth: '75%',
-                                borderRadius: 10,
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false,
-                            style: {
-                                colors: ['#000']
-                            }
-                        },
-                        stroke: {
-                            show: false
-                        },
-                        xaxis: {
-                            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
-                                'Dec'
-                            ]
-                        },
-                        yaxis: {
-                            title: {
-                                text: 'Jumlah Bibit'
-                            }
-                        },
-                        fill: {
-                            opacity: 1
-                        },
-                        tooltip: {
-                            y: {
-                                formatter: function(val) {
-                                    return val + " bibit";
-                                }
-                            }
+            const ctxKayuTPK = document.getElementById('kayuTPKChart');
+            if (ctxKayuTPK) {
+                new Chart(ctxKayuTPK, configKayuTPK);
+            }
+        });
+    </script>
+
+    <style>
+        /* Tambahkan gaya ini agar bar berubah warna saat hover */
+        #bibitChart .apexcharts-bar-series .apexcharts-series path:hover {
+            fill: #8DD88D !important;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ambil data jumlah bibit yang dikirim dari controller Laravel
+            var bibitCounts = @json($bibitCounts); // Mengambil data jumlah bibit dari controller
+
+            var options = {
+                series: [{
+                    name: 'Jumlah Bibit',
+                    data: bibitCounts // Menggunakan data jumlah bibit yang didapat dari Firestore
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 400
+                },
+                colors: ['#F2FCF1'], // Warna dasar chart
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '75%',
+                        borderRadius: 10,
+                    }
+                },
+                dataLabels: {
+                    enabled: false,
+                    style: {
+                        colors: ['#000']
+                    }
+                },
+                stroke: {
+                    show: false
+                },
+                xaxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
+                        'Dec'
+                    ]
+                },
+                yaxis: {
+                    title: {
+                        text: 'Jumlah Bibit'
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return val + " bibit";
                         }
-                    };
+                    }
+                }
+            };
 
-                    var chart = new ApexCharts(document.querySelector("#bibitChart"), options);
-                    chart.render();
-                });
-            </script>
-        @endsection
+            var chart = new ApexCharts(document.querySelector("#bibitChart"), options);
+            chart.render();
+        });
+    </script>
+@endsection
