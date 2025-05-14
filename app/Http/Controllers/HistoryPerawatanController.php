@@ -56,16 +56,13 @@ class HistoryPerawatanController extends Controller
                 $perawatan[] = [
                     'id' => $id,
                     'nama' => $fields['created_by_name']['stringValue'] ?? '-',
-                    // Menambahkan pengecekan untuk memformat userRole
                     'userRole' => isset($fields['role']['arrayValue']['values'])
                                     ? $this->formatRole($fields['role']['arrayValue']['values'])
-                                    : 'Tidak ada role', // Default jika tidak ada role
+                                    : 'Tidak ada role',
                     'keterangan' => $fields['jenis_perawatan']['stringValue'] ?? '-',
                     'nama_bibit' => $fields['nama_bibit']['stringValue'] ?? '-',
                     'detail' => $fields['catatan']['stringValue'] ?? '-',
-                    'waktu' => isset($fields['created_at']['stringValue'])
-                                ? $this->formatDate($fields['tanggal']['stringValue'])
-                                : null,
+                    'waktu' => $this->getTanggalDariFields($fields),
                 ];
 
                 $total++;
@@ -78,7 +75,7 @@ class HistoryPerawatanController extends Controller
             'currentPage' => $page,
             'perPage' => $perPage,
             'search' => $search,
-            'searchType' => $searchType // Menambahkan searchType agar bisa dipakai di tampilan
+            'searchType' => $searchType
         ]);
     }
 
@@ -92,20 +89,136 @@ class HistoryPerawatanController extends Controller
         return implode(', ', $roleNames);
     }
 
-    // Fungsi untuk memformat tanggal agar sesuai dengan format yang diinginkan
-    private function formatDate($dateString)
+    // Fungsi sederhana untuk mendapatkan tanggal dari berbagai kemungkinan field
+    private function getTanggalDariFields($fields)
     {
-        try {
-            // Menghapus microdetik untuk memastikan format tanggal bisa dikenali
-            $dateString = preg_replace('/\.\d+$/', '', $dateString);
+        // Cek berbagai format dan field tanggal yang mungkin ada di Firestore
 
-            // Coba parse tanggal dengan format yang sudah diubah
-            $date = \Carbon\Carbon::parse($dateString);
-
-            return $date->format('Y-m-d H:i:s');  // Format yang diinginkan
-        } catch (\Exception $e) {
-            // Jika gagal parse, kembalikan null atau nilai default
-            return null;
+        // 1. Cek format timestampValue (format khusus Firestore)
+        if (isset($fields['tanggal']['timestampValue'])) {
+            return $this->konversiTanggal($fields['tanggal']['timestampValue']);
         }
+
+        if (isset($fields['created_at']['timestampValue'])) {
+            return $this->konversiTanggal($fields['created_at']['timestampValue']);
+        }
+
+        // 2. Cek format stringValue
+        if (isset($fields['tanggal']['stringValue'])) {
+            return $this->konversiTanggal($fields['tanggal']['stringValue']);
+        }
+
+        if (isset($fields['created_at']['stringValue'])) {
+            return $this->konversiTanggal($fields['created_at']['stringValue']);
+        }
+
+        // 3. Cek format integerValue (unix timestamp)
+        if (isset($fields['tanggal']['integerValue'])) {
+            return date('d F Y', (int)$fields['tanggal']['integerValue']);
+        }
+
+        if (isset($fields['created_at']['integerValue'])) {
+            return date('d F Y', (int)$fields['created_at']['integerValue']);
+        }
+
+        // 4. Cek format tanggal di field metadata lainnya
+        $dateFields = ['timestamp', 'waktu', 'date', 'tanggal_perawatan'];
+        foreach ($dateFields as $field) {
+            if (isset($fields[$field]['stringValue'])) {
+                $result = $this->konversiTanggal($fields[$field]['stringValue']);
+                if ($result) return $result;
+            }
+
+            if (isset($fields[$field]['timestampValue'])) {
+                $result = $this->konversiTanggal($fields[$field]['timestampValue']);
+                if ($result) return $result;
+            }
+
+            if (isset($fields[$field]['integerValue'])) {
+                return date('d F Y H:i', (int)$fields[$field]['integerValue']);
+            }
+        }
+
+        // 5. Periksa struktur dokumen secara langsung
+        // Dump seluruh struktur fields untuk debug
+        ob_start();
+        var_dump($fields);
+        $dump = ob_get_clean();
+
+        // Return dump data untuk debugging (tampilkan sementara untuk debugging)
+        return "Tanggal tidak tersedia";
+    }
+
+    // Fungsi untuk mengkonversi tanggal ke format yang diinginkan
+    private function konversiTanggal($dateString)
+    {
+        if (empty($dateString)) {
+            return "Format tanggal kosong";
+        }
+
+        // Debug: tampilkan format tanggal yang diterima
+        $originalDateString = $dateString;
+
+        // 1. Handle format timestamp Firestore (ISO8601 / RFC3339)
+        // Format: 2023-05-17T10:30:00Z atau 2023-05-17T10:30:00.123456Z
+        if (strpos($dateString, 'T') !== false &&
+            (strpos($dateString, 'Z') !== false || strpos($dateString, '+') !== false)) {
+            $timestamp = strtotime($dateString);
+            if ($timestamp !== false) {
+                return date('d F Y', $timestamp); // Hanya tanggal, tanpa jam
+            }
+        }
+
+        // 2. Handle format numeric (UNIX timestamp)
+        if (is_numeric($dateString)) {
+            $timestamp = (int)$dateString;
+            // Jika timestamp terlalu besar (dalam milidetik), konversi ke detik
+            if ($timestamp > 10000000000) {
+                $timestamp = floor($timestamp / 1000);
+            }
+            return date('d F Y', $timestamp); // Hanya tanggal, tanpa jam
+        }
+
+        // 3. Handle format dengan titik (Firestore native timestamp)
+        // Format: 1621234567.123456 (seconds.microseconds)
+        if (strpos($dateString, '.') !== false) {
+            $parts = explode('.', $dateString);
+            if (is_numeric($parts[0])) {
+                return date('d F Y', (int)$parts[0]); // Hanya tanggal, tanpa jam
+            }
+        }
+
+        // 4. Handle format tanggal standar dengan berbagai pemisah
+        $dateString = trim($dateString);
+        // Hapus microseconds jika ada
+        $dateString = preg_replace('/\.\d+/', '', $dateString);
+
+        // Coba dengan strtotime (menangani banyak format)
+        $timestamp = strtotime($dateString);
+        if ($timestamp !== false) {
+            return date('d F Y', $timestamp); // Hanya tanggal, tanpa jam
+        }
+
+        // 5. Coba berbagai format tanggal yang umum
+        $formats = [
+            'Y-m-d H:i:s',
+            'Y-m-d',
+            'd-m-Y H:i:s',
+            'd-m-Y',
+            'Y/m/d H:i:s',
+            'Y/m/d',
+            'd/m/Y H:i:s',
+            'd/m/Y'
+        ];
+
+        foreach ($formats as $format) {
+            $date = \DateTime::createFromFormat($format, $dateString);
+            if ($date !== false) {
+                return $date->format('d F Y'); // Hanya tanggal, tanpa jam
+            }
+        }
+
+        // Debug: Kembalikan string tanggal asli jika semua metode gagal
+        return "Format tidak dikenali: " . $originalDateString;
     }
 }
