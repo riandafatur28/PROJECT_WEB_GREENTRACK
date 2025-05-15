@@ -123,38 +123,54 @@
 
                     <div class="w-full md:w-1/2 space-y-3">
                         <input type="hidden" id="modalMode">
-                        <div id="idField"><label class="text-gray-600 text-sm">ID Admin</label><input type="text"
-                                id="modalID" readonly
-                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800"></div>
-                        <div><label class="text-gray-600 text-sm">Nama</label><input type="text" id="modalNama"
-                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800"></div>
-                        <div><label class="text-gray-600 text-sm">Email</label><input type="email" id="modalEmail"
-                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800"></div>
-                        <div><label class="text-gray-600 text-sm">Peran</label>
+                        <div id="idField">
+                            <label class="text-gray-600 text-sm">ID Admin</label>
+                            <input type="text" id="modalID" readonly
+                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
+                        </div>
+                        <div>
+                            <label class="text-gray-600 text-sm">Nama</label>
+                            <input type="text" id="modalNama"
+                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
+                        </div>
+                        <div>
+                            <label class="text-gray-600 text-sm">Email</label>
+                            <input type="email" id="modalEmail"
+                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
+                        </div>
+                        <div>
+                            <label class="text-gray-600 text-sm">Password</label>
+                            <input type="password" id="password" name="password"
+                                class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
+                        </div>
+                        <div>
+                            <label class="text-gray-600 text-sm">Peran</label>
                             <select id="modalPeranSelect"
                                 class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
                                 <option value="admin_penyemaian">Admin Penyemaian</option>
                                 <option value="admin_tpk">Admin TPK</option>
                             </select>
                         </div>
-                        <div><label class="text-gray-600 text-sm">Status</label>
+                        <div>
+                            <label class="text-gray-600 text-sm">Status</label>
                             <select id="modalStatusSelect"
                                 class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
                                 <option value="Aktif">Aktif</option>
                                 <option value="Nonaktif">Nonaktif</option>
                             </select>
                         </div>
+                    </div>
 
-                        <div class="flex justify-end gap-2 pt-4">
-                            <button class="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600"
-                                onclick="simpanPerubahan()">Perbarui</button>
-                            <button class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600"
-                                onclick="hapusAdmin()">Hapus</button>
-                        </div>
+                    <div class="flex justify-end gap-2 pt-4">
+                        <button class="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600"
+                            onclick="simpanPerubahan()">Perbarui</button>
+                        <button class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600"
+                            onclick="hapusAdmin()">Hapus</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 @endsection
 

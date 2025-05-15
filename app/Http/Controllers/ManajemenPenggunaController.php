@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\FirestoreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Hash;
 
 class ManajemenPenggunaController extends Controller
 {
@@ -97,7 +98,7 @@ class ManajemenPenggunaController extends Controller
             $payload['fields']['photo_url'] = ['stringValue' => $photoUrl];
         }
 
-        $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+        $response = Http::withToken($firestore->getAccessToken())
             ->patch($url, $payload);
 
         return response()->json(['success' => $response->successful(), 'message' => 'Admin berhasil diperbarui']);
@@ -116,20 +117,24 @@ class ManajemenPenggunaController extends Controller
             ]
         ];
 
-        $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+        $response = Http::withToken($firestore->getAccessToken())
             ->patch($url, $payload);
 
         return response()->json(['success' => $response->successful()]);
     }
 
-    // Fungsi untuk menambah data admin baru
+    // Fungsi untuk menambah data admin baru dengan password
     public function store(Request $request, FirestoreService $firestore)
     {
         $nama = $request->input('nama');
         $email = $request->input('email');
         $peran = $request->input('peran');
         $status = $request->input('status');
+        $password = $request->input('password'); // Ambil password dari request
         $photoUrl = $request->input('photo_url', 'https://randomuser.me/api/portraits/lego/2.jpg'); // Default image if not provided
+
+        // Hash password untuk keamanan
+        $hashedPassword = Hash::make($password);
 
         // Format data yang akan disimpan
         $fields = [
@@ -144,6 +149,7 @@ class ManajemenPenggunaController extends Controller
             ],
             'status' => ['stringValue' => $status],
             'photo_url' => ['stringValue' => $photoUrl],
+            'password' => ['stringValue' => $hashedPassword], // Tambahkan password yang sudah di-hash
             'created_at' => ['timestampValue' => date('c')], // Format ISO 8601
             'updated_at' => ['timestampValue' => date('c')], // Format ISO 8601
             'kode_otp' => ['stringValue' => ''],
@@ -153,7 +159,7 @@ class ManajemenPenggunaController extends Controller
         $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun";
         $payload = ['fields' => $fields];
 
-        $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+        $response = Http::withToken($firestore->getAccessToken())
             ->post($url, $payload);
 
         return response()->json([
@@ -169,7 +175,7 @@ class ManajemenPenggunaController extends Controller
 
         $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}";
 
-        $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+        $response = Http::withToken($firestore->getAccessToken())
             ->delete($url);
 
         return response()->json([
