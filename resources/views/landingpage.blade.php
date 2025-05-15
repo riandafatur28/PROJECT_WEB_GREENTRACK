@@ -29,25 +29,14 @@
     <!-- Main CSS File -->
     <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
 
-    <!-- =======================================================
-  * Template Name: AgriCulture
-  * Template URL: https://bootstrapmade.com/agriculture-bootstrap-website-template/
-  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
 </head>
 
 <body class="index-page">
 
-    <header id="header" class="header d-flex align-items-center position-relative">
+    <header id="header" class="header d-flex align-items-center">
         <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
-            <a href="index.html" class="logo d-flex align-items-center">
-                <!-- Uncomment the line below if you also wish to use an image logo -->
-                <img src="{{ asset('assets/img/logo.png') }}" alt="AgriCulture">
-                <!-- <h1 class="sitename">AgriCulture</h1>  -->
-            </a>
+            <h1 class="text-green-500 text-4xl font-bold font-sans">GreenTrack</h1>
 
             <nav id="navmenu" class="navmenu">
                 <ul>
@@ -80,7 +69,7 @@
                     <img src="{{ asset('assets/img/hero_1.jpg') }}" alt="">
                     <div class="carousel-container">
                         <h2>Greentrack: Solusi Digital untuk Keberlanjutan Pertanian</h2>
-                        <p>Kelola penyemaian bibit, distribusi kayu, dan pengelolaan pohon secara efisien dengan
+                        <p>Kelola persemaian bibit, distribusi kayu, dan pengelolaan pohon secara efisien dengan
                             aplikasi berbasis web dan mobile.</p>
                     </div>
                 </div><!-- End Carousel Item -->
@@ -116,7 +105,7 @@
                     <img src="{{ asset('assets/img/hero_6.jpg') }}" alt="">
                     <div class="carousel-container">
                         <h2>Aplikasi Cerdas untuk Pengelolaan Sumber Daya Alam Berkelanjutan</h2>
-                        <p>Dari penyemaian bibit hingga distribusi kayu, Greentrack mempermudah proses pengelolaan yang
+                        <p>Dari persemaian bibit hingga distribusi kayu, Greentrack mempermudah proses pengelolaan yang
                             lebih ramah lingkungan.</p>
                     </div>
                 </div><!-- End Carousel Item -->
@@ -141,7 +130,7 @@
             <!-- Section Title -->
             <div class="container section-title" data-aos="fade-up">
                 <h2>LAYANAN KAMI</h2>
-                <p>Solusi Digital Terintegrasi untuk Penyemaian & Distribusi Kayu</p>
+                <p>Solusi Digital Terintegrasi untuk Persemaian & Distribusi Kayu</p>
             </div><!-- End Section Title -->
             <div class="content">
                 <div class="container">
@@ -220,7 +209,7 @@
                                     </svg>
                                 </div>
                                 <div class="service-item-content">
-                                    <h3 class="service-heading">Aktivitas Penyemaian & TPK</h3>
+                                    <h3 class="service-heading">Aktivitas Persemaian & TPK</h3>
                                     <p>
                                         Pantau kondisi dan perkembangan pohon serta bibit secara real-time
                                     </p>
@@ -285,7 +274,7 @@
                                 <div class="service-item-content">
                                     <h3 class="service-heading">Manajemen Admin</h3>
                                     <p>
-                                        Kelola akun pengguna sesuai peran: Admin Penyemaian, Admin TPK, dan Super Admin
+                                        Kelola akun pengguna sesuai peran: Admin Persemaian, Admin TPK, dan Super Admin
                                     </p>
                                 </div>
                             </div>
@@ -432,7 +421,7 @@
                             </h2>
                             <p class="opacity-50">
                                 GreenTrack hadir sebagai solusi digital terintegrasi yang mendukung proses
-                                penyemaian hingga distribusi kayu secara akurat, efisien, dan real-time.
+                                persemaian hingga distribusi kayu secara akurat, efisien, dan real-time.
                             </p>
 
                             <div class="row my-5">
@@ -450,7 +439,7 @@
                                     <div>
                                         <h4 class="m-0 h5 text-white"> Akses Aman & Terstruktur</h4>
                                         <p class="text-white opacity-50">Setiap pengguna memiliki hak akses berbeda
-                                            sesuai tugasnya—Admin Penyemaian, Admin TPK, hingga Super Admin—menjamin
+                                            sesuai tugasnya—Admin Persemaian, Admin TPK, hingga Super Admin—menjamin
                                             keamanan dan efisiensi kerja.</p>
                                     </div>
                                 </div>
@@ -570,7 +559,7 @@
                                             <h2 class="service-item-title">Konservasi Hutan</h2>
                                         </a>
                                     </div>
-                                    <img src="{{ asset('assets/img/img_sq_3.jpg') }}" alt="Image"
+                                    <img src="{{ asset('assets/img/img_sq_6.jpeg') }}" alt="Image"
                                         class="img-fluid">
                                 </div>
                             </div>
@@ -594,7 +583,8 @@
                                             <h2 class="service-item-title">Konsultasi Lingkungan</h2>
                                         </a>
                                     </div>
-                                    <img src="{{ asset('assets/img/img_sq_6.jpg') }}" alt="Image"
+
+                                    <img src="{{ asset('assets/img/img_sq_3.jpg') }}" alt="Image"
                                         class="img-fluid">
                                 </div>
                             </div>

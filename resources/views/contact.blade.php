@@ -32,14 +32,13 @@
 
 <body class="contact-page">
 
-    <header id="header" class="header d-flex align-items-center position-relative">
+    <header id="header" class="header d-flex align-items-center mb-60 py-3">
         <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
-
             <!-- Logo -->
-            <h1 class="text-green-500 text-4xl font-bold font-sans">GreenTrack</h1>
+            <h1 class="text-green-500 text-xl font-bold font-sans">GreenTrack</h1>
 
             <nav id="navmenu" class="navmenu">
-                <ul>
+                <ul class="flex space-x-4">
                     <li><a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Beranda</a></li>
                     <li><a href="{{ url('/about') }}" class="{{ request()->is('about') ? 'active' : '' }}">Tentang
                             Kami</a></li>
@@ -53,13 +52,11 @@
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
-
-
         </div>
     </header>
 
-    <main class="main">
 
+    <main class="main mt-64"> <!-- Menambahkan margin-top untuk memberi ruang lebih besar -->
         <!-- Page Title -->
         <div class="page-title dark-background" data-aos="fade"
             style="background-image: url(assets/img/page-title-bg.webp);">
@@ -67,27 +64,30 @@
                 <h1>Kontak</h1>
                 <nav class="breadcrumbs">
                     <ol>
-                        <li> <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'current' : '' }}">
-                                Beranda
-                            </a></li>
+                        <li><a href="{{ url('/') }}"
+                                class="{{ request()->is('/') ? 'current' : '' }}">Beranda</a></li>
                         <li class="current">Kontak</li>
                     </ol>
                 </nav>
             </div>
         </div><!-- End Page Title -->
-
-        <!-- Contact Section -->
-        <section id="contact" class="contact section">
-
-            <div class="mb-5 ml-8 mr-8">
-                <iframe style="width: 100%; height: 400px;"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63284.33688646477!2d111.8378824286128!3d-7.545391501234625!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e784b07b58ae7ed%3A0xcd76227bd3b5d3!2sPerum%20Perhutani%20KPH%20Nganjuk!5e0!3m2!1sid!2sid!4v1744583897508!5m2!1sid!2sid"
-                    frameborder="0" allowfullscreen="">
-                </iframe>
-            </div><!-- End Google Maps -->
+    </main>
 
 
-        </section><!-- /Contact Section -->
+
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact section">
+
+        <div class="mb-5 ml-8 mr-8">
+            <iframe style="width: 100%; height: 400px;"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63284.33688646477!2d111.8378824286128!3d-7.545391501234625!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e784b07b58ae7ed%3A0xcd76227bd3b5d3!2sPerum%20Perhutani%20KPH%20Nganjuk!5e0!3m2!1sid!2sid!4v1744583897508!5m2!1sid!2sid"
+                frameborder="0" allowfullscreen="">
+            </iframe>
+        </div><!-- End Google Maps -->
+
+
+    </section><!-- /Contact Section -->
 
     </main>
 
