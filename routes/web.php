@@ -14,7 +14,7 @@ use App\Http\Controllers\HistoryBarcodeController;
 use App\Http\Controllers\DashboardController;
 
 // Halaman Welcome (Beranda)
-Route::get('/', fn() => view('welcome'))->name('welcome');
+Route::get('/', fn() => view('splashscreen'))->name('welcome');
 
 // Login & Auth
 Route::get('/login', fn() => view('layouts.login'))->name('login');
@@ -118,11 +118,6 @@ Route::get('/', function () {
 });
 Route::view('/about', 'about');
 Route::view('/services', 'services');
-Route::view('/testimonials', 'testimonials');
-Route::view('/blog', 'blog');
+
 Route::view('/contact', 'contact');
-Route::view('/services', 'services');
-Route::view('/testimonials', 'testimonials');
-Route::view('/blog', 'blog');
-Route::view('/contact', 'contact');
-Route::view('/about', 'about');
+Route::view('/landingpage', 'landingpage');
