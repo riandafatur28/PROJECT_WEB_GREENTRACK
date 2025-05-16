@@ -5,7 +5,7 @@
 @section('content')
     <div class="container mx-auto px-4 py-6">
         <div class="flex items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-800 ml-4">{{ session('user_nama') }} 👋</h1>
+            <h1 class="text-2xl font-semibold text-gray-800 ml-4">Hallo, {{ session('user_nama') }} 👋</h1>
         </div>
 
         <div id="table-admin" class="bg-white shadow-md rounded-3xl p-3 mt-8">
@@ -18,21 +18,65 @@
                         <span>Tambahkan Admin</span>
                     </button>
 
-                    <div class="relative w-full md:w-auto">
-                        <input type="text" id="searchInput" name="search" value="{{ request('search') }}"
-                            placeholder="Cari"
-                            class="pl-8 pr-3 py-1.5 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
-                        <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
-                    </div>
+                    <<!-- Search and Sort Form -->
+                        <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
+                            <form method="GET" action="{{ url()->current() }}">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                    <!-- Search Input -->
+                                    <div class="relative w-full md:w-1/2">
+                                        <input type="text" name="search" value="{{ $search ?? '' }}"
+                                            placeholder="Cari nama, email, atau peran admin..."
+                                            class="pl-10 pr-3 py-2 w-full border rounded-lg bg-green-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                                fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </span>
+                                    </div>
 
-                    <div class="flex flex-col md:flex-row md:items-center">
-                        <label class="text-gray-600 text-sm">Urutkan Berdasarkan :</label>
-                        <select
-                            class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto">
-                            <option value="terbaru">Terbaru</option>
-                            <option value="terlama">Terlama</option>
-                        </select>
-                    </div>
+                                    <!-- Sort and Filter Controls -->
+                                    <div class="flex gap-4">
+                                        <div>
+                                            <select name="sort"
+                                                class="border rounded-lg bg-green-50 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                                <option value="terbaru"
+                                                    {{ ($sortOrder ?? 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru
+                                                </option>
+                                                <option value="terlama"
+                                                    {{ ($sortOrder ?? '') == 'terlama' ? 'selected' : '' }}>Terlama</option>
+                                            </select>
+                                        </div>
+
+                                        <button type="submit"
+                                            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1"
+                                                viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                            Filter
+                                        </button>
+
+                                        @if (!empty($search) || ($sortOrder ?? '') != 'terbaru')
+                                            <a href="{{ url()->current() }}"
+                                                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1"
+                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                                Reset
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                 </div>
             </div>
 
@@ -83,20 +127,49 @@
                     <p class="text-sm text-gray-500">Menampilkan data {{ ($currentPage - 1) * $perPage + 1 }} hingga
                         {{ min($currentPage * $perPage, $total) }} dari {{ $total }} entri</p>
                     <div class="flex space-x-1">
+                        <!-- Previous Page Button -->
                         @if ($currentPage > 1)
-                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage - 1, 'search' => request('search')]) }} "
-                                class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&lt;</a>
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage - 1, 'search' => request('search')]) }}"
+                                class="px-3 py-1 border border-gray-300 rounded text-sm {{ $currentPage == 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50' }}">
+                                ‹
+                            </a>
                         @endif
-                        @for ($i = 1; $i <= ceil($total / $perPage); $i++)
-                            <a href="{{ route('manajemenpengguna.index', ['page' => $i, 'search' => request('search')]) }} "
-                                class="px-2 py-0.5 {{ $currentPage == $i ? 'bg-green-500 text-white' : 'bg-white text-gray-500' }} border border-gray-300 rounded-md text-xs">{{ $i }}</a>
+
+                        <!-- Page Numbers -->
+                        @php
+                            $startPage = max(1, $currentPage - 2);
+                            $endPage = min($startPage + 4, $totalPages);
+
+                            if ($endPage - $startPage < 4 && $startPage > 1) {
+                                $startPage = max(1, $endPage - 4);
+                            }
+                        @endphp
+
+                        @for ($i = $startPage; $i <= $endPage; $i++)
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $i, 'search' => request('search')]) }}"
+                                class="px-3 py-1 border border-gray-300 rounded text-sm {{ $i == $currentPage ? 'bg-green-500 text-white border-green-500' : 'text-blue-600 hover:bg-blue-50' }}">
+                                {{ $i }}
+                            </a>
                         @endfor
-                        @if ($currentPage < ceil($total / $perPage))
-                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage + 1, 'search' => request('search')]) }} "
-                                class="px-2 py-0.5 bg-white text-gray-500 border border-gray-300 rounded-md text-xs">&gt;</a>
+
+                        <!-- Next Page Button -->
+                        @if ($currentPage < $totalPages)
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $currentPage + 1, 'search' => request('search')]) }}"
+                                class="px-3 py-1 border border-gray-300 rounded text-sm {{ $currentPage == $totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50' }}">
+                                ›
+                            </a>
+                        @endif
+
+                        <!-- Last Page Button -->
+                        @if ($currentPage < $totalPages)
+                            <a href="{{ route('manajemenpengguna.index', ['page' => $totalPages, 'search' => request('search')]) }}"
+                                class="px-3 py-1 border border-gray-300 rounded text-sm {{ $currentPage == $totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50' }}">
+                                »
+                            </a>
                         @endif
                     </div>
                 </div>
+
             </div>
         </div>
 

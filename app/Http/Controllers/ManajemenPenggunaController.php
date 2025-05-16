@@ -12,8 +12,9 @@ class ManajemenPenggunaController extends Controller
     // Fungsi untuk menampilkan daftar admin dengan pagination dan pencarian
     public function index(Request $request, FirestoreService $firestore)
     {
-        // Ambil query pencarian dari input
+        // Ambil query pencarian dan urutan dari input
         $search = $request->input('search', '');
+        $sortOrder = $request->input('sort', 'terbaru'); // Default ke 'terbaru' jika tidak ada
         $page = $request->input('page', 1);
         $perPage = 10; // Tentukan jumlah data per halaman
 
@@ -31,25 +32,46 @@ class ManajemenPenggunaController extends Controller
                 $nama = $fields['nama_lengkap']['stringValue'] ?? '-';
                 $email = $fields['email']['stringValue'] ?? '-';
 
+                // Format peran admin
+                $peranAdmin = $this->formatRole($fields['role']['arrayValue']['values'] ?? []);
+
                 // Ambil photo_url dari Firestore
                 $photoUrl = $fields['photo_url']['stringValue'] ?? 'https://randomuser.me/api/portraits/lego/2.jpg';
 
-                // Filter manual pakai PHP (case-insensitive)
-                if ($search && stripos($nama, $search) === false) {
-                    continue; // Skip jika nama tidak mengandung kata pencarian
+                // Filter berdasarkan nama, email, dan peran admin
+                if ($search) {
+                    $searchLower = strtolower($search);
+                    $namaLower = strtolower($nama);
+                    $emailLower = strtolower($email);
+                    $peranLower = strtolower($peranAdmin);
+
+                    // Skip jika tidak ada kata pencarian yang cocok di nama, email, ATAU peran
+                    if (stripos($namaLower, $searchLower) === false &&
+                        stripos($emailLower, $searchLower) === false &&
+                        stripos($peranLower, $searchLower) === false) {
+                        continue;
+                    }
                 }
 
+                // Ekstrak timestamp untuk sorting
+                $timestamp = 0;
+                if (isset($fields['created_at']['timestampValue'])) {
+                    $timestamp = strtotime($fields['created_at']['timestampValue']);
+                }
+
+                // Menambahkan data admin ke array
                 $admins[] = [
                     'id' => $id,
                     'nama' => $nama,
                     'email' => $email,
-                    'peran_admin' => $this->formatRole($fields['role']['arrayValue']['values'] ?? []),
+                    'peran_admin' => $peranAdmin,
                     'status' => $fields['status']['stringValue'] ?? 'Aktif',
                     'photo_url' => $photoUrl, // Tambahkan photo_url ke data
                     'created_at' => isset($fields['created_at']['timestampValue']) ?
                         $this->formatTimestamp($fields['created_at']['timestampValue']) : '-',
                     'updated_at' => isset($fields['updated_at']['timestampValue']) ?
                         $this->formatTimestamp($fields['updated_at']['timestampValue']) : '-',
+                    'timestamp' => $timestamp, // Store timestamp for sorting
                 ];
             }
 
@@ -57,16 +79,36 @@ class ManajemenPenggunaController extends Controller
             $total = count($admins);
         }
 
+        // Sort the admins based on the sort order ('terbaru' or 'terlama')
+        if ($sortOrder === 'terbaru') {
+            usort($admins, function ($a, $b) {
+                return $b['timestamp'] - $a['timestamp']; // Urutkan berdasarkan timestamp terbaru
+            });
+        } else if ($sortOrder === 'terlama') {
+            usort($admins, function ($a, $b) {
+                return $a['timestamp'] - $b['timestamp']; // Urutkan berdasarkan timestamp terlama
+            });
+        }
+
         // Pagination manual (slice array)
         $offset = ($page - 1) * $perPage;
         $paginatedAdmins = array_slice($admins, $offset, $perPage);
 
-        // Return view dengan data
+        // Calculate total pages based on total data
+        $totalPages = ceil($total / $perPage);
+
+        // Ensure page is within bounds
+        $page = max(1, min($page, $totalPages > 0 ? $totalPages : 1));
+
+        // Return view with data
         return view('layouts.manajemenpengguna', [
             'admin' => $paginatedAdmins,
             'total' => $total,
             'currentPage' => $page,
-            'perPage' => $perPage
+            'perPage' => $perPage,
+            'totalPages' => $totalPages, // Pass totalPages to the view
+            'sortOrder' => $sortOrder, // Pass sortOrder to the view
+            'search' => $search // Pass search to the view
         ]);
     }
 
