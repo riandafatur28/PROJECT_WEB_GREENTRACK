@@ -7,7 +7,7 @@
     <div class="container mx-auto px-4 py-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-800">{{ session('user_nama') }} 👋</h1>
+            <h1 class="text-2xl font-semibold text-gray-800">Hallo, {{ session('user_nama') }} 👋</h1>
         </div>
 
         <!-- Card Statistik -->
@@ -95,19 +95,30 @@
                 <div class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-3 md:space-y-0">
                     <!-- Input Pencarian -->
                     <div class="relative w-full md:w-auto">
-                        <input type="text" placeholder="Cari" id="searchBibit"
-                            class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
-                        <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                        <form action="{{ url()->current() }}" method="GET">
+                            <input type="text" name="search" value="{{ $search ?? '' }}"
+                                placeholder="Cari nama, id, jenis..." id="searchBibit"
+                                class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
+                            <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                            <input type="hidden" name="sort" value="{{ $sort ?? 'terbaru' }}">
+                            <button type="submit" class="hidden">Search</button>
+                        </form>
                     </div>
 
                     <!-- Dropdown Sorting -->
                     <div class="flex flex-col md:flex-row md:items-center">
                         <label class="text-gray-600 text-sm">Urutkan:</label>
-                        <select id="sortBibit"
-                            class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto">
-                            <option value="terbaru">Terbaru</option>
-                            <option value="terlama">Terlama</option>
-                        </select>
+                        <form id="sortBibitForm" action="{{ url()->current() }}" method="GET">
+                            <input type="hidden" name="search" value="{{ $search ?? '' }}">
+                            <select id="sortBibit" name="sort"
+                                onchange="document.getElementById('sortBibitForm').submit()"
+                                class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto">
+                                <option value="terbaru" {{ ($sort ?? 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru
+                                </option>
+                                <option value="terlama" {{ ($sort ?? '') == 'terlama' ? 'selected' : '' }}>Terlama
+                                </option>
+                            </select>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -127,7 +138,7 @@
                     <tbody>
                         @foreach ($bibit as $item)
                             <tr class="border-b">
-                                <td class="px-2 py-1">{{ $item['id'] }}</td>
+                                <td class="px-2 py-1">{{ $item['id_bibit'] ?? $item['id'] }}</td>
                                 <td class="px-2 py-1">{{ $item['jenis_bibit'] }}</td>
                                 <td class="px-2 py-1">{{ $item['tinggi'] }} cm</td>
                                 <td class="px-2 py-1">{{ $item['lokasi'] }}</td>
@@ -148,15 +159,19 @@
                                 <td class="px-2 py-1">
                                     <button
                                         class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block bibit-detail-btn"
-                                        data-id="{{ $item['id'] }}" data-jenis="{{ $item['jenis_bibit'] }}"
-                                        data-tinggi="{{ $item['tinggi'] }}" data-lokasi="{{ $item['lokasi'] }}"
-                                        data-status="{{ $item['status'] }}" data-usia="{{ $item['usia'] ?? '' }}"
+                                        data-id="{{ $item['id'] }}" data-id-bibit="{{ $item['id_bibit'] ?? '' }}"
+                                        data-jenis="{{ $item['jenis_bibit'] }}" data-tinggi="{{ $item['tinggi'] }}"
+                                        data-lokasi="{{ $item['lokasi'] }}" data-status="{{ $item['status'] }}"
+                                        data-usia="{{ $item['usia'] ?? '' }}"
                                         data-nama="{{ $item['nama_bibit'] ?? '' }}"
                                         data-varietas="{{ $item['varietas'] ?? '' }}"
                                         data-produktivitas="{{ $item['produktivitas'] ?? '' }}"
                                         data-asal="{{ $item['asal_bibit'] ?? '' }}"
                                         data-nutrisi="{{ $item['nutrisi'] ?? '' }}"
                                         data-media="{{ $item['media_tanam'] ?? '' }}"
+                                        data-tanggal="{{ $item['tanggal_pembibitan'] ?? ($item['tanggal_pembibitanFl'] ?? ($item['tanggal_pembibitanSl'] ?? '')) }}"
+                                        data-status-hama="{{ $item['status_hama'] ?? '' }}"
+                                        data-catatan="{{ $item['catatan'] ?? '' }}"
                                         data-gambar="{{ $item['gambar_image'] ?? '' }}">
                                         Lihat Selengkapnya
                                     </button>
@@ -164,8 +179,33 @@
                             </tr>
                         @endforeach
                     </tbody>
-
                 </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-4 flex justify-center">
+                <div class="flex space-x-1">
+                    @if ($currentPage > 1)
+                        <a href="{{ url()->current() }}?page={{ $currentPage - 1 }}&search={{ $search ?? '' }}&sort={{ $sort ?? 'terbaru' }}"
+                            class="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                            Prev
+                        </a>
+                    @endif
+
+                    @for ($i = max(1, $currentPage - 2); $i <= min($lastPage, $currentPage + 2); $i++)
+                        <a href="{{ url()->current() }}?page={{ $i }}&search={{ $search ?? '' }}&sort={{ $sort ?? 'terbaru' }}"
+                            class="px-3 py-1 {{ $i == $currentPage ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-green-700 hover:text-white">
+                            {{ $i }}
+                        </a>
+                    @endfor
+
+                    @if ($currentPage < $lastPage)
+                        <a href="{{ url()->current() }}?page={{ $currentPage + 1 }}&search={{ $search ?? '' }}&sort={{ $sort ?? 'terbaru' }}"
+                            class="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                            Next
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -178,19 +218,32 @@
                 <div class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-3 md:space-y-0">
                     <!-- Input Pencarian -->
                     <div class="relative w-full md:w-auto">
-                        <input type="text" placeholder="Cari" id="searchKayu"
-                            class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
-                        <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                        <form action="{{ url()->current() }}?tab=kayu" method="GET">
+                            <input type="text" name="search" value="{{ $search ?? '' }}"
+                                placeholder="Cari nama, id, jenis..." id="searchKayu"
+                                class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
+                            <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                            <input type="hidden" name="sort" value="{{ $sort ?? 'terbaru' }}">
+                            <input type="hidden" name="tab" value="kayu">
+                            <button type="submit" class="hidden">Search</button>
+                        </form>
                     </div>
 
                     <!-- Dropdown Sorting -->
                     <div class="flex flex-col md:flex-row md:items-center">
                         <label class="text-gray-600 text-sm">Urutkan:</label>
-                        <select id="sortKayu"
-                            class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto">
-                            <option value="terbaru">Terbaru</option>
-                            <option value="terlama">Terlama</option>
-                        </select>
+                        <form id="sortKayuForm" action="{{ url()->current() }}" method="GET">
+                            <input type="hidden" name="search" value="{{ $search ?? '' }}">
+                            <input type="hidden" name="tab" value="kayu">
+                            <select id="sortKayu" name="sort"
+                                onchange="document.getElementById('sortKayuForm').submit()"
+                                class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto">
+                                <option value="terbaru" {{ ($sort ?? 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru
+                                </option>
+                                <option value="terlama" {{ ($sort ?? '') == 'terlama' ? 'selected' : '' }}>Terlama
+                                </option>
+                            </select>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -211,7 +264,7 @@
                     <tbody>
                         @foreach ($kayu as $item)
                             <tr class="border-b">
-                                <td class="px-2 py-1">{{ $item['id'] }}</td>
+                                <td class="px-2 py-1">{{ $item['id_kayu'] ?? $item['id'] }}</td>
                                 <td class="px-2 py-1">{{ $item['jenis_kayu'] }}</td>
                                 <td class="px-2 py-1">{{ $item['tinggi'] }} Batang</td>
                                 <td class="px-2 py-1">{{ $item['lokasi'] }}</td>
@@ -230,13 +283,18 @@
                                 </td>
                                 <td class="px-2 py-1">
                                     <button
-                                        class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block detail-btn"
-                                        data-id="{{ $item['id'] }}" data-nama="{{ $item['nama'] ?? '' }}"
+                                        class="ml-1 bg-teal-300 text-teal-700 text-semibold px-3 py-1 rounded-lg border border-teal-700 inline-block kayu-detail-btn"
+                                        data-id="{{ $item['id'] }}" data-id-kayu="{{ $item['id_kayu'] ?? '' }}"
+                                        data-nama="{{ $item['nama_kayu'] ?? '' }}"
                                         data-jenis="{{ $item['jenis_kayu'] }}" data-usia="{{ $item['usia'] ?? '' }}"
                                         data-jumlah="{{ $item['tinggi'] }}" data-lokasi="{{ $item['lokasi'] }}"
                                         data-status="{{ $item['status'] }}" data-barcode="{{ $item['barcode'] ?? '' }}"
                                         data-batch="{{ $item['batch_panen'] ?? '' }}"
-                                        data-tanggal="{{ $item['tanggal_lahir_pohon'] ?? '' }}"
+                                        data-stok="{{ $item['jumlah_stok'] ?? '' }}"
+                                        data-varietas="{{ $item['varietas'] ?? '' }}"
+                                        data-tanggal-lahir="{{ $item['tanggal_lahir_pohon'] ?? '' }}"
+                                        data-tanggal-panen="{{ $item['tanggal_panen'] ?? '' }}"
+                                        data-catatan="{{ $item['catatan'] ?? '' }}"
                                         data-gambar="{{ $item['gambar_image'] ?? '' }}">
                                         Lihat Selengkapnya
                                     </button>
@@ -245,6 +303,32 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination for Kayu -->
+            <div class="mt-4 flex justify-center">
+                <div class="flex space-x-1">
+                    @if ($currentPage > 1)
+                        <a href="{{ url()->current() }}?page={{ $currentPage - 1 }}&search={{ $search ?? '' }}&sort={{ $sort ?? 'terbaru' }}&tab=kayu"
+                            class="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                            Prev
+                        </a>
+                    @endif
+
+                    @for ($i = max(1, $currentPage - 2); $i <= min($lastPage, $currentPage + 2); $i++)
+                        <a href="{{ url()->current() }}?page={{ $i }}&search={{ $search ?? '' }}&sort={{ $sort ?? 'terbaru' }}&tab=kayu"
+                            class="px-3 py-1 {{ $i == $currentPage ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-green-700 hover:text-white">
+                            {{ $i }}
+                        </a>
+                    @endfor
+
+                    @if ($currentPage < $lastPage)
+                        <a href="{{ url()->current() }}?page={{ $currentPage + 1 }}&search={{ $search ?? '' }}&sort={{ $sort ?? 'terbaru' }}&tab=kayu"
+                            class="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                            Next
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -267,23 +351,8 @@
 
                         <!-- Fields below image -->
                         <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Penanggung Jawab</label>
-                            <input type="text" id="detail-penanggung" placeholder="Placeholder"
-                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
-                        </div>
-
-                        <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Tanggal Kayu</label>
-                            <input type="text" id="detail-tanggal" placeholder="Placeholder"
-                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
-                        </div>
-                    </div>
-
-                    <!-- Right Column Form Fields -->
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">ID Barcode</label>
-                            <input type="text" id="detail-id" placeholder="Placeholder"
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Nama Kayu</label>
+                            <input type="text" id="detail-nama" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
 
@@ -294,20 +363,54 @@
                         </div>
 
                         <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Volume</label>
-                            <input type="text" id="detail-volume" placeholder="Placeholder"
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Tanggal Tebang</label>
+                            <input type="text" id="detail-tanggal-lahir" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
 
                         <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Diameter</label>
-                            <input type="text" id="detail-diameter" placeholder="Placeholder"
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Catatan</label>
+                            <input type="text" id="detail-catatan" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Right Column Form Fields -->
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">ID Kayu</label>
+                            <input type="text" id="detail-id-kayu" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                            <input type="hidden" id="detail-id" value="">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Barcode</label>
+                            <input type="text" id="detail-barcode" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
 
                         <div>
-                            <label class="block text-gray-700 text-sm font-semibold mb-1">Panjang</label>
-                            <input type="text" id="detail-panjang" placeholder="Placeholder"
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Varietas</label>
+                            <input type="text" id="detail-varietas" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Tinggi</label>
+                            <input type="text" id="detail-tinggi" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Usia</label>
+                            <input type="text" id="detail-usia" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Jumlah Stok</label>
+                            <input type="text" id="detail-stok" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
 
@@ -321,13 +424,17 @@
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-2">
-                    <button class="bg-green-600 text-white px-5 py-2 rounded text-sm font-medium hover:bg-green-700">
+                    <button id="save-kayu-btn"
+                        class="bg-green-600 text-white px-5 py-2 rounded text-sm font-medium hover:bg-green-700"
+                        style="display: none;">
                         Simpan
                     </button>
-                    <button class="bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm font-medium hover:bg-gray-300">
+                    <button id="delete-kayu-btn"
+                        class="bg-red-600 text-gray-700 px-5 py-2 rounded text-sm font-medium hover:bg-gray-300">
                         Hapus
                     </button>
-                    <button class="bg-gray-400 text-white px-5 py-2 rounded text-sm font-medium hover:bg-gray-500">
+                    <button id="edit-kayu-btn"
+                        class="bg-yellow-600 text-white px-5 py-2 rounded text-sm font-medium hover:bg-gray-500">
                         Edit
                     </button>
                 </div>
@@ -354,7 +461,7 @@
                         <!-- Fields below image -->
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1 mt-21">Nama Bibit</label>
-                            <input type="text" id="detail-bibit-penanggung" placeholder="Placeholder"
+                            <input type="text" id="detail-bibit-nama" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
 
@@ -363,6 +470,13 @@
                             <input type="text" id="detail-bibit-tanggal" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Produktivitas</label>
+                            <input type="text" id="detail-bibit-produktivitas" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Nutrisi</label>
                             <input type="text" id="detail-bibit-nutrisi" placeholder="Placeholder"
@@ -374,6 +488,12 @@
                             <input type="text" id="detail-bibit-media" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
                         </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Catatan</label>
+                            <input type="text" id="detail-bibit-catatan" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
                     </div>
 
                     <!-- Right Column Form Fields -->
@@ -382,6 +502,7 @@
                             <label class="block text-gray-700 text-sm font-semibold mb-1">ID Bibit</label>
                             <input type="text" id="detail-bibit-id" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                            <input type="hidden" id="detail-bibit-actual-id" value="">
                         </div>
 
                         <div>
@@ -415,6 +536,12 @@
                         </div>
 
                         <div>
+                            <label class="block text-gray-700 text-sm font-semibold mb-1">Status Hama</label>
+                            <input type="text" id="detail-bibit-status-hama" placeholder="Placeholder"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                        </div>
+
+                        <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Varietas</label>
                             <input type="text" id="detail-bibit-varietas" placeholder="Placeholder"
                                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
@@ -430,35 +557,61 @@
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-2">
-                    <button class="bg-green-600 text-white px-5 py-2 rounded text-sm font-medium hover:bg-green-700">
+                    <button id="save-bibit-btn"
+                        class="bg-green-600 text-white px-5 py-2 rounded text-sm font-medium hover:bg-green-700"
+                        style="display: none;">
                         Simpan
                     </button>
-                    <button class="bg-gray-200 text-gray-700 px-5 py-2 rounded text-sm font-medium hover:bg-gray-300">
+                    <button id="delete-bibit-btn"
+                        class="bg-red-600 text-white-700 px-5 py-2 rounded text-sm font-medium hover:bg-gray-300">
                         Hapus
                     </button>
-                    <button class="bg-gray-400 text-white px-5 py-2 rounded text-sm font-medium hover:bg-gray-500">
+                    <button id="edit-bibit-btn"
+                        class="bg-yellow-400 text-white px-5 py-2 rounded text-sm font-medium hover:bg-gray-500">
                         Edit
                     </button>
                 </div>
             </div>
         </div>
-
-
     </div>
 @endsection
 
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Global variables
+            let isEditingBibit = false;
+            let isEditingKayu = false;
+
+            // Modal Elements
             const modalBibit = document.getElementById('modalDetailBibit');
+            const modalKayu = document.getElementById('modalDetailKayu');
+
+            // Button Elements
             const detailButtonsBibit = document.querySelectorAll('.bibit-detail-btn');
+            const detailButtonsKayu = document.querySelectorAll('.kayu-detail-btn');
             const tutupModalBibit = document.getElementById('tutupModalBibit');
+            const tutupModalKayu = document.getElementById('tutupModal');
+
+            // Action Buttons
+            const saveBibitBtn = document.getElementById('save-bibit-btn');
+            const deleteBibitBtn = document.getElementById('delete-bibit-btn');
+            const editBibitBtn = document.getElementById('edit-bibit-btn');
+
+            const saveKayuBtn = document.getElementById('save-kayu-btn');
+            const deleteKayuBtn = document.getElementById('delete-kayu-btn');
+            const editKayuBtn = document.getElementById('edit-kayu-btn');
 
             // Handle Bibit detail buttons click
             detailButtonsBibit.forEach(button => {
                 button.addEventListener('click', function() {
+                    // Reset edit mode
+                    isEditingBibit = false;
+                    enableDisableBibitFields(false);
+
                     // Get data from data-* attributes
                     const id = this.dataset.id || '';
+                    const idBibit = this.dataset.idBibit || '';
                     const jenis = this.dataset.jenis || '';
                     const tinggi = this.dataset.tinggi || '';
                     const lokasi = this.dataset.lokasi || '';
@@ -470,32 +623,41 @@
                     const asal = this.dataset.asal || '';
                     const nutrisi = this.dataset.nutrisi || '';
                     const media = this.dataset.media || '';
+                    const produktivitas = this.dataset.produktivitas || '';
+                    const statusHama = this.dataset.statusHama || '';
+                    const catatan = this.dataset.catatan || '';
                     const gambar = this.dataset.gambar || 'https://via.placeholder.com/300x220';
 
                     // Fill data into the modal form
-                    document.getElementById('detail-bibit-id').value = id;
+                    document.getElementById('detail-bibit-actual-id').value = id;
+                    document.getElementById('detail-bibit-id').value = idBibit || id;
                     document.getElementById('detail-bibit-jenis').value = jenis;
-                    document.getElementById('detail-bibit-usia').value = usia ? usia + ' tahun' :
-                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-usia').value = usia ? usia + ' hari' :
+                        'Tidak tersedia';
                     document.getElementById('detail-bibit-tinggi').value = tinggi ? tinggi + ' cm' :
-                        'Data tidak tersedia';
-                    document.getElementById('detail-bibit-lokasi').value = lokasi;
+                        'Tidak tersedia';
+                    document.getElementById('detail-bibit-lokasi').value = lokasi !==
+                        'Tidak tersedia' ? lokasi : 'Tidak tersedia';
                     document.getElementById('detail-bibit-status').value = status;
-                    document.getElementById('detail-bibit-penanggung').value = nama ||
-                        'Data tidak tersedia';
+                    document.getElementById('detail-bibit-nama').value = nama || 'Tidak tersedia';
                     document.getElementById('detail-bibit-tanggal').value = tanggal ||
-                        'Data tidak tersedia';
+                        'Tidak tersedia';
                     document.getElementById('detail-bibit-varietas').value = varietas ||
-                        'Data tidak tersedia';
-                    document.getElementById('detail-bibit-asal').value = asal ||
-                        'Data tidak tersedia';
-                    document.getElementById('detail-bibit-nutrisi').value = nutrisi ||
-                        'Data tidak tersedia';
-                    document.getElementById('detail-bibit-media').value = media ||
-                        'Data tidak tersedia';
+                        'Tidak tersedia';
+                    document.getElementById('detail-bibit-asal').value = asal || 'Tidak tersedia';
+                    document.getElementById('detail-bibit-nutrisi').value = nutrisi !== '-' ?
+                        nutrisi : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-media').value = media !== '-' ? media :
+                        'Tidak tersedia';
+                    document.getElementById('detail-bibit-produktivitas').value = produktivitas ||
+                        'Tidak tersedia';
+                    document.getElementById('detail-bibit-status-hama').value = statusHama !== '-' ?
+                        statusHama : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-catatan').value = catatan !== '-' ?
+                        catatan : 'Tidak tersedia';
 
                     // Set the image if available
-                    if (gambar && gambar !== '') {
+                    if (gambar && gambar !== '' && gambar !== 'https://via.placeholder.com/250') {
                         document.getElementById('detail-bibit-foto').src = gambar;
                     } else {
                         document.getElementById('detail-bibit-foto').src =
@@ -508,66 +670,56 @@
                 });
             });
 
-            // Close modal Bibit
-            if (tutupModalBibit) {
-                tutupModalBibit.addEventListener('click', function() {
-                    modalBibit.classList.add('hidden');
-                    modalBibit.classList.remove('flex');
-                });
-            }
-
-            // Close modal Bibit when clicking outside
-            window.addEventListener('click', function(event) {
-                if (event.target === modalBibit) {
-                    modalBibit.classList.add('hidden');
-                    modalBibit.classList.remove('flex');
-                }
-            });
-        });
-
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Kayu Modal
-            const modalKayu = document.getElementById('modalDetailKayu');
-            const detailButtonsKayu = document.querySelectorAll('.detail-btn');
-            const tutupModalKayu = document.getElementById('tutupModal');
-
-            // Bibit Modal
-            const modalBibit = document.getElementById('modalDetailBibit');
-            const detailButtonsBibit = document.querySelectorAll('.bibit-detail-btn');
-            const tutupModalBibit = document.getElementById('tutupModalBibit');
-
             // Handle Kayu detail buttons click
             detailButtonsKayu.forEach(button => {
                 button.addEventListener('click', function() {
+                    // Reset edit mode
+                    isEditingKayu = false;
+                    enableDisableKayuFields(false);
+
                     // Get data from data-* attributes
                     const id = this.dataset.id || '';
+                    const idKayu = this.dataset.idKayu || '';
                     const jenis = this.dataset.jenis || '';
                     const nama = this.dataset.nama || '';
                     const jumlah = this.dataset.jumlah || '';
-                    const lokasi = this.dataset.lokasi || '';
                     const status = this.dataset.status || '';
                     const usia = this.dataset.usia || '';
                     const barcode = this.dataset.barcode || '';
                     const batch = this.dataset.batch || '';
-                    const tanggal = this.dataset.tanggal || '';
+                    const stok = this.dataset.stok || '';
+                    const varietas = this.dataset.varietas || '';
+                    const tanggalLahir = this.dataset.tanggalLahir || '';
+                    const tanggalPanen = this.dataset.tanggalPanen || '';
+                    const catatan = this.dataset.catatan || '';
                     const gambar = this.dataset.gambar || 'https://via.placeholder.com/300x220';
 
                     // Fill data into the modal form
-                    document.getElementById('detail-id').value = barcode || id;
+                    document.getElementById('detail-id').value = id;
+                    document.getElementById('detail-id-kayu').value = idKayu || id;
+                    document.getElementById('detail-barcode').value = barcode !== 'Tidak tersedia' ?
+                        barcode : 'Tidak tersedia';
                     document.getElementById('detail-jenis').value = jenis;
-                    document.getElementById('detail-volume').value = jumlah + ' Batang';
-                    document.getElementById('detail-diameter').value = 'Data tidak tersedia';
-                    document.getElementById('detail-panjang').value = 'Data tidak tersedia';
+                    document.getElementById('detail-tinggi').value = jumlah ? jumlah + ' meter' :
+                        'Tidak tersedia';
+                    document.getElementById('detail-usia').value = usia ? usia + ' tahun' :
+                        'Tidak tersedia';
+                    document.getElementById('detail-stok').value = stok || 'Tidak tersedia';
+                    document.getElementById('detail-varietas').value = varietas !== '-' ? varietas :
+                        'Tidak tersedia';
                     document.getElementById('detail-kondisi').value = status;
-                    document.getElementById('detail-penanggung').value = nama ||
-                        'Data tidak tersedia';
-                    document.getElementById('detail-tanggal').value = tanggal ||
-                        'Data tidak tersedia';
+                    document.getElementById('detail-nama').value = nama || 'Tidak tersedia';
+                    document.getElementById('detail-tanggal-lahir').value = tanggalLahir !==
+                        'Tidak tersedia' ? tanggalLahir : 'Tidak tersedia';
+                    document.getElementById('detail-catatan').value = catatan !== '-' ? catatan :
+                        'Tidak tersedia';
 
                     // Set the image if available
-                    if (gambar && gambar !== '') {
+                    if (gambar && gambar !== '' && gambar !== 'https://via.placeholder.com/250') {
                         document.getElementById('detail-foto').src = gambar;
+                    } else {
+                        document.getElementById('detail-foto').src =
+                            'https://via.placeholder.com/300x220';
                     }
 
                     // Show modal
@@ -576,87 +728,214 @@
                 });
             });
 
-            // Handle Bibit detail buttons click
-            detailButtonsBibit.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Get data from data-* attributes
-                    const id = this.dataset.id || '';
-                    const jenis = this.dataset.jenis || '';
-                    const tinggi = this.dataset.tinggi || '';
-                    const lokasi = this.dataset.lokasi || '';
-                    const status = this.dataset.status || '';
-                    const usia = this.dataset.usia || '';
-                    const nama = this.dataset.nama || '';
-                    const tanggal = this.dataset.tanggal || '';
-                    const varietas = this.dataset.varietas || '';
-                    const asal = this.dataset.asal || '';
-                    const nutrisi = this.dataset.nutrisi || '';
-                    const media = this.dataset.media || '';
-                    const gambar = this.dataset.gambar || 'https://via.placeholder.com/300x220';
-
-                    // Fill data into the modal form
-                    document.getElementById('detail-bibit-id').value = id;
-                    document.getElementById('detail-bibit-jenis').value = jenis;
-                    document.getElementById('detail-bibit-usia').value = usia ? usia + ' hari' :
-                        'Data tidak tersedia';
-                    document.getElementById('detail-bibit-tinggi').value = tinggi ? tinggi + ' cm' :
-                        'Data tidak tersedia';
-                    document.getElementById('detail-bibit-lokasi').value = lokasi;
-                    document.getElementById('detail-bibit-status').value = status;
-                    document.getElementById('detail-bibit-penanggung').value = produktivitas ||
-                        'Data tidak tersedia';
-                    document.getElementById('detail-bibit-tanggal').value = tanggal ||
-                        'Data tidak tersedia';
-
-                    // Set the image if available
-                    if (gambar && gambar !== '') {
-                        document.getElementById('detail-bibit-foto').src = gambar;
+            // Functions to enable/disable form fields
+            function enableDisableBibitFields(enable) {
+                const fields = modalBibit.querySelectorAll('input[type="text"]');
+                fields.forEach(field => {
+                    if (field.id !== 'detail-bibit-id') { // Keep ID field readonly
+                        field.readOnly = !enable;
+                        field.classList.toggle('bg-gray-100', !enable);
                     }
-
-                    // Show modal
-                    modalBibit.classList.remove('hidden');
-                    modalBibit.classList.add('flex');
                 });
-            });
 
-
-            // Close modal Kayu
-            if (tutupModalKayu) {
-                tutupModalKayu.addEventListener('click', function() {
-                    modalKayu.classList.add('hidden');
-                    modalKayu.classList.remove('flex');
-                });
+                // Toggle button display
+                saveBibitBtn.style.display = enable ? 'block' : 'none';
+                editBibitBtn.textContent = enable ? 'Cancel' : 'Edit';
             }
 
-            // Close modal Bibit
-            if (tutupModalBibit) {
-                tutupModalBibit.addEventListener('click', function() {
-                    modalBibit.classList.add('hidden');
-                    modalBibit.classList.remove('flex');
+            function enableDisableKayuFields(enable) {
+                const fields = modalKayu.querySelectorAll('input[type="text"]');
+                fields.forEach(field => {
+                    if (field.id !== 'detail-id-kayu') { // Keep ID field readonly
+                        field.readOnly = !enable;
+                        field.classList.toggle('bg-gray-100', !enable);
+                    }
                 });
+
+                // Toggle button display
+                saveKayuBtn.style.display = enable ? 'block' : 'none';
+                editKayuBtn.textContent = enable ? 'Cancel' : 'Edit';
             }
 
-            // Close modals when clicking outside
-            window.addEventListener('click', function(event) {
-                if (event.target === modalKayu) {
-                    modalKayu.classList.add('hidden');
-                    modalKayu.classList.remove('flex');
-                }
-                if (event.target === modalBibit) {
-                    modalBibit.classList.add('hidden');
-                    modalBibit.classList.remove('flex');
+            // Edit button for Bibit
+            editBibitBtn.addEventListener('click', function() {
+                isEditingBibit = !isEditingBibit;
+                enableDisableBibitFields(isEditingBibit);
+            });
+
+            // Save button for Bibit
+            saveBibitBtn.addEventListener('click', function() {
+                const id = document.getElementById('detail-bibit-actual-id').value;
+                const data = {
+                    nama_bibit: document.getElementById('detail-bibit-nama').value,
+                    jenis_bibit: document.getElementById('detail-bibit-jenis').value,
+                    varietas: document.getElementById('detail-bibit-varietas').value,
+                    asal_bibit: document.getElementById('detail-bibit-asal').value,
+                    produktivitas: document.getElementById('detail-bibit-produktivitas').value,
+                    kondisi: document.getElementById('detail-bibit-status').value,
+                    media_tanam: document.getElementById('detail-bibit-media').value,
+                    nutrisi: document.getElementById('detail-bibit-nutrisi').value,
+                    status_hama: document.getElementById('detail-bibit-status-hama').value,
+                    catatan: document.getElementById('detail-bibit-catatan').value,
+                };
+
+                fetch('/bibit/edit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            ...data
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Data bibit berhasil diperbarui!');
+                            location.reload();
+                        } else {
+                            alert('Gagal memperbarui data bibit');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan. Silakan coba lagi.');
+                    });
+            });
+
+            // Delete button for Bibit
+            deleteBibitBtn.addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus bibit ini?')) {
+                    const id = document.getElementById('detail-bibit-actual-id').value;
+
+                    fetch('/bibit/delete', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content,
+                            },
+                            body: JSON.stringify({
+                                id: id
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Bibit berhasil dihapus!');
+                                location.reload();
+                            } else {
+                                alert('Gagal menghapus bibit');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Terjadi kesalahan. Silakan coba lagi.');
+                        });
                 }
             });
 
-            // Initialize tab behavior
+            // Edit button for Kayu
+            editKayuBtn.addEventListener('click', function() {
+                isEditingKayu = !isEditingKayu;
+                enableDisableKayuFields(isEditingKayu);
+            });
+
+            // Save button for Kayu
+            saveKayuBtn.addEventListener('click', function() {
+                const id = document.getElementById('detail-id').value;
+                const data = {
+                    nama_kayu: document.getElementById('detail-nama').value,
+                    jenis_kayu: document.getElementById('detail-jenis').value,
+                    varietas: document.getElementById('detail-varietas').value,
+                    barcode: document.getElementById('detail-barcode').value,
+                    catatan: document.getElementById('detail-catatan').value,
+                };
+
+                fetch('/kayu/edit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            ...data
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Data kayu berhasil diperbarui!');
+                            location.reload();
+                        } else {
+                            alert('Gagal memperbarui data kayu');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan. Silakan coba lagi.');
+                    });
+            });
+
+            // Delete button for Kayu
+            deleteKayuBtn.addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus kayu ini?')) {
+                    const id = document.getElementById('detail-id').value;
+
+                    fetch('/kayu/delete', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content,
+                            },
+                            body: JSON.stringify({
+                                id: id
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Kayu berhasil dihapus!');
+                                location.reload();
+                            } else {
+                                alert('Gagal menghapus kayu');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Terjadi kesalahan. Silakan coba lagi.');
+                        });
+                }
+            });
+
+            // Handle tab switching and maintain search/sort
             const tabButtons = document.querySelectorAll(".tab-btn");
             const tables = {
                 bibit: document.getElementById("table-bibit"),
                 kayu: document.getElementById("table-kayu"),
             };
 
-            // Set default active tab (bibit)
-            document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("border-gray-800", "text-gray-800");
+            // Set default active tab or use URL param if available
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+
+            if (tabParam === 'kayu') {
+                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("border-gray-800",
+                    "text-gray-800");
+                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("text-gray-600",
+                    "border-transparent");
+                tables.bibit.classList.add('hidden');
+                tables.kayu.classList.remove('hidden');
+            } else {
+                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("border-gray-800",
+                    "text-gray-800");
+                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("text-gray-600",
+                    "border-transparent");
+            }
 
             tabButtons.forEach(button => {
                 button.addEventListener("click", function() {
@@ -678,7 +957,40 @@
 
                     this.classList.add("border-gray-800", "text-gray-800");
                     this.classList.remove("text-gray-600", "border-transparent");
+
+                    // Update URL with current tab
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', tab);
+                    window.history.replaceState({}, '', url);
                 });
+            });
+
+            // Close modal Bibit
+            if (tutupModalBibit) {
+                tutupModalBibit.addEventListener('click', function() {
+                    modalBibit.classList.add('hidden');
+                    modalBibit.classList.remove('flex');
+                });
+            }
+
+            // Close modal Kayu
+            if (tutupModalKayu) {
+                tutupModalKayu.addEventListener('click', function() {
+                    modalKayu.classList.add('hidden');
+                    modalKayu.classList.remove('flex');
+                });
+            }
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modalKayu) {
+                    modalKayu.classList.add('hidden');
+                    modalKayu.classList.remove('flex');
+                }
+                if (event.target === modalBibit) {
+                    modalBibit.classList.add('hidden');
+                    modalBibit.classList.remove('flex');
+                }
             });
 
             // Set background color for status dropdowns
@@ -715,7 +1027,8 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').content,
                             },
                             body: JSON.stringify({
                                 id,
