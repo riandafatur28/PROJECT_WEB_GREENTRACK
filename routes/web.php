@@ -36,6 +36,11 @@ Route::post('/add-admin', [ManajemenPenggunaController::class, 'store'])->name('
 Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])->name('manajemenkayubibit');
 Route::post('/bibit/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('bibit.update.status');
 Route::post('/kayu/update-status', [ManajemenPohonBibitController::class, 'updateKayuStatus'])->name('kayu.update.status');
+Route::post('/edit-bibit', [ManajemenPohonBibitController::class, 'editBibit']);
+Route::post('/edit-kayu', [ManajemenPohonBibitController::class, 'editKayu']);
+Route::post('/delete-bibit', [ManajemenPohonBibitController::class, 'deleteBibit']);
+Route::post('/delete-kayu', [ManajemenPohonBibitController::class, 'deleteKayu']);
+
 
 // Routes untuk Kayu
 Route::prefix('kayu')->name('kayu.')->group(function () {

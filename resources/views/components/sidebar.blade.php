@@ -56,6 +56,19 @@
         </ul>
     </div>
 
+    <!-- Logout Button -->
+    <div class="flex justify-center mb-2">
+        <button id="logoutButton" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+            class="bg-red-600 text-white px-3 py-3 rounded-lg text-lg hover:bg-red-700 w-full mt-80 flex items-center justify-center gap-4 ml-4 mr-4">
+            <!-- Logout Icon -->
+            <img src="{{ asset('assets/images/logout.png') }}" alt="Logout"
+                class="w-6 h-6 filter brightness-0 invert">
+            <span>Keluar</span>
+        </button>
+    </div>
+
+
+
     <a href="{{ route('profile') }}"
         class="block p-4 border-t flex items-center w-[90%] mx-auto mb-6 hover:bg-gray-100 rounded-lg transition"
         id="profile-link">
@@ -93,6 +106,11 @@
             menuBtn.classList.remove('hidden');
             body.classList.remove('overflow-hidden');
         }
+
+        // Logout
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            window.location.href = '{{ route('login') }}';
+        });
 
         function setActiveMenuByURL() {
             const currentPath = window.location.pathname;

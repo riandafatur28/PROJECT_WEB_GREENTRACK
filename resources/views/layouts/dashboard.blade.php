@@ -5,7 +5,7 @@
     <div class="container mx-auto px-4 py-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-800">{{ session('user_nama') }} 👋</h1>
+            <h1 class="text-2xl font-semibold text-gray-800">Selamat Datang, {{ session('user_nama') }} 👋</h1>
         </div>
 
         <!-- Card Statistik -->
