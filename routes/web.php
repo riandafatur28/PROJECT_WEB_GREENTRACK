@@ -12,6 +12,7 @@ use App\Http\Controllers\HistoryPerawatanController;
 use App\Http\Controllers\FirestoreController;
 use App\Http\Controllers\HistoryBarcodeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 
 // Halaman Welcome (Beranda)
 Route::get('/', fn() => view('splashscreen'))->name('welcome');
@@ -25,6 +26,7 @@ Route::get('/resendotp', fn() => view('layouts.resendotp'))->name('resendotp');
 // Dashboard & Profile
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/profile', fn() => view('layouts.profile'))->name('profile');
+
 
 // Manajemen Pengguna
 Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna.index');

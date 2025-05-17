@@ -7,87 +7,143 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-   public function index(FirestoreService $firestore, Request $request)
-{
-    // Handle filtering based on dates
-    $filter = $request->input('filter', 'all');
-    $dateFilter = $this->getDateFilter($filter);
+    public function index(FirestoreService $firestore, Request $request)
+    {
+        // Handle filtering based on dates
+        $filter = $request->input('filter', 'all');
+        $dateFilter = $this->getDateFilter($filter);
 
-    // Ambil data bibit dari Firestore
-    $bibitResponse = $firestore->getCollection('bibit');
-    $bibitCounts = [];
+        // Ambil data bibit dari Firestore
+        $bibitResponse = $firestore->getCollection('bibit');
+        $bibitCounts = [];
 
-    if (isset($bibitResponse['documents'])) {
-        // Asumsikan data bibit ada dalam dokumen yang memiliki data yang sesuai
-        foreach ($bibitResponse['documents'] as $document) {
-            $fields = $document['fields'] ?? [];
-            $jumlah = $fields['jumlah']['integerValue'] ?? 0;  // Mengambil jumlah bibit
-            $bibitCounts[] = $jumlah;
+        if (isset($bibitResponse['documents'])) {
+            // Asumsikan data bibit ada dalam dokumen yang memiliki data yang sesuai
+            foreach ($bibitResponse['documents'] as $document) {
+                $fields = $document['fields'] ?? [];
+                $jumlah = $fields['jumlah']['integerValue'] ?? 0;  // Mengambil jumlah bibit
+                $bibitCounts[] = $jumlah;
+            }
+        }
+
+        // Hitung total akun
+        $totalAkun = $this->countTotalAkun($firestore);
+
+        // Ambil total admin dari Firestore
+        $totalAdmin = $this->countTotalAdmin($firestore);
+
+        // Ambil data aktivitas dari Firestore
+        $response = $firestore->getCollection('activities', $dateFilter);
+
+        $activities = [];
+
+        // Get total bibit count (no need for ID filtering)
+        $totalBibit = count($bibitCounts);  // Counting total bibit from Firestore data
+
+        // Get total kayu count (no need for ID filtering)
+        $kayuResponse = $firestore->getCollection('kayu');
+        $totalKayu = count($kayuResponse['documents'] ?? []);  // Counting total kayu
+
+        // Process activities data
+        if (isset($response['documents'])) {
+            // Sort the documents by date (newest first)
+            usort($response['documents'], function($a, $b) {
+                $dateA = $a['fields']['tanggal']['stringValue'] ?? '';
+                $dateB = $b['fields']['tanggal']['stringValue'] ?? '';
+                return strcmp($dateB, $dateA); // Descending order
+            });
+
+            // Take only the first 10 documents
+            $documents = array_slice($response['documents'], 0, 10);
+
+            foreach ($documents as $document) {
+                $fields = $document['fields'] ?? [];
+                $id = basename($document['name']);
+
+                // Check for image
+                $imageUrl = isset($fields['image']['stringValue']) ? $fields['image']['stringValue'] : null;
+
+                // Get role from ID mapping (remove the ID mapping, assuming role exists in the document)
+                $roles = isset($fields['role']['arrayValue']['values']) ? $this->formatRole($fields['role']['arrayValue']['values']) : 'Tidak ada role';
+
+                $activities[] = [
+                    'id' => $id,
+                    'nama' => $fields['userName']['stringValue'] ?? '-',
+                    'userRole' => $roles,
+                    'keterangan' => $fields['description']['stringValue'] ?? '-',
+                    'detail' => isset($fields['metadata']['fields']['catatan']['stringValue'])
+                                ? $fields['metadata']['fields']['catatan']['stringValue']
+                                : 'Tidak ada catatan',
+                    'waktu' => isset($fields['tanggal']['stringValue'])
+                                ? $this->formatDate($fields['tanggal']['stringValue'])
+                                : null,
+                    'image' => $imageUrl,
+                ];
+            }
+        }
+
+        // Return view without pagination
+        return view('layouts.dashboard', [
+            'activities' => $activities,
+            'totalActivities' => count($response['documents'] ?? []),
+            'totalBibit' => $totalBibit,
+            'totalKayu' => $totalKayu,
+            'totalAkun' => $totalAkun,  // Tambahkan total akun ke view
+            'totalAdmin' => $totalAdmin, // Tambahkan total admin ke view
+            'filter' => $filter,
+            'bibitCounts' => $bibitCounts
+        ]);
+    }
+
+    /**
+     * Menghitung total akun dari collection 'akun'
+     */
+    private function countTotalAkun(FirestoreService $firestore)
+    {
+        try {
+            // Ambil data akun dari Firestore
+            $akunResponse = $firestore->getCollection('akun');
+
+            // Hitung total dokumen dalam koleksi
+            $totalAkun = count($akunResponse['documents'] ?? []);
+
+            return $totalAkun;
+        } catch (\Exception $e) {
+            // Jika gagal, kembalikan 0
+            return 0;
         }
     }
 
-    // Ambil data aktivitas dari Firestore
-    $response = $firestore->getCollection('activities', $dateFilter);
+    /**
+     * Menghitung total admin dari collection 'akun'
+     */
+    private function countTotalAdmin(FirestoreService $firestore)
+    {
+        try {
+            // Ambil data akun dari Firestore
+            $akunResponse = $firestore->getCollection('akun');
 
-    $activities = [];
+            $totalAdmin = 0;
 
-    // Get total bibit count (no need for ID filtering)
-    $totalBibit = count($bibitCounts);  // Counting total bibit from Firestore data
+            if (isset($akunResponse['documents']) && !empty($akunResponse['documents'])) {
+                foreach ($akunResponse['documents'] as $document) {
+                    $fields = $document['fields'] ?? [];
 
-    // Get total kayu count (no need for ID filtering)
-    $kayuResponse = $firestore->getCollection('kayu');
-    $totalKayu = count($kayuResponse['documents'] ?? []);  // Counting total kayu
+                    // Periksa apakah role adalah 'admin' (assuming there's a role field)
+                    $role = $fields['role']['stringValue'] ?? '';
+                    if (strtolower($role) === 'admin') {
+                        $totalAdmin++;
+                    }
+                }
+            }
 
-    // Process activities data
-    if (isset($response['documents'])) {
-        // Sort the documents by date (newest first)
-        usort($response['documents'], function($a, $b) {
-            $dateA = $a['fields']['tanggal']['stringValue'] ?? '';
-            $dateB = $b['fields']['tanggal']['stringValue'] ?? '';
-            return strcmp($dateB, $dateA); // Descending order
-        });
-
-        // Take only the first 10 documents
-        $documents = array_slice($response['documents'], 0, 10);
-
-        foreach ($documents as $document) {
-            $fields = $document['fields'] ?? [];
-            $id = basename($document['name']);
-
-            // Check for image
-            $imageUrl = isset($fields['image']['stringValue']) ? $fields['image']['stringValue'] : null;
-
-            // Get role from ID mapping (remove the ID mapping, assuming role exists in the document)
-            $roles = isset($fields['role']['arrayValue']['values']) ? $this->formatRole($fields['role']['arrayValue']['values']) : 'Tidak ada role';
-
-            $activities[] = [
-                'id' => $id,
-                'nama' => $fields['userName']['stringValue'] ?? '-',
-                'userRole' => $roles,
-                'keterangan' => $fields['description']['stringValue'] ?? '-',
-                'detail' => isset($fields['metadata']['fields']['catatan']['stringValue'])
-                            ? $fields['metadata']['fields']['catatan']['stringValue']
-                            : 'Tidak ada catatan',
-                'waktu' => isset($fields['tanggal']['stringValue'])
-                            ? $this->formatDate($fields['tanggal']['stringValue'])
-                            : null,
-                'image' => $imageUrl,
-            ];
+            return $totalAdmin;
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            // \Log::error('Error in countTotalAdmin: ' . $e->getMessage());
+            return 0;
         }
     }
-
-
-    // Return view without pagination
-    return view('layouts.dashboard', [
-        'activities' => $activities,
-        'totalActivities' => count($response['documents'] ?? []),
-        'totalBibit' => $totalBibit,
-        'totalKayu' => $totalKayu,
-        'filter' => $filter,
-        'bibitCounts' => $bibitCounts
-    ]);
-}
-
 
     // Helper function to get the date filter based on the selected filter
     private function getDateFilter($filter)

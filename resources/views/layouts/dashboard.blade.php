@@ -55,20 +55,8 @@
                         <img src="/assets/images/admin.svg" alt="New Icon" class="w-8 h-8">
                     </div>
                     <div class="ml-4">
-                        <p class="text-gray-600 text-sm">Admin Aktif</p>
-                        <h2 class="text-xl font-bold text-black-600">9</h2>
-                        <div class="flex mt-1">
-                            <img class="w-6 h-6 rounded-full border-2 border-white -ml-2 first:ml-0"
-                                src="https://randomuser.me/api/portraits/women/1.jpg" alt="Admin 1">
-                            <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
-                                src="https://randomuser.me/api/portraits/men/2.jpg" alt="Admin 2">
-                            <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
-                                src="https://randomuser.me/api/portraits/women/3.jpg" alt="Admin 3">
-                            <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
-                                src="https://randomuser.me/api/portraits/men/4.jpg" alt="Admin 4">
-                            <img class="w-6 h-6 rounded-full border-2 border-white -ml-2"
-                                src="https://randomuser.me/api/portraits/women/5.jpg" alt="Admin 5">
-                        </div>
+                        <p class="text-gray-600 text-sm">Total Admin</p>
+                        <h2 class="text-xl font-bold text-black-600">{{ $totalAdmin }}</h2>
                     </div>
                 </div>
             </div>
