@@ -148,7 +148,7 @@
                                         data-id="{{ $item['id'] }}" onchange="updateBackground(this)">
                                         <option value="Penyemaian"
                                             {{ $item['status'] == 'Penyemaian' || $item['status'] == 'Sedang' ? 'selected' : '' }}>
-                                            Persemaian
+                                            Penyemaian
                                         </option>
                                         <option value="Siap Tanam"
                                             {{ $item['status'] == 'Siap Tanam' ? 'selected' : '' }}>
@@ -1024,7 +1024,7 @@
                 selectElement.style.backgroundColor = "#f48fb1"; // Pink
             } else if (selectElement.value === "Siap Tanam") {
                 selectElement.style.backgroundColor = "#fde047"; // Yellow
-            } else if (selectElement.value === "Persemaian" || selectElement.value === "Penyemaian") {
+            } else if (selectElement.value === "Pernyemaian" || selectElement.value === "Penyemaian") {
                 selectElement.style.backgroundColor = "#4ade80"; // Green
             }
         }

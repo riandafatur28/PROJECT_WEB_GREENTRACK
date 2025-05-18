@@ -66,7 +66,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <!-- Bibit Chart -->
             <div class="bg-white p-6 rounded-3xl shadow">
-                <h3 class="text-xl font-bold mb-2">Bibit Dalam Persemaian</h3>
+                <h3 class="text-xl font-bold mb-2">Bibit Dalam Penyemaian</h3>
                 <p class="text-base text-gray-600 mb-4">Total Bibit {{ number_format($totalBibit) }}</p>
                 <div id="bibitChart" style="height: 400px;"></div>
             </div>

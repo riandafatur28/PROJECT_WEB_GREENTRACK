@@ -84,7 +84,7 @@
             <!-- Section Title -->
             <div class="container section-title" data-aos="fade-up">
                 <h2>LAYANAN KAMI</h2>
-                <p>Solusi Digital Terintegrasi untuk Persemaian & Distribusi Kayu</p>
+                <p>Solusi Digital Terintegrasi untuk Penyemaian & Distribusi Kayu</p>
             </div><!-- End Section Title -->
             <div class="content">
                 <div class="container">
@@ -161,7 +161,7 @@
                                     </svg>
                                 </div>
                                 <div class="service-item-content">
-                                    <h3 class="service-heading">Aktivitas Persemaian & TPK</h3>
+                                    <h3 class="service-heading">Aktivitas Penyemaian & TPK</h3>
                                     <p>
                                         Pantau kondisi dan perkembangan pohon serta bibit secara real-time
                                     </p>
@@ -226,7 +226,7 @@
                                 <div class="service-item-content">
                                     <h3 class="service-heading">Manajemen Admin</h3>
                                     <p>
-                                        Kelola akun pengguna sesuai peran: Admin Persemaian, Admin TPK, dan Super Admin
+                                        Kelola akun pengguna sesuai peran: Admin Penyemaian, Admin TPK, dan Super Admin
                                     </p>
                                 </div>
                             </div>
@@ -373,7 +373,7 @@
                             </h2>
                             <p class="opacity-50">
                                 GreenTrack hadir sebagai solusi digital terintegrasi yang mendukung proses
-                                persemaian hingga distribusi kayu secara akurat, efisien, dan real-time.
+                                penyemaian hingga distribusi kayu secara akurat, efisien, dan real-time.
                             </p>
 
                             <div class="row my-5">
@@ -391,7 +391,7 @@
                                     <div>
                                         <h4 class="m-0 h5 text-white"> Akses Aman & Terstruktur</h4>
                                         <p class="text-white opacity-50">Setiap pengguna memiliki hak akses berbeda
-                                            sesuai tugasnya—Admin Persemaian, Admin TPK, hingga Super Admin—menjamin
+                                            sesuai tugasnya—Admin Penyemaian, Admin TPK, hingga Super Admin—menjamin
                                             keamanan dan efisiensi kerja.</p>
                                     </div>
                                 </div>
