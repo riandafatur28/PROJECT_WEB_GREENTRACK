@@ -266,7 +266,7 @@
                             <tr class="border-b">
                                 <td class="px-2 py-1">{{ $item['id_kayu'] ?? $item['id'] }}</td>
                                 <td class="px-2 py-1">{{ $item['jenis_kayu'] }}</td>
-                                <td class="px-2 py-1">{{ $item['tinggi'] }} Batang</td>
+                                <td class="px-2 py-1">{{ $item['tinggi'] }} meter</td>
                                 <td class="px-2 py-1">{{ $item['lokasi'] }}</td>
                                 <td class="px-2 py-1">{{ $item['batch_panen'] ?? 'Tidak tersedia' }}</td>
                                 <td class="px-2 py-1">
@@ -399,14 +399,24 @@
 
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Tinggi</label>
-                            <input type="text" id="detail-tinggi" placeholder="Placeholder"
-                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                            <div class="flex items-center">
+                                <input type="text" id="detail-tinggi" placeholder="Placeholder"
+                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
+                                <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
+                                    meter
+                                </span>
+                            </div>
                         </div>
 
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Usia</label>
-                            <input type="text" id="detail-usia" placeholder="Placeholder"
-                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                            <div class="flex items-center">
+                                <input type="text" id="detail-usia" placeholder="Placeholder"
+                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
+                                <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
+                                    tahun
+                                </span>
+                            </div>
                         </div>
 
                         <div>
@@ -701,8 +711,8 @@
                     document.getElementById('detail-id-kayu').value = idKayu || id;
                     document.getElementById('detail-barcode').value = barcode !== 'Tidak tersedia' ? barcode : 'Tidak tersedia';
                     document.getElementById('detail-jenis').value = jenis;
-                    document.getElementById('detail-tinggi').value = jumlah ? jumlah + ' meter' : 'Tidak tersedia';
-                    document.getElementById('detail-usia').value = usia ? usia + ' tahun' : 'Tidak tersedia';
+                    document.getElementById('detail-tinggi').value = jumlah ? jumlah.replace(/[^0-9.]/g, '') : 'Tidak tersedia';
+                    document.getElementById('detail-usia').value = usia ? usia.replace(/[^0-9.]/g, '') : 'Tidak tersedia';
                     document.getElementById('detail-stok').value = stok || 'Tidak tersedia';
                     document.getElementById('detail-varietas').value = varietas !== '-' ? varietas : 'Tidak tersedia';
                     document.getElementById('detail-kondisi').value = status;
@@ -880,13 +890,30 @@
                 const formData = new FormData();
                 
                 // Get all the updated values and clean them
-                formData.append('id', id);
-                formData.append('nama_kayu', document.getElementById('detail-nama').value.replace(' Tidak tersedia', ''));
-                formData.append('jenis_kayu', document.getElementById('detail-jenis').value);
-                formData.append('varietas', document.getElementById('detail-varietas').value.replace(' Tidak tersedia', ''));
-                formData.append('barcode', document.getElementById('detail-barcode').value.replace(' Tidak tersedia', ''));
-                formData.append('catatan', document.getElementById('detail-catatan').value.replace(' Tidak tersedia', ''));
-                formData.append('jumlah_stok', document.getElementById('detail-stok').value.replace(/[^0-9]/g, '') || '0');
+                const tinggi = document.getElementById('detail-tinggi').value.replace(/[^0-9.]/g, '');
+                const usia = document.getElementById('detail-usia').value.replace(/[^0-9]/g, '');
+                const jumlahStok = document.getElementById('detail-stok').value.replace(/[^0-9]/g, '');
+                
+                // Prepare the data object to match Firestore structure
+                const kayuData = {
+                    id: id,
+                    id_kayu: document.getElementById('detail-id-kayu').value.trim(),
+                    nama_kayu: document.getElementById('detail-nama').value.replace(' Tidak tersedia', '').trim() || null,
+                    jenis_kayu: document.getElementById('detail-jenis').value.trim(),
+                    varietas: document.getElementById('detail-varietas').value.replace(' Tidak tersedia', '').trim() || null,
+                    barcode: document.getElementById('detail-barcode').value.replace(' Tidak tersedia', '').trim() || null,
+                    catatan: document.getElementById('detail-catatan').value.replace(' Tidak tersedia', '').trim() || null,
+                    tinggi: parseFloat(tinggi) || 0,
+                    usia: parseInt(usia) || 0,
+                    jumlah_stok: parseInt(jumlahStok) || 0,
+                    status: document.getElementById('detail-kondisi').value.trim()
+                };
+
+                // Log data yang akan dikirim
+                console.log('Data yang akan dikirim:', kayuData);
+
+                // Append the stringified data to FormData
+                formData.append('data', JSON.stringify(kayuData));
 
                 // Append image if selected
                 const imageInput = document.getElementById('detail-kayu-gambar-upload');
@@ -896,38 +923,55 @@
 
                 // Add CSRF token
                 formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
-                formData.append('_method', 'PUT'); // For PUT request
+                formData.append('_method', 'PUT');
 
-                console.log('Sending kayu update request with image');
+                // Show loading state
+                saveKayuBtn.disabled = true;
+                saveKayuBtn.textContent = 'Menyimpan...';
 
                 // Send update request
                 fetch('/kayu/update/' + id, {
-                    method: 'POST', // Changed to POST because we're sending FormData
+                    method: 'POST',
                     body: formData,
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        // Do not set Content-Type header, let the browser set it for FormData
                     }
                 })
                 .then(response => {
-                    console.log('Response status:', response.status);
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.text().then(text => {
+                            try {
+                                return Promise.reject(JSON.parse(text));
+                            } catch (e) {
+                                return Promise.reject({ message: text });
+                            }
+                        });
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Response data:', data);
                     if (data.success) {
-                        alert('Data kayu berhasil diperbarui!');
-                        location.reload();
+                        // Update the display values immediately
+                        document.getElementById('detail-tinggi').value = tinggi;
+                        document.getElementById('detail-usia').value = usia;
+                        document.getElementById('detail-stok').value = jumlahStok;
+                        
+                        // Close modal and refresh page
+                        modalKayu.classList.add('hidden');
+                        modalKayu.classList.remove('flex');
+                        window.location.reload();
                     } else {
-                        alert('Gagal memperbarui data kayu: ' + (data.message || 'Terjadi kesalahan'));
+                        throw new Error(data.message || 'Gagal memperbarui data kayu');
                     }
                 })
                 .catch(error => {
                     console.error('Error details:', error);
-                    alert('Terjadi kesalahan: ' + error.message);
+                    alert('Terjadi kesalahan: ' + (error.message || 'Unknown error'));
+                })
+                .finally(() => {
+                    // Reset button state
+                    saveKayuBtn.disabled = false;
+                    saveKayuBtn.textContent = 'Simpan';
                 });
             });
 

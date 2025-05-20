@@ -1023,12 +1023,13 @@ class ManajemenPohonBibitController extends Controller
     public function updateKayu(Request $request, FirestoreService $firestore, $id)
     {
         try {
+            // Log the incoming request
             Log::info('Starting kayu update', [
                 'id' => $id,
                 'request_data' => $request->all()
             ]);
 
-            // First, verify the document exists and get current data
+            // Get existing document first
             $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}";
             $existingDoc = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
                 ->get($url);
@@ -1044,63 +1045,38 @@ class ManajemenPohonBibitController extends Controller
             $existingFields = $existingDoc->json()['fields'] ?? [];
             Log::info('Existing document fields:', ['fields' => $existingFields]);
 
-            // Start with existing fields to preserve all data
+            // Decode the JSON data from the request
+            $requestData = json_decode($request->input('data'), true);
+            Log::info('Decoded request data:', ['data' => $requestData]);
+
+            // Prepare fields to update while preserving existing fields
             $fields = $existingFields;
 
-            // Handle numeric fields with proper type conversion
-            if ($request->has('tinggi')) {
-                $tinggi = floatval($request->input('tinggi'));
+            // Update numeric fields with proper types
+            if (isset($requestData['tinggi'])) {
+                $tinggi = (float)$requestData['tinggi'];
                 $fields['tinggi'] = ['doubleValue' => $tinggi];
+                Log::info('Updated tinggi value:', ['tinggi' => $tinggi]);
             }
-
-            if ($request->has('usia')) {
-                $usia = intval($request->input('usia'));
+            
+            if (isset($requestData['usia'])) {
+                $usia = (int)$requestData['usia'];
                 $fields['usia'] = ['integerValue' => $usia];
+                Log::info('Updated usia value:', ['usia' => $usia]);
             }
-
-            if ($request->has('jumlah_stok')) {
-                $jumlahStok = intval($request->input('jumlah_stok'));
+            
+            if (isset($requestData['jumlah_stok'])) {
+                $jumlahStok = (int)$requestData['jumlah_stok'];
                 $fields['jumlah_stok'] = ['integerValue' => $jumlahStok];
+                Log::info('Updated jumlah_stok value:', ['jumlah_stok' => $jumlahStok]);
             }
 
-            // Handle string fields
-            $stringFields = [
-                'nama_kayu', 'jenis_kayu', 'varietas', 'barcode',
-                'batch_panen', 'catatan', 'status', 'id_user'
-            ];
-
+            // Update string fields
+            $stringFields = ['nama_kayu', 'jenis_kayu', 'varietas', 'barcode', 'catatan', 'status'];
             foreach ($stringFields as $field) {
-                if ($request->has($field) && $request->input($field) !== null) {
-                    $fields[$field] = ['stringValue' => (string)$request->input($field)];
+                if (isset($requestData[$field]) && !is_null($requestData[$field])) {
+                    $fields[$field] = ['stringValue' => (string)$requestData[$field]];
                 }
-            }
-
-            // Handle lokasi_tanam as a map
-            $lokasiFields = ['kph', 'luas_petak', 'rkph', 'bkph', 'alamat'];
-            $lokasiUpdated = false;
-            $lokasiMap = isset($fields['lokasi_tanam']) ? $fields['lokasi_tanam'] : [
-                'mapValue' => [
-                    'fields' => [
-                        'kph' => ['stringValue' => ''],
-                        'luas_petak' => ['stringValue' => ''],
-                        'rkph' => ['stringValue' => ''],
-                        'lng' => ['integerValue' => 0],
-                        'lat' => ['integerValue' => 0],
-                        'bkph' => ['stringValue' => ''],
-                        'alamat' => ['stringValue' => '']
-                    ]
-                ]
-            ];
-
-            foreach ($lokasiFields as $field) {
-                if ($request->has("lokasi_$field")) {
-                    $lokasiMap['mapValue']['fields'][$field]['stringValue'] = $request->input("lokasi_$field");
-                    $lokasiUpdated = true;
-                }
-            }
-
-            if ($lokasiUpdated) {
-                $fields['lokasi_tanam'] = $lokasiMap;
             }
 
             // Handle image upload if present
@@ -1148,11 +1124,10 @@ class ManajemenPohonBibitController extends Controller
                     Log::error('Image upload failed', [
                         'error' => $e->getMessage()
                     ]);
-                    throw new \Exception('Failed to upload image: ' . $e->getMessage());
                 }
             }
 
-            // Update the updated_at timestamp
+            // Update timestamp
             $fields['updated_at'] = [
                 'mapValue' => [
                     'fields' => [
@@ -1162,47 +1137,39 @@ class ManajemenPohonBibitController extends Controller
                 ]
             ];
 
-            // Prepare update URL - no need for update mask as we're sending all fields
-            $updateUrl = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}";
-            
             Log::info('Sending update to Firestore', [
-                'url' => $updateUrl,
+                'url' => $url,
                 'fields' => $fields
             ]);
 
-            // Make the update request
+            // Send update to Firestore
             $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
-                ->patch($updateUrl, [
+                ->patch($url, [
                     'fields' => $fields
                 ]);
 
-            if (!$response->successful()) {
-                Log::error('Firestore update failed', [
-                    'status' => $response->status(),
-                    'body' => $response->body()
+            Log::info('Update response', ['response' => $response->json()]);
+
+            if ($response->successful()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data kayu berhasil diperbarui'
                 ]);
-                throw new \Exception('Firestore update failed: ' . $response->body());
+            } else {
+                Log::error('Update failed', [
+                    'response' => $response->body()
+                ]);
+                throw new \Exception('Failed to update document: ' . $response->body());
             }
 
-            Log::info('Update successful', [
-                'response' => $response->json()
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data updated successfully',
-                'data' => $response->json()
-            ]);
-
         } catch (\Exception $e) {
-            Log::error('Update failed', [
+            Log::error('Error in updateKayu', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating data: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
     }
