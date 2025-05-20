@@ -145,9 +145,9 @@
                                 <td class="px-2 py-1">
                                     <select
                                         class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm bg-green-300"
-                                        data-id="{{ $item['id'] }}" onchange="updateBackground(this)">
+                                        data-id="{{ $item['id'] }}" data-type="bibit" onchange="updateBackground(this)">
                                         <option value="Penyemaian"
-                                            {{ $item['status'] == 'Penyemaian' || $item['status'] == 'Sedang' ? 'selected' : '' }}>
+                                            {{ $item['status'] == 'Penyemaian' ? 'selected' : '' }}>
                                             Penyemaian
                                         </option>
                                         <option value="Siap Tanam"
@@ -255,7 +255,6 @@
                             <th class="px-2 py-1 text-left">ID Kayu</th>
                             <th class="px-2 py-1 text-left">Jenis Kayu</th>
                             <th class="px-2 py-1 text-left">Tinggi</th>
-                            <th class="px-2 py-1 text-left">Lokasi</th>
                             <th class="px-2 py-1 text-left">Batch Panen</th>
                             <th class="px-2 py-1 text-left">Status</th>
                             <th class="px-2 py-1 text-left">Aksi</th>
@@ -267,12 +266,11 @@
                                 <td class="px-2 py-1">{{ $item['id_kayu'] ?? $item['id'] }}</td>
                                 <td class="px-2 py-1">{{ $item['jenis_kayu'] }}</td>
                                 <td class="px-2 py-1">{{ $item['tinggi'] }} meter</td>
-                                <td class="px-2 py-1">{{ $item['lokasi'] }}</td>
                                 <td class="px-2 py-1">{{ $item['batch_panen'] ?? 'Tidak tersedia' }}</td>
                                 <td class="px-2 py-1">
                                     <select
                                         class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm bg-green-300"
-                                        data-id="{{ $item['id'] }}" onchange="updateBackground(this)">
+                                        data-id="{{ $item['id'] }}" data-type="kayu" onchange="updateBackground(this)">
                                         <option value="Tersedia" {{ $item['status'] == 'Tersedia' ? 'selected' : '' }}>
                                             Tersedia
                                         </option>
@@ -400,8 +398,9 @@
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Tinggi</label>
                             <div class="flex items-center">
-                                <input type="text" id="detail-tinggi" placeholder="Placeholder"
-                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
+                                <input type="number" min="0" step="1" id="detail-tinggi" placeholder="Masukkan tinggi"
+                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 3) this.value = this.value.slice(0, 3);">
                                 <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
                                     meter
                                 </span>
@@ -411,8 +410,9 @@
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Usia</label>
                             <div class="flex items-center">
-                                <input type="text" id="detail-usia" placeholder="Placeholder"
-                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
+                                <input type="number" min="0" step="1" id="detail-usia" placeholder="Masukkan usia"
+                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 3) this.value = this.value.slice(0, 3);">
                                 <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
                                     tahun
                                 </span>
@@ -421,8 +421,9 @@
 
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Jumlah Stok</label>
-                            <input type="text" id="detail-stok" placeholder="Placeholder"
-                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                            <input type="number" min="0" step="1" id="detail-stok" placeholder="Masukkan jumlah stok"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 6) this.value = this.value.slice(0, 6);">
                         </div>
 
                         <div>
@@ -526,8 +527,9 @@
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Usia Bibit</label>
                             <div class="flex items-center">
-                                <input type="text" id="detail-bibit-usia" placeholder="Placeholder"
-                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
+                                <input type="number" min="0" step="1" id="detail-bibit-usia" placeholder="Masukkan usia"
+                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 3) this.value = this.value.slice(0, 3);">
                                 <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
                                     hari
                                 </span>
@@ -537,8 +539,9 @@
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Tinggi</label>
                             <div class="flex items-center">
-                                <input type="text" id="detail-bibit-tinggi" placeholder="Placeholder"
-                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
+                                <input type="number" min="0" step="1" id="detail-bibit-tinggi" placeholder="Masukkan tinggi"
+                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 3) this.value = this.value.slice(0, 3);">
                                 <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
                                     cm
                                 </span>
@@ -735,11 +738,15 @@
 
             // Functions to enable/disable form fields
             function enableDisableBibitFields(enable) {
-                const fields = modalBibit.querySelectorAll('input[type="text"]');
+                const fields = modalBibit.querySelectorAll('input[type="text"], input[type="number"]');
                 fields.forEach(field => {
                     if (field.id !== 'detail-bibit-id') { // Keep ID field readonly
                         field.readOnly = !enable;
-                        field.classList.toggle('bg-gray-100', !enable);
+                        if (enable) {
+                            field.classList.remove('bg-gray-100');
+                        } else {
+                            field.classList.add('bg-gray-100');
+                        }
                     }
                 });
 
@@ -749,11 +756,15 @@
             }
 
             function enableDisableKayuFields(enable) {
-                const fields = modalKayu.querySelectorAll('input[type="text"]');
+                const fields = modalKayu.querySelectorAll('input[type="text"], input[type="number"]');
                 fields.forEach(field => {
                     if (field.id !== 'detail-id-kayu') { // Keep ID field readonly
                         field.readOnly = !enable;
-                        field.classList.toggle('bg-gray-100', !enable);
+                        if (enable) {
+                            field.classList.remove('bg-gray-100');
+                        } else {
+                            field.classList.add('bg-gray-100');
+                        }
                     }
                 });
 
@@ -772,12 +783,32 @@
             saveBibitBtn.addEventListener('click', function() {
                 const id = document.getElementById('detail-bibit-actual-id').value;
                 
+                // Get and validate numeric inputs
+                const tinggiInput = document.getElementById('detail-bibit-tinggi');
+                const usiaInput = document.getElementById('detail-bibit-usia');
+                
+                // Validate inputs
+                if (!tinggiInput.value || !usiaInput.value) {
+                    alert('Tinggi dan usia harus diisi dengan angka yang valid');
+                    return;
+                }
+                
+                const tinggi = parseInt(tinggiInput.value);
+                const usia = parseInt(usiaInput.value);
+                
+                // Validate ranges
+                if (tinggi <= 0 || tinggi > 999) {
+                    alert('Tinggi harus antara 1-999 cm');
+                    return;
+                }
+                
+                if (usia <= 0 || usia > 999) {
+                    alert('Usia harus antara 1-999 hari');
+                    return;
+                }
+                
                 // Create FormData object
                 const formData = new FormData();
-                
-                // Get numeric values and clean them
-                const tinggi = parseInt(document.getElementById('detail-bibit-tinggi').value.replace(/[^0-9]/g, '')) || 0;
-                const usia = parseInt(document.getElementById('detail-bibit-usia').value.replace(/[^0-9]/g, '')) || 0;
                 
                 // Append all form fields with proper data cleaning
                 formData.append('id', id);
@@ -813,17 +844,14 @@
                     body: formData,
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        // Do not set Content-Type header, let the browser set it for FormData
                     },
                 })
                 .then(response => {
                     if (!response.ok) {
                         return response.text().then(text => {
                             try {
-                                // Try to parse as JSON
                                 return Promise.reject(JSON.parse(text));
                             } catch (e) {
-                                // If not JSON, reject with text
                                 return Promise.reject({ message: text });
                             }
                         });
@@ -832,8 +860,14 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        alert('Data bibit berhasil diperbarui!');
-                        location.reload();
+                        // Update the display values immediately
+                        document.getElementById('detail-bibit-tinggi').value = tinggi;
+                        document.getElementById('detail-bibit-usia').value = usia;
+                        
+                        // Close modal and refresh page
+                        modalBibit.classList.add('hidden');
+                        modalBibit.classList.remove('flex');
+                        window.location.reload();
                     } else {
                         throw new Error(data.message || 'Gagal memperbarui data bibit');
                     }
@@ -886,35 +920,57 @@
             saveKayuBtn.addEventListener('click', function() {
                 const id = document.getElementById('detail-id').value;
                 
+                // Get and validate numeric inputs
+                const tinggiInput = document.getElementById('detail-tinggi');
+                const usiaInput = document.getElementById('detail-usia');
+                const stokInput = document.getElementById('detail-stok');
+                
+                // Validate inputs
+                if (!tinggiInput.value || !usiaInput.value || !stokInput.value) {
+                    alert('Semua field harus diisi dengan angka yang valid');
+                    return;
+                }
+                
+                const tinggi = parseInt(tinggiInput.value);
+                const usia = parseInt(usiaInput.value);
+                const jumlahStok = parseInt(stokInput.value);
+                
+                // Validate ranges
+                if (tinggi <= 0 || tinggi > 99999) {
+                    alert('Tinggi harus antara 1-99999 meter');
+                    return;
+                }
+                
+                if (usia <= 0 || usia > 999) {
+                    alert('Usia harus antara 1-999 tahun');
+                    return;
+                }
+                
+                if (jumlahStok < 0 || jumlahStok > 999999) {
+                    alert('Jumlah stok harus antara 0-999999');
+                    return;
+                }
+                
                 // Create FormData object
                 const formData = new FormData();
-                
-                // Get all the updated values and clean them
-                const tinggi = document.getElementById('detail-tinggi').value.replace(/[^0-9.]/g, '');
-                const usia = document.getElementById('detail-usia').value.replace(/[^0-9]/g, '');
-                const jumlahStok = document.getElementById('detail-stok').value.replace(/[^0-9]/g, '');
-                
-                // Prepare the data object to match Firestore structure
+
+                // Create the data object
                 const kayuData = {
                     id: id,
-                    id_kayu: document.getElementById('detail-id-kayu').value.trim(),
                     nama_kayu: document.getElementById('detail-nama').value.replace(' Tidak tersedia', '').trim() || null,
                     jenis_kayu: document.getElementById('detail-jenis').value.trim(),
                     varietas: document.getElementById('detail-varietas').value.replace(' Tidak tersedia', '').trim() || null,
                     barcode: document.getElementById('detail-barcode').value.replace(' Tidak tersedia', '').trim() || null,
                     catatan: document.getElementById('detail-catatan').value.replace(' Tidak tersedia', '').trim() || null,
-                    tinggi: parseFloat(tinggi) || 0,
-                    usia: parseInt(usia) || 0,
-                    jumlah_stok: parseInt(jumlahStok) || 0,
+                    tinggi: tinggi,
+                    usia: usia,
+                    jumlah_stok: jumlahStok,
                     status: document.getElementById('detail-kondisi').value.trim()
                 };
 
-                // Log data yang akan dikirim
-                console.log('Data yang akan dikirim:', kayuData);
-
-                // Append the stringified data to FormData
+                // Append the data as a JSON string
                 formData.append('data', JSON.stringify(kayuData));
-
+                
                 // Append image if selected
                 const imageInput = document.getElementById('detail-kayu-gambar-upload');
                 if (imageInput.files.length > 0) {
@@ -923,7 +979,7 @@
 
                 // Add CSRF token
                 formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
-                formData.append('_method', 'PUT');
+                formData.append('_method', 'PUT'); // Add this for method spoofing
 
                 // Show loading state
                 saveKayuBtn.disabled = true;
@@ -931,7 +987,7 @@
 
                 // Send update request
                 fetch('/kayu/update/' + id, {
-                    method: 'POST',
+                    method: 'POST', // Keep as POST for method spoofing
                     body: formData,
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -940,6 +996,7 @@
                 .then(response => {
                     if (!response.ok) {
                         return response.text().then(text => {
+                            console.error('Server response:', text);
                             try {
                                 return Promise.reject(JSON.parse(text));
                             } catch (e) {
@@ -1090,7 +1147,7 @@
                 select.addEventListener('change', function() {
                     const id = this.dataset.id;
                     const status = this.value;
-                    const isBibit = this.closest('table').id === "table-bibit";
+                    const isBibit = this.dataset.type === "bibit";
 
                     // Tentukan URL berdasarkan tabel (Bibit atau Kayu)
                     const url = isBibit ? '/bibit/update-status' : '/kayu/update-status';
@@ -1100,20 +1157,43 @@
                     this.disabled = true;
                     this.style.opacity = '0.5';
 
+                    // Prepare the data
+                    const formData = new FormData();
+                    formData.append('id', id);
+                    formData.append('status', status);
+                    formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+
+                    // For kayu, we need to update jumlah_stok based on status
+                    if (!isBibit) {
+                        const jumlahStok = status === 'Tersedia' ? 1 : 0;
+                        formData.append('jumlah_stok', jumlahStok);
+                    }
+
+                    // Log the data being sent
+                    console.log('Sending update:', {
+                        id: id,
+                        status: status,
+                        isBibit: isBibit,
+                        url: url
+                    });
+
                     fetch(url, {
                         method: 'POST',
+                        body: formData,
                         headers: {
-                            'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        },
-                        body: JSON.stringify({
-                            id,
-                            status
-                        })
+                        }
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
+                            return response.text().then(text => {
+                                console.error('Server response:', text);
+                                try {
+                                    return Promise.reject(JSON.parse(text));
+                                } catch (e) {
+                                    return Promise.reject({ message: text });
+                                }
+                            });
                         }
                         return response.json();
                     })
@@ -1124,21 +1204,40 @@
                             // Show success message
                             const message = isBibit ? 'Status bibit berhasil diperbarui' : 'Status kayu berhasil diperbarui';
                             alert(message);
+                            // Refresh the page to show updated data
+                            window.location.reload();
                         } else {
                             throw new Error(data.message || 'Gagal memperbarui status');
                         }
                     })
                     .catch(error => {
+                        console.error('Error:', error);
                         // Revert to original value on error
                         this.value = originalValue;
                         updateBackground(this);
-                        alert('Terjadi kesalahan: ' + error.message);
+                        alert('Terjadi kesalahan: ' + (error.message || 'Unknown error'));
                     })
                     .finally(() => {
                         // Reset loading state
                         this.disabled = false;
                         this.style.opacity = '1';
                     });
+                });
+            });
+
+            function updateBackground(selectElement) {
+                const value = selectElement.value;
+                if (value === "Tersedia" || value === "Siap Tanam") {
+                    selectElement.style.backgroundColor = "#4ade80"; // Green
+                } else if (value === "Kosong" || value === "Penyemaian") {
+                    selectElement.style.backgroundColor = "#f87171"; // Red
+                }
+            }
+
+            // Initialize background colors for all status dropdowns
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.status-dropdown').forEach(select => {
+                    updateBackground(select);
                 });
             });
 
@@ -1159,17 +1258,5 @@
                 }
             });
         });
-
-        function updateBackground(selectElement) {
-            if (selectElement.value === "Tersedia") {
-                selectElement.style.backgroundColor = "#4ade80"; // Green
-            } else if (selectElement.value === "Kosong") {
-                selectElement.style.backgroundColor = "#f48fb1"; // Pink
-            } else if (selectElement.value === "Siap Tanam") {
-                selectElement.style.backgroundColor = "#fde047"; // Yellow
-            } else if (selectElement.value === "Pernyemaian" || selectElement.value === "Penyemaian") {
-                selectElement.style.backgroundColor = "#4ade80"; // Green
-            }
-        }
     </script>
 @endsection

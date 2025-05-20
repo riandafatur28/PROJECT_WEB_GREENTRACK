@@ -657,30 +657,87 @@ class ManajemenPohonBibitController extends Controller
         $status = $request->input('status');
 
         try {
+            Log::info('Starting bibit status update', [
+                'id' => $id,
+                'status' => $status
+            ]);
+
+            // First, get the current document
+            $getUrl = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}";
+            $currentDoc = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+                ->get($getUrl);
+
+            if (!$currentDoc->successful()) {
+                Log::error('Failed to get current document', [
+                    'response' => $currentDoc->body()
+                ]);
+                throw new Exception('Failed to get current document');
+            }
+
             // URL API Firestore untuk update status bibit
-            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}?updateMask.fieldPaths=status";
+            $url = $getUrl;
+            
+            // Get existing fields
+            $existingFields = $currentDoc->json()['fields'] ?? [];
+            
+            // Update only the kondisi field
+            $existingFields['kondisi'] = ['stringValue' => $status];
+
+            // Prepare the payload with all existing fields
             $payload = [
-                'fields' => [
-                    'status' => ['stringValue' => $status]
-                ]
+                'fields' => $existingFields
             ];
+
+            Log::info('Updating bibit with payload', [
+                'url' => $url,
+                'payload' => $payload
+            ]);
 
             // Melakukan permintaan PATCH ke Firestore
             $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
-                ->patch($url, $payload);
+                ->patch($url . '?updateMask.fieldPaths=kondisi', $payload);
 
             if (!$response->successful()) {
+                Log::error('Failed to update bibit status', [
+                    'response' => $response->body(),
+                    'status_code' => $response->status()
+                ]);
                 throw new Exception('Gagal memperbarui status bibit: ' . $response->body());
             }
+
+            Log::info('Successfully updated bibit status', [
+                'id' => $id,
+                'new_status' => $status,
+                'response' => $response->json()
+            ]);
 
             return response()->json(['success' => true]);
 
         } catch (ConnectException $e) {
-            return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
+            Log::error('Connection error while updating bibit status', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'
+            ], 503);
         } catch (RequestException $e) {
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
+            Log::error('Request error while updating bibit status', [
+                'error' => $e->getMessage(),
+                'error_code' => $e->getCode()
+            ]);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()
+            ], 500);
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            Log::error('General error while updating bibit status', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -689,32 +746,84 @@ class ManajemenPohonBibitController extends Controller
     {
         $id = $request->input('id');
         $status = $request->input('status');
+        $jumlahStok = $request->input('jumlah_stok', 0);
 
         try {
             // URL API Firestore untuk update status kayu
-            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}?updateMask.fieldPaths=status";
-            $payload = [
-                'fields' => [
-                    'status' => ['stringValue' => $status]
-                ]
+            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}";
+            
+            // Fields to update
+            $fields = [
+                'status' => ['stringValue' => $status],
+                'jumlah_stok' => ['integerValue' => (int)$jumlahStok]
             ];
+
+            // Create update mask - each field needs to be a separate parameter
+            $updateMaskParams = [
+                'updateMask.fieldPaths=status',
+                'updateMask.fieldPaths=jumlah_stok'
+            ];
+            $url .= '?' . implode('&', $updateMaskParams);
+
+            // Prepare the payload
+            $payload = [
+                'fields' => $fields
+            ];
+
+            // Log the update attempt
+            Log::info('Attempting to update kayu status', [
+                'id' => $id,
+                'status' => $status,
+                'jumlah_stok' => $jumlahStok,
+                'url' => $url,
+                'payload' => $payload
+            ]);
 
             // Melakukan permintaan PATCH ke Firestore
             $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
                 ->patch($url, $payload);
 
             if (!$response->successful()) {
+                Log::error('Failed to update kayu status', [
+                    'response' => $response->body(),
+                    'status_code' => $response->status()
+                ]);
                 throw new Exception('Gagal memperbarui status kayu: ' . $response->body());
             }
+
+            Log::info('Successfully updated kayu status', [
+                'id' => $id,
+                'new_status' => $status,
+                'new_jumlah_stok' => $jumlahStok,
+                'response' => $response->json()
+            ]);
 
             return response()->json(['success' => true]);
 
         } catch (ConnectException $e) {
-            return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
+            Log::error('Connection error while updating kayu status', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'
+            ], 503);
         } catch (RequestException $e) {
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
+            Log::error('Request error while updating kayu status', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()
+            ], 500);
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            Log::error('General error while updating kayu status', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
     }
 
