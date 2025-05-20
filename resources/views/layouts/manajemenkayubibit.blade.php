@@ -633,36 +633,25 @@
                     document.getElementById('detail-bibit-actual-id').value = id;
                     document.getElementById('detail-bibit-id').value = idBibit || id;
                     document.getElementById('detail-bibit-jenis').value = jenis;
-                    document.getElementById('detail-bibit-usia').value = usia ? usia + ' hari' :
-                        'Tidak tersedia';
-                    document.getElementById('detail-bibit-tinggi').value = tinggi ? tinggi + ' cm' :
-                        'Tidak tersedia';
-                    document.getElementById('detail-bibit-lokasi').value = lokasi !==
-                        'Tidak tersedia' ? lokasi : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-usia').value = usia ? usia + ' hari' : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-tinggi').value = tinggi ? tinggi + ' cm' : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-lokasi').value = lokasi !== 'Tidak tersedia' ? lokasi : 'Tidak tersedia';
                     document.getElementById('detail-bibit-status').value = status;
                     document.getElementById('detail-bibit-nama').value = nama || 'Tidak tersedia';
-                    document.getElementById('detail-bibit-tanggal').value = tanggal ||
-                        'Tidak tersedia';
-                    document.getElementById('detail-bibit-varietas').value = varietas ||
-                        'Tidak tersedia';
+                    document.getElementById('detail-bibit-tanggal').value = tanggal || 'Tidak tersedia';
+                    document.getElementById('detail-bibit-varietas').value = varietas || 'Tidak tersedia';
                     document.getElementById('detail-bibit-asal').value = asal || 'Tidak tersedia';
-                    document.getElementById('detail-bibit-nutrisi').value = nutrisi !== '-' ?
-                        nutrisi : 'Tidak tersedia';
-                    document.getElementById('detail-bibit-media').value = media !== '-' ? media :
-                        'Tidak tersedia';
-                    document.getElementById('detail-bibit-produktivitas').value = produktivitas ||
-                        'Tidak tersedia';
-                    document.getElementById('detail-bibit-status-hama').value = statusHama !== '-' ?
-                        statusHama : 'Tidak tersedia';
-                    document.getElementById('detail-bibit-catatan').value = catatan !== '-' ?
-                        catatan : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-nutrisi').value = nutrisi !== '-' ? nutrisi : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-media').value = media !== '-' ? media : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-produktivitas').value = produktivitas || 'Tidak tersedia';
+                    document.getElementById('detail-bibit-status-hama').value = statusHama !== '-' ? statusHama : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-catatan').value = catatan !== '-' ? catatan : 'Tidak tersedia';
 
                     // Set the image if available
                     if (gambar && gambar !== '' && gambar !== 'https://via.placeholder.com/250') {
                         document.getElementById('detail-bibit-foto').src = gambar;
                     } else {
-                        document.getElementById('detail-bibit-foto').src =
-                            'https://via.placeholder.com/300x220';
+                        document.getElementById('detail-bibit-foto').src = 'https://via.placeholder.com/300x220';
                     }
 
                     // Show modal
@@ -698,29 +687,22 @@
                     // Fill data into the modal form
                     document.getElementById('detail-id').value = id;
                     document.getElementById('detail-id-kayu').value = idKayu || id;
-                    document.getElementById('detail-barcode').value = barcode !== 'Tidak tersedia' ?
-                        barcode : 'Tidak tersedia';
+                    document.getElementById('detail-barcode').value = barcode !== 'Tidak tersedia' ? barcode : 'Tidak tersedia';
                     document.getElementById('detail-jenis').value = jenis;
-                    document.getElementById('detail-tinggi').value = jumlah ? jumlah + ' meter' :
-                        'Tidak tersedia';
-                    document.getElementById('detail-usia').value = usia ? usia + ' tahun' :
-                        'Tidak tersedia';
+                    document.getElementById('detail-tinggi').value = jumlah ? jumlah + ' meter' : 'Tidak tersedia';
+                    document.getElementById('detail-usia').value = usia ? usia + ' tahun' : 'Tidak tersedia';
                     document.getElementById('detail-stok').value = stok || 'Tidak tersedia';
-                    document.getElementById('detail-varietas').value = varietas !== '-' ? varietas :
-                        'Tidak tersedia';
+                    document.getElementById('detail-varietas').value = varietas !== '-' ? varietas : 'Tidak tersedia';
                     document.getElementById('detail-kondisi').value = status;
                     document.getElementById('detail-nama').value = nama || 'Tidak tersedia';
-                    document.getElementById('detail-tanggal-lahir').value = tanggalLahir !==
-                        'Tidak tersedia' ? tanggalLahir : 'Tidak tersedia';
-                    document.getElementById('detail-catatan').value = catatan !== '-' ? catatan :
-                        'Tidak tersedia';
+                    document.getElementById('detail-tanggal-lahir').value = tanggalLahir !== 'Tidak tersedia' ? tanggalLahir : 'Tidak tersedia';
+                    document.getElementById('detail-catatan').value = catatan !== '-' ? catatan : 'Tidak tersedia';
 
                     // Set the image if available
                     if (gambar && gambar !== '' && gambar !== 'https://via.placeholder.com/250') {
                         document.getElementById('detail-foto').src = gambar;
                     } else {
-                        document.getElementById('detail-foto').src =
-                            'https://via.placeholder.com/300x220';
+                        document.getElementById('detail-foto').src = 'https://via.placeholder.com/300x220';
                     }
 
                     // Show modal
@@ -767,52 +749,54 @@
             // Save button for Bibit
             saveBibitBtn.addEventListener('click', function() {
                 const id = document.getElementById('detail-bibit-actual-id').value;
-
-                // Extract values directly from form fields and remove any units (like " cm", " hari")
+                
+                // Get all the updated values and clean them
                 const data = {
                     id: id,
-                    nama_bibit: document.getElementById('detail-bibit-nama').value.replace(
-                        ' Tidak tersedia', ''),
+                    nama_bibit: document.getElementById('detail-bibit-nama').value.replace(' Tidak tersedia', ''),
                     jenis_bibit: document.getElementById('detail-bibit-jenis').value,
-                    varietas: document.getElementById('detail-bibit-varietas').value.replace(
-                        ' Tidak tersedia', ''),
-                    asal_bibit: document.getElementById('detail-bibit-asal').value.replace(
-                        ' Tidak tersedia', ''),
-                    produktivitas: document.getElementById('detail-bibit-produktivitas').value.replace(
-                        ' Tidak tersedia', ''),
+                    varietas: document.getElementById('detail-bibit-varietas').value.replace(' Tidak tersedia', ''),
+                    asal_bibit: document.getElementById('detail-bibit-asal').value.replace(' Tidak tersedia', ''),
+                    produktivitas: document.getElementById('detail-bibit-produktivitas').value.replace(' Tidak tersedia', ''),
                     kondisi: document.getElementById('detail-bibit-status').value,
-                    media_tanam: document.getElementById('detail-bibit-media').value.replace(
-                        ' Tidak tersedia', ''),
-                    nutrisi: document.getElementById('detail-bibit-nutrisi').value.replace(
-                        ' Tidak tersedia', ''),
-                    status_hama: document.getElementById('detail-bibit-status-hama').value.replace(
-                        ' Tidak tersedia', ''),
-                    catatan: document.getElementById('detail-bibit-catatan').value.replace(
-                        ' Tidak tersedia', '')
+                    media_tanam: document.getElementById('detail-bibit-media').value.replace(' Tidak tersedia', ''),
+                    nutrisi: document.getElementById('detail-bibit-nutrisi').value.replace(' Tidak tersedia', ''),
+                    status_hama: document.getElementById('detail-bibit-status-hama').value.replace(' Tidak tersedia', ''),
+                    catatan: document.getElementById('detail-bibit-catatan').value.replace(' Tidak tersedia', '')
                 };
 
-                fetch('/manajemen-pohon-bibit/edit-bibit', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Data bibit berhasil diperbarui!');
-                            location.reload();
-                        } else {
-                            alert('Gagal memperbarui data bibit: ' + (data.message ||
-                                'Terjadi kesalahan'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Terjadi kesalahan. Silakan coba lagi.');
-                    });
+                console.log('Sending bibit update request:', data);
+
+                // Send update request
+                fetch('/bibit/update/' + id, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        alert('Data bibit berhasil diperbarui!');
+                        location.reload();
+                    } else {
+                        alert('Gagal memperbarui data bibit: ' + (data.message || 'Terjadi kesalahan'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error details:', error);
+                    alert('Terjadi kesalahan: ' + error.message);
+                });
             });
 
             // Delete button for Bibit
@@ -820,31 +804,25 @@
                 if (confirm('Apakah Anda yakin ingin menghapus bibit ini?')) {
                     const id = document.getElementById('detail-bibit-actual-id').value;
 
-                    fetch('/manajemen-pohon-bibit/delete-bibit', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content,
-                            },
-                            body: JSON.stringify({
-                                id: id
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Bibit berhasil dihapus!');
-                                location.reload();
-                            } else {
-                                alert('Gagal menghapus bibit: ' + (data.message ||
-                                    'Terjadi kesalahan'));
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Terjadi kesalahan. Silakan coba lagi.');
-                        });
+                    fetch('/bibit/delete/' + id, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Bibit berhasil dihapus!');
+                            location.reload();
+                        } else {
+                            alert('Gagal menghapus bibit: ' + (data.message || 'Terjadi kesalahan'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan. Silakan coba lagi.');
+                    });
                 }
             });
 
@@ -857,45 +835,50 @@
             // Save button for Kayu
             saveKayuBtn.addEventListener('click', function() {
                 const id = document.getElementById('detail-id').value;
-
-                // Extract values directly from form fields and clean up the data
+                
+                // Get all the updated values and clean them
                 const data = {
                     id: id,
-                    nama_kayu: document.getElementById('detail-nama').value.replace(' Tidak tersedia',
-                        ''),
+                    nama_kayu: document.getElementById('detail-nama').value.replace(' Tidak tersedia', ''),
                     jenis_kayu: document.getElementById('detail-jenis').value,
-                    varietas: document.getElementById('detail-varietas').value.replace(
-                        ' Tidak tersedia', ''),
-                    barcode: document.getElementById('detail-barcode').value.replace(' Tidak tersedia',
-                        ''),
-                    catatan: document.getElementById('detail-catatan').value.replace(' Tidak tersedia',
-                        ''),
-                    jumlah_stok: document.getElementById('detail-stok').value.replace(/[^0-9]/g, '') ||
-                        '0'
+                    varietas: document.getElementById('detail-varietas').value.replace(' Tidak tersedia', ''),
+                    barcode: document.getElementById('detail-barcode').value.replace(' Tidak tersedia', ''),
+                    catatan: document.getElementById('detail-catatan').value.replace(' Tidak tersedia', ''),
+                    jumlah_stok: document.getElementById('detail-stok').value.replace(/[^0-9]/g, '') || '0'
                 };
 
-                fetch('/manajemen-pohon-bibit/edit-kayu', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Data kayu berhasil diperbarui!');
-                            location.reload();
-                        } else {
-                            alert('Gagal memperbarui data kayu: ' + (data.message ||
-                                'Terjadi kesalahan'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Terjadi kesalahan. Silakan coba lagi.');
-                    });
+                console.log('Sending kayu update request:', data);
+
+                // Send update request
+                fetch('/kayu/update/' + id, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        alert('Data kayu berhasil diperbarui!');
+                        location.reload();
+                    } else {
+                        alert('Gagal memperbarui data kayu: ' + (data.message || 'Terjadi kesalahan'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error details:', error);
+                    alert('Terjadi kesalahan: ' + error.message);
+                });
             });
 
             // Delete button for Kayu
@@ -903,34 +886,29 @@
                 if (confirm('Apakah Anda yakin ingin menghapus kayu ini?')) {
                     const id = document.getElementById('detail-id').value;
 
-                    fetch('/manajemen-pohon-bibit/delete-kayu', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .content,
-                            },
-                            body: JSON.stringify({
-                                id: id
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Kayu berhasil dihapus!');
-                                location.reload();
-                            } else {
-                                alert('Gagal menghapus kayu: ' + (data.message || 'Terjadi kesalahan'));
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Terjadi kesalahan. Silakan coba lagi.');
-                        });
+                    fetch('/kayu/delete/' + id, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Kayu berhasil dihapus!');
+                            location.reload();
+                        } else {
+                            alert('Gagal menghapus kayu: ' + (data.message || 'Terjadi kesalahan'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan. Silakan coba lagi.');
+                    });
                 }
             });
 
-            // Handle tab switching and maintain search/sort
+            // Handle tab switching
             const tabButtons = document.querySelectorAll(".tab-btn");
             const tables = {
                 bibit: document.getElementById("table-bibit"),
@@ -942,17 +920,13 @@
             const tabParam = urlParams.get('tab');
 
             if (tabParam === 'kayu') {
-                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("border-gray-800",
-                    "text-gray-800");
-                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("text-gray-600",
-                    "border-transparent");
+                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("border-gray-800", "text-gray-800");
+                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("text-gray-600", "border-transparent");
                 tables.bibit.classList.add('hidden');
                 tables.kayu.classList.remove('hidden');
             } else {
-                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("border-gray-800",
-                    "text-gray-800");
-                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("text-gray-600",
-                    "border-transparent");
+                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("border-gray-800", "text-gray-800");
+                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("text-gray-600", "border-transparent");
             }
 
             tabButtons.forEach(button => {
@@ -1015,6 +989,64 @@
             document.querySelectorAll(".status-dropdown").forEach(select => {
                 updateBackground(select);
             });
+
+            // Fungsi untuk mengupdate status bibit dan kayu
+            const statusDropdowns = document.querySelectorAll('.status-dropdown');
+            statusDropdowns.forEach(select => {
+                select.addEventListener('change', function() {
+                    const id = this.dataset.id;
+                    const status = this.value;
+                    const isBibit = this.closest('table').id === "table-bibit";
+
+                    // Tentukan URL berdasarkan tabel (Bibit atau Kayu)
+                    const url = isBibit ? '/bibit/update-status' : '/kayu/update-status';
+
+                    // Tampilkan loading state
+                    const originalValue = this.value;
+                    this.disabled = true;
+                    this.style.opacity = '0.5';
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({
+                            id,
+                            status
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Update background color
+                            updateBackground(this);
+                            // Show success message
+                            const message = isBibit ? 'Status bibit berhasil diperbarui' : 'Status kayu berhasil diperbarui';
+                            alert(message);
+                        } else {
+                            throw new Error(data.message || 'Gagal memperbarui status');
+                        }
+                    })
+                    .catch(error => {
+                        // Revert to original value on error
+                        this.value = originalValue;
+                        updateBackground(this);
+                        alert('Terjadi kesalahan: ' + error.message);
+                    })
+                    .finally(() => {
+                        // Reset loading state
+                        this.disabled = false;
+                        this.style.opacity = '1';
+                    });
+                });
+            });
         });
 
         function updateBackground(selectElement) {
@@ -1028,43 +1060,5 @@
                 selectElement.style.backgroundColor = "#4ade80"; // Green
             }
         }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Fungsi untuk mengupdate status bibit dan kayu
-            const statusDropdowns = document.querySelectorAll('.status-dropdown');
-            statusDropdowns.forEach(select => {
-                select.addEventListener('change', function() {
-                    const id = this.dataset.id;
-                    const status = this.value;
-
-                    // Tentukan URL berdasarkan tabel (Bibit atau Kayu)
-                    const url = this.closest('table').id === "table-bibit" ?
-                        '/manajemen-pohon-bibit/update-bibit-status' :
-                        '/manajemen-pohon-bibit/update-kayu-status';
-
-                    fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector(
-                                    'meta[name="csrf-token"]').content,
-                            },
-                            body: JSON.stringify({
-                                id,
-                                status
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Status berhasil diperbarui');
-                            } else {
-                                alert('Gagal memperbarui status');
-                            }
-                        })
-                        .catch(error => alert('Terjadi kesalahan'));
-                });
-            });
-        });
     </script>
 @endsection

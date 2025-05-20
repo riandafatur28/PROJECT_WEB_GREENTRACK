@@ -60,11 +60,6 @@ Route::prefix('bibit')->name('bibit.')->group(function () {
     Route::delete('/delete/{id}', [ManajemenPohonBibitController::class, 'deleteBibit'])->name('delete');
 });
 
-// Routes untuk Update Status Bibit dan Kayu
-Route::post('/bibit/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('bibit.update.status');
-Route::post('/kayu/update-status', [ManajemenPohonBibitController::class, 'updateKayuStatus'])->name('kayu.update.status');
-
-
 // Riwayat / History
 Route::get('/history-perawatan', [HistoryPerawatanController::class, 'index'])->name('historyperawatan');
 Route::get('/history', [HistoryBarcodeController::class, 'index'])->name('history.index');

@@ -637,10 +637,10 @@ class ManajemenPohonBibitController extends Controller
 
         try {
             // URL API Firestore untuk update status bibit
-            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}?updateMask.fieldPaths=kondisi";
+            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}?updateMask.fieldPaths=status";
             $payload = [
                 'fields' => [
-                    'kondisi' => ['stringValue' => $status]
+                    'status' => ['stringValue' => $status]
                 ]
             ];
 
@@ -648,7 +648,11 @@ class ManajemenPohonBibitController extends Controller
             $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
                 ->patch($url, $payload);
 
-            return response()->json(['success' => $response->successful()]);
+            if (!$response->successful()) {
+                throw new Exception('Gagal memperbarui status bibit: ' . $response->body());
+            }
+
+            return response()->json(['success' => true]);
 
         } catch (ConnectException $e) {
             Log::error('Firestore connectivity error: ' . $e->getMessage());
@@ -681,7 +685,11 @@ class ManajemenPohonBibitController extends Controller
             $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
                 ->patch($url, $payload);
 
-            return response()->json(['success' => $response->successful()]);
+            if (!$response->successful()) {
+                throw new Exception('Gagal memperbarui status kayu: ' . $response->body());
+            }
+
+            return response()->json(['success' => true]);
 
         } catch (ConnectException $e) {
             Log::error('Firestore connectivity error: ' . $e->getMessage());
@@ -772,10 +780,8 @@ class ManajemenPohonBibitController extends Controller
     }
 
     // Fungsi untuk menghapus bibit
-    public function deleteBibit(Request $request, FirestoreService $firestore)
+    public function deleteBibit($id, FirestoreService $firestore)
     {
-        $id = $request->input('id');
-
         try {
             // URL API Firestore untuk delete bibit
             $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}";
@@ -784,7 +790,88 @@ class ManajemenPohonBibitController extends Controller
             $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
                 ->delete($url);
 
-            return response()->json(['success' => $response->successful()]);
+            if ($response->successful()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Bibit berhasil dihapus'
+                ]);
+            } else {
+                Log::error('Firestore delete error: ' . $response->body());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghapus bibit: ' . $response->body()
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            Log::error('General error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Fungsi untuk menghapus kayu
+    public function deleteKayu($id, FirestoreService $firestore)
+    {
+        try {
+            // URL API Firestore untuk delete kayu
+            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}";
+
+            // Melakukan permintaan DELETE ke Firestore
+            $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+                ->delete($url);
+
+            if ($response->successful()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kayu berhasil dihapus'
+                ]);
+            } else {
+                Log::error('Firestore delete error: ' . $response->body());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghapus kayu: ' . $response->body()
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            Log::error('General error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Fungsi untuk mengupdate bibit
+    public function updateBibit(Request $request, FirestoreService $firestore, $id)
+    {
+        try {
+            // Konversi data ke format Firestore
+            $fields = [];
+            $fieldPaths = [];
+            foreach ($request->all() as $key => $value) {
+                if ($key !== 'id' && $key !== '_token' && $key !== 'gambar_image') {
+                    $fields[$key] = ['stringValue' => $value];
+                    $fieldPaths[] = $key;
+                }
+            }
+
+            // URL API Firestore untuk update bibit
+            $fieldsString = implode('&updateMask.fieldPaths=', $fieldPaths);
+            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}?updateMask.fieldPaths={$fieldsString}";
+            $payload = ['fields' => $fields];
+
+            // Melakukan permintaan PATCH ke Firestore
+            $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+                ->patch($url, $payload);
+
+            if ($response->successful()) {
+                return response()->json(['success' => true]);
+            } else {
+                Log::error('Firestore update error: ' . $response->body());
+                return response()->json(['success' => false, 'message' => 'Gagal memperbarui data bibit'], 500);
+            }
 
         } catch (ConnectException $e) {
             Log::error('Firestore connectivity error: ' . $e->getMessage());
@@ -798,20 +885,35 @@ class ManajemenPohonBibitController extends Controller
         }
     }
 
-    // Fungsi untuk menghapus kayu
-    public function deleteKayu(Request $request, FirestoreService $firestore)
+    // Fungsi untuk mengupdate kayu
+    public function updateKayu(Request $request, FirestoreService $firestore, $id)
     {
-        $id = $request->input('id');
-
         try {
-            // URL API Firestore untuk delete kayu
-            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}";
+            // Konversi data ke format Firestore
+            $fields = [];
+            $fieldPaths = [];
+            foreach ($request->all() as $key => $value) {
+                if ($key !== 'id' && $key !== '_token' && $key !== 'gambar_image') {
+                    $fields[$key] = ['stringValue' => $value];
+                    $fieldPaths[] = $key;
+                }
+            }
 
-            // Melakukan permintaan DELETE ke Firestore
+            // URL API Firestore untuk update kayu
+            $fieldsString = implode('&updateMask.fieldPaths=', $fieldPaths);
+            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}?updateMask.fieldPaths={$fieldsString}";
+            $payload = ['fields' => $fields];
+
+            // Melakukan permintaan PATCH ke Firestore
             $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
-                ->delete($url);
+                ->patch($url, $payload);
 
-            return response()->json(['success' => $response->successful()]);
+            if ($response->successful()) {
+                return response()->json(['success' => true]);
+            } else {
+                Log::error('Firestore update error: ' . $response->body());
+                return response()->json(['success' => false, 'message' => 'Gagal memperbarui data kayu'], 500);
+            }
 
         } catch (ConnectException $e) {
             Log::error('Firestore connectivity error: ' . $e->getMessage());
