@@ -14,9 +14,6 @@ use App\Http\Controllers\HistoryBarcodeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 
-// Halaman Welcome (Beranda)
-Route::get('/', fn() => view('splashscreen'))->name('welcome');
-
 // Login & Auth
 Route::get('/login', fn() => view('layouts.login'))->name('login');
 Route::post('/login', [AuthController::class, 'handleLogin']);
