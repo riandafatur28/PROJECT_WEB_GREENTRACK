@@ -7,7 +7,7 @@
     <div class="container mx-auto px-4 py-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold text-gray-800">Hallo, {{ session('user_nama') }} 👋</h1>
+            <h1 class="text-2xl font-semibold text-gray-800">Halo, {{ session('user_nama') }} 👋</h1>
         </div>
 
         <!-- Card Statistik -->
@@ -348,7 +348,8 @@
                         <!-- Wood Image -->
                         <img id="detail-foto" src="https://via.placeholder.com/300x220" alt="Foto Kayu"
                             class="w-full h-52 object-cover mb-3">
-                        <input type="file" id="detail-kayu-gambar-upload" name="gambar_image" accept="image/*" style="margin-bottom: 10px;">
+                        <input type="file" id="detail-kayu-gambar-upload" name="gambar_image" accept="image/*"
+                            style="margin-bottom: 10px;">
 
                         <!-- Fields below image -->
                         <div>
@@ -402,7 +403,8 @@
                             <div class="flex items-center">
                                 <input type="text" id="detail-tinggi" placeholder="Placeholder"
                                     class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
-                                <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
+                                <span
+                                    class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
                                     meter
                                 </span>
                             </div>
@@ -413,7 +415,8 @@
                             <div class="flex items-center">
                                 <input type="text" id="detail-usia" placeholder="Placeholder"
                                     class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
-                                <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
+                                <span
+                                    class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
                                     tahun
                                 </span>
                             </div>
@@ -468,7 +471,8 @@
                         <!-- Seedling Image -->
                         <img id="detail-bibit-foto" src="https://via.placeholder.com/300x220" alt="Foto Bibit"
                             class="w-full h-52 object-cover mb-3">
-                        <input type="file" id="detail-bibit-gambar-upload" name="gambar_image" accept="image/*" style="margin-bottom: 10px;">
+                        <input type="file" id="detail-bibit-gambar-upload" name="gambar_image" accept="image/*"
+                            style="margin-bottom: 10px;">
 
                         <!-- Fields below image -->
                         <div>
@@ -528,7 +532,8 @@
                             <div class="flex items-center">
                                 <input type="text" id="detail-bibit-usia" placeholder="Placeholder"
                                     class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
-                                <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
+                                <span
+                                    class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
                                     hari
                                 </span>
                             </div>
@@ -539,7 +544,8 @@
                             <div class="flex items-center">
                                 <input type="text" id="detail-bibit-tinggi" placeholder="Placeholder"
                                     class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
-                                <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
+                                <span
+                                    class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
                                     cm
                                 </span>
                             </div>
@@ -656,24 +662,34 @@
                     document.getElementById('detail-bibit-id').value = idBibit || id;
                     document.getElementById('detail-bibit-jenis').value = jenis;
                     document.getElementById('detail-bibit-usia').value = usia || 'Tidak tersedia';
-                    document.getElementById('detail-bibit-tinggi').value = tinggi || 'Tidak tersedia';
-                    document.getElementById('detail-bibit-lokasi').value = lokasi !== 'Tidak tersedia' ? lokasi : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-tinggi').value = tinggi ||
+                        'Tidak tersedia';
+                    document.getElementById('detail-bibit-lokasi').value = lokasi !==
+                        'Tidak tersedia' ? lokasi : 'Tidak tersedia';
                     document.getElementById('detail-bibit-status').value = status;
                     document.getElementById('detail-bibit-nama').value = nama || 'Tidak tersedia';
-                    document.getElementById('detail-bibit-tanggal').value = tanggal || 'Tidak tersedia';
-                    document.getElementById('detail-bibit-varietas').value = varietas || 'Tidak tersedia';
+                    document.getElementById('detail-bibit-tanggal').value = tanggal ||
+                        'Tidak tersedia';
+                    document.getElementById('detail-bibit-varietas').value = varietas ||
+                        'Tidak tersedia';
                     document.getElementById('detail-bibit-asal').value = asal || 'Tidak tersedia';
-                    document.getElementById('detail-bibit-nutrisi').value = nutrisi !== '-' ? nutrisi : 'Tidak tersedia';
-                    document.getElementById('detail-bibit-media').value = media !== '-' ? media : 'Tidak tersedia';
-                    document.getElementById('detail-bibit-produktivitas').value = produktivitas || 'Tidak tersedia';
-                    document.getElementById('detail-bibit-status-hama').value = statusHama !== '-' ? statusHama : 'Tidak tersedia';
-                    document.getElementById('detail-bibit-catatan').value = catatan !== '-' ? catatan : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-nutrisi').value = nutrisi !== '-' ?
+                        nutrisi : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-media').value = media !== '-' ? media :
+                        'Tidak tersedia';
+                    document.getElementById('detail-bibit-produktivitas').value = produktivitas ||
+                        'Tidak tersedia';
+                    document.getElementById('detail-bibit-status-hama').value = statusHama !== '-' ?
+                        statusHama : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-catatan').value = catatan !== '-' ?
+                        catatan : 'Tidak tersedia';
 
                     // Set the image if available
                     if (gambar && gambar !== '' && gambar !== 'https://via.placeholder.com/250') {
                         document.getElementById('detail-bibit-foto').src = gambar;
                     } else {
-                        document.getElementById('detail-bibit-foto').src = 'https://via.placeholder.com/300x220';
+                        document.getElementById('detail-bibit-foto').src =
+                            'https://via.placeholder.com/300x220';
                     }
 
                     // Show modal
@@ -709,22 +725,29 @@
                     // Fill data into the modal form
                     document.getElementById('detail-id').value = id;
                     document.getElementById('detail-id-kayu').value = idKayu || id;
-                    document.getElementById('detail-barcode').value = barcode !== 'Tidak tersedia' ? barcode : 'Tidak tersedia';
+                    document.getElementById('detail-barcode').value = barcode !== 'Tidak tersedia' ?
+                        barcode : 'Tidak tersedia';
                     document.getElementById('detail-jenis').value = jenis;
-                    document.getElementById('detail-tinggi').value = jumlah ? jumlah.replace(/[^0-9.]/g, '') : 'Tidak tersedia';
-                    document.getElementById('detail-usia').value = usia ? usia.replace(/[^0-9.]/g, '') : 'Tidak tersedia';
+                    document.getElementById('detail-tinggi').value = jumlah ? jumlah.replace(
+                        /[^0-9.]/g, '') : 'Tidak tersedia';
+                    document.getElementById('detail-usia').value = usia ? usia.replace(/[^0-9.]/g,
+                        '') : 'Tidak tersedia';
                     document.getElementById('detail-stok').value = stok || 'Tidak tersedia';
-                    document.getElementById('detail-varietas').value = varietas !== '-' ? varietas : 'Tidak tersedia';
+                    document.getElementById('detail-varietas').value = varietas !== '-' ? varietas :
+                        'Tidak tersedia';
                     document.getElementById('detail-kondisi').value = status;
                     document.getElementById('detail-nama').value = nama || 'Tidak tersedia';
-                    document.getElementById('detail-tanggal-lahir').value = tanggalLahir !== 'Tidak tersedia' ? tanggalLahir : 'Tidak tersedia';
-                    document.getElementById('detail-catatan').value = catatan !== '-' ? catatan : 'Tidak tersedia';
+                    document.getElementById('detail-tanggal-lahir').value = tanggalLahir !==
+                        'Tidak tersedia' ? tanggalLahir : 'Tidak tersedia';
+                    document.getElementById('detail-catatan').value = catatan !== '-' ? catatan :
+                        'Tidak tersedia';
 
                     // Set the image if available
                     if (gambar && gambar !== '' && gambar !== 'https://via.placeholder.com/250') {
                         document.getElementById('detail-foto').src = gambar;
                     } else {
-                        document.getElementById('detail-foto').src = 'https://via.placeholder.com/300x220';
+                        document.getElementById('detail-foto').src =
+                            'https://via.placeholder.com/300x220';
                     }
 
                     // Show modal
@@ -771,26 +794,36 @@
             // Save button for Bibit
             saveBibitBtn.addEventListener('click', function() {
                 const id = document.getElementById('detail-bibit-actual-id').value;
-                
+
                 // Create FormData object
                 const formData = new FormData();
-                
+
                 // Get numeric values and clean them
-                const tinggi = parseInt(document.getElementById('detail-bibit-tinggi').value.replace(/[^0-9]/g, '')) || 0;
-                const usia = parseInt(document.getElementById('detail-bibit-usia').value.replace(/[^0-9]/g, '')) || 0;
-                
+                const tinggi = parseInt(document.getElementById('detail-bibit-tinggi').value.replace(
+                    /[^0-9]/g, '')) || 0;
+                const usia = parseInt(document.getElementById('detail-bibit-usia').value.replace(/[^0-9]/g,
+                    '')) || 0;
+
                 // Append all form fields with proper data cleaning
                 formData.append('id', id);
-                formData.append('nama_bibit', document.getElementById('detail-bibit-nama').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('nama_bibit', document.getElementById('detail-bibit-nama').value.replace(
+                    ' Tidak tersedia', '').trim() || null);
                 formData.append('jenis_bibit', document.getElementById('detail-bibit-jenis').value.trim());
-                formData.append('varietas', document.getElementById('detail-bibit-varietas').value.replace(' Tidak tersedia', '').trim() || null);
-                formData.append('asal_bibit', document.getElementById('detail-bibit-asal').value.replace(' Tidak tersedia', '').trim() || null);
-                formData.append('produktivitas', document.getElementById('detail-bibit-produktivitas').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('varietas', document.getElementById('detail-bibit-varietas').value.replace(
+                    ' Tidak tersedia', '').trim() || null);
+                formData.append('asal_bibit', document.getElementById('detail-bibit-asal').value.replace(
+                    ' Tidak tersedia', '').trim() || null);
+                formData.append('produktivitas', document.getElementById('detail-bibit-produktivitas').value
+                    .replace(' Tidak tersedia', '').trim() || null);
                 formData.append('kondisi', document.getElementById('detail-bibit-status').value.trim());
-                formData.append('media_tanam', document.getElementById('detail-bibit-media').value.replace(' Tidak tersedia', '').trim() || null);
-                formData.append('nutrisi', document.getElementById('detail-bibit-nutrisi').value.replace(' Tidak tersedia', '').trim() || null);
-                formData.append('status_hama', document.getElementById('detail-bibit-status-hama').value.replace(' Tidak tersedia', '').trim() || null);
-                formData.append('catatan', document.getElementById('detail-bibit-catatan').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('media_tanam', document.getElementById('detail-bibit-media').value.replace(
+                    ' Tidak tersedia', '').trim() || null);
+                formData.append('nutrisi', document.getElementById('detail-bibit-nutrisi').value.replace(
+                    ' Tidak tersedia', '').trim() || null);
+                formData.append('status_hama', document.getElementById('detail-bibit-status-hama').value
+                    .replace(' Tidak tersedia', '').trim() || null);
+                formData.append('catatan', document.getElementById('detail-bibit-catatan').value.replace(
+                    ' Tidak tersedia', '').trim() || null);
                 formData.append('tinggi', tinggi.toString());
                 formData.append('usia', usia.toString());
 
@@ -809,44 +842,46 @@
 
                 // Send update request
                 fetch('/bibit/update/' + id, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        // Do not set Content-Type header, let the browser set it for FormData
-                    },
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            try {
-                                // Try to parse as JSON
-                                return Promise.reject(JSON.parse(text));
-                            } catch (e) {
-                                // If not JSON, reject with text
-                                return Promise.reject({ message: text });
-                            }
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        alert('Data bibit berhasil diperbarui!');
-                        location.reload();
-                    } else {
-                        throw new Error(data.message || 'Gagal memperbarui data bibit');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error details:', error);
-                    alert('Terjadi kesalahan: ' + (error.message || 'Unknown error'));
-                })
-                .finally(() => {
-                    // Reset button state
-                    saveBibitBtn.disabled = false;
-                    saveBibitBtn.textContent = 'Simpan';
-                });
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            // Do not set Content-Type header, let the browser set it for FormData
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                try {
+                                    // Try to parse as JSON
+                                    return Promise.reject(JSON.parse(text));
+                                } catch (e) {
+                                    // If not JSON, reject with text
+                                    return Promise.reject({
+                                        message: text
+                                    });
+                                }
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            alert('Data bibit berhasil diperbarui!');
+                            location.reload();
+                        } else {
+                            throw new Error(data.message || 'Gagal memperbarui data bibit');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error details:', error);
+                        alert('Terjadi kesalahan: ' + (error.message || 'Unknown error'));
+                    })
+                    .finally(() => {
+                        // Reset button state
+                        saveBibitBtn.disabled = false;
+                        saveBibitBtn.textContent = 'Simpan';
+                    });
             });
 
             // Delete button for Bibit
@@ -855,24 +890,26 @@
                     const id = document.getElementById('detail-bibit-actual-id').value;
 
                     fetch('/bibit/delete/' + id, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        },
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Bibit berhasil dihapus!');
-                            location.reload();
-                        } else {
-                            alert('Gagal menghapus bibit: ' + (data.message || 'Terjadi kesalahan'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Terjadi kesalahan. Silakan coba lagi.');
-                    });
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content,
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Bibit berhasil dihapus!');
+                                location.reload();
+                            } else {
+                                alert('Gagal menghapus bibit: ' + (data.message ||
+                                'Terjadi kesalahan'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Terjadi kesalahan. Silakan coba lagi.');
+                        });
                 }
             });
 
@@ -885,24 +922,28 @@
             // Save button for Kayu
             saveKayuBtn.addEventListener('click', function() {
                 const id = document.getElementById('detail-id').value;
-                
+
                 // Create FormData object
                 const formData = new FormData();
-                
+
                 // Get all the updated values and clean them
                 const tinggi = document.getElementById('detail-tinggi').value.replace(/[^0-9.]/g, '');
                 const usia = document.getElementById('detail-usia').value.replace(/[^0-9]/g, '');
                 const jumlahStok = document.getElementById('detail-stok').value.replace(/[^0-9]/g, '');
-                
+
                 // Prepare the data object to match Firestore structure
                 const kayuData = {
                     id: id,
                     id_kayu: document.getElementById('detail-id-kayu').value.trim(),
-                    nama_kayu: document.getElementById('detail-nama').value.replace(' Tidak tersedia', '').trim() || null,
+                    nama_kayu: document.getElementById('detail-nama').value.replace(' Tidak tersedia',
+                        '').trim() || null,
                     jenis_kayu: document.getElementById('detail-jenis').value.trim(),
-                    varietas: document.getElementById('detail-varietas').value.replace(' Tidak tersedia', '').trim() || null,
-                    barcode: document.getElementById('detail-barcode').value.replace(' Tidak tersedia', '').trim() || null,
-                    catatan: document.getElementById('detail-catatan').value.replace(' Tidak tersedia', '').trim() || null,
+                    varietas: document.getElementById('detail-varietas').value.replace(
+                        ' Tidak tersedia', '').trim() || null,
+                    barcode: document.getElementById('detail-barcode').value.replace(' Tidak tersedia',
+                        '').trim() || null,
+                    catatan: document.getElementById('detail-catatan').value.replace(' Tidak tersedia',
+                        '').trim() || null,
                     tinggi: parseFloat(tinggi) || 0,
                     usia: parseInt(usia) || 0,
                     jumlah_stok: parseInt(jumlahStok) || 0,
@@ -931,48 +972,50 @@
 
                 // Send update request
                 fetch('/kayu/update/' + id, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            try {
-                                return Promise.reject(JSON.parse(text));
-                            } catch (e) {
-                                return Promise.reject({ message: text });
-                            }
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Update the display values immediately
-                        document.getElementById('detail-tinggi').value = tinggi;
-                        document.getElementById('detail-usia').value = usia;
-                        document.getElementById('detail-stok').value = jumlahStok;
-                        
-                        // Close modal and refresh page
-                        modalKayu.classList.add('hidden');
-                        modalKayu.classList.remove('flex');
-                        window.location.reload();
-                    } else {
-                        throw new Error(data.message || 'Gagal memperbarui data kayu');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error details:', error);
-                    alert('Terjadi kesalahan: ' + (error.message || 'Unknown error'));
-                })
-                .finally(() => {
-                    // Reset button state
-                    saveKayuBtn.disabled = false;
-                    saveKayuBtn.textContent = 'Simpan';
-                });
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                try {
+                                    return Promise.reject(JSON.parse(text));
+                                } catch (e) {
+                                    return Promise.reject({
+                                        message: text
+                                    });
+                                }
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Update the display values immediately
+                            document.getElementById('detail-tinggi').value = tinggi;
+                            document.getElementById('detail-usia').value = usia;
+                            document.getElementById('detail-stok').value = jumlahStok;
+
+                            // Close modal and refresh page
+                            modalKayu.classList.add('hidden');
+                            modalKayu.classList.remove('flex');
+                            window.location.reload();
+                        } else {
+                            throw new Error(data.message || 'Gagal memperbarui data kayu');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error details:', error);
+                        alert('Terjadi kesalahan: ' + (error.message || 'Unknown error'));
+                    })
+                    .finally(() => {
+                        // Reset button state
+                        saveKayuBtn.disabled = false;
+                        saveKayuBtn.textContent = 'Simpan';
+                    });
             });
 
             // Delete button for Kayu
@@ -981,24 +1024,25 @@
                     const id = document.getElementById('detail-id').value;
 
                     fetch('/kayu/delete/' + id, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        },
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Kayu berhasil dihapus!');
-                            location.reload();
-                        } else {
-                            alert('Gagal menghapus kayu: ' + (data.message || 'Terjadi kesalahan'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Terjadi kesalahan. Silakan coba lagi.');
-                    });
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content,
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Kayu berhasil dihapus!');
+                                location.reload();
+                            } else {
+                                alert('Gagal menghapus kayu: ' + (data.message || 'Terjadi kesalahan'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Terjadi kesalahan. Silakan coba lagi.');
+                        });
                 }
             });
 
@@ -1014,13 +1058,17 @@
             const tabParam = urlParams.get('tab');
 
             if (tabParam === 'kayu') {
-                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("border-gray-800", "text-gray-800");
-                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("text-gray-600", "border-transparent");
+                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("border-gray-800",
+                    "text-gray-800");
+                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("text-gray-600",
+                    "border-transparent");
                 tables.bibit.classList.add('hidden');
                 tables.kayu.classList.remove('hidden');
             } else {
-                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("border-gray-800", "text-gray-800");
-                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("text-gray-600", "border-transparent");
+                document.querySelector('.tab-btn[data-tab="bibit"]').classList.add("border-gray-800",
+                    "text-gray-800");
+                document.querySelector('.tab-btn[data-tab="kayu"]').classList.add("text-gray-600",
+                    "border-transparent");
             }
 
             tabButtons.forEach(button => {
@@ -1101,44 +1149,46 @@
                     this.style.opacity = '0.5';
 
                     fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        },
-                        body: JSON.stringify({
-                            id,
-                            status
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').content,
+                            },
+                            body: JSON.stringify({
+                                id,
+                                status
+                            })
                         })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            // Update background color
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Update background color
+                                updateBackground(this);
+                                // Show success message
+                                const message = isBibit ? 'Status bibit berhasil diperbarui' :
+                                    'Status kayu berhasil diperbarui';
+                                alert(message);
+                            } else {
+                                throw new Error(data.message || 'Gagal memperbarui status');
+                            }
+                        })
+                        .catch(error => {
+                            // Revert to original value on error
+                            this.value = originalValue;
                             updateBackground(this);
-                            // Show success message
-                            const message = isBibit ? 'Status bibit berhasil diperbarui' : 'Status kayu berhasil diperbarui';
-                            alert(message);
-                        } else {
-                            throw new Error(data.message || 'Gagal memperbarui status');
-                        }
-                    })
-                    .catch(error => {
-                        // Revert to original value on error
-                        this.value = originalValue;
-                        updateBackground(this);
-                        alert('Terjadi kesalahan: ' + error.message);
-                    })
-                    .finally(() => {
-                        // Reset loading state
-                        this.disabled = false;
-                        this.style.opacity = '1';
-                    });
+                            alert('Terjadi kesalahan: ' + error.message);
+                        })
+                        .finally(() => {
+                            // Reset loading state
+                            this.disabled = false;
+                            this.style.opacity = '1';
+                        });
                 });
             });
 
