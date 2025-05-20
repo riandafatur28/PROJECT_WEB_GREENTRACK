@@ -348,6 +348,7 @@
                         <!-- Wood Image -->
                         <img id="detail-foto" src="https://via.placeholder.com/300x220" alt="Foto Kayu"
                             class="w-full h-52 object-cover mb-3">
+                        <input type="file" id="detail-kayu-gambar-upload" name="gambar_image" accept="image/*" style="margin-bottom: 10px;">
 
                         <!-- Fields below image -->
                         <div>
@@ -457,6 +458,7 @@
                         <!-- Seedling Image -->
                         <img id="detail-bibit-foto" src="https://via.placeholder.com/300x220" alt="Foto Bibit"
                             class="w-full h-52 object-cover mb-3">
+                        <input type="file" id="detail-bibit-gambar-upload" name="gambar_image" accept="image/*" style="margin-bottom: 10px;">
 
                         <!-- Fields below image -->
                         <div>
@@ -513,14 +515,24 @@
 
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Usia Bibit</label>
-                            <input type="text" id="detail-bibit-usia" placeholder="Placeholder"
-                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                            <div class="flex items-center">
+                                <input type="text" id="detail-bibit-usia" placeholder="Placeholder"
+                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
+                                <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
+                                    hari
+                                </span>
+                            </div>
                         </div>
 
                         <div>
                             <label class="block text-gray-700 text-sm font-semibold mb-1">Tinggi</label>
-                            <input type="text" id="detail-bibit-tinggi" placeholder="Placeholder"
-                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm" readonly>
+                            <div class="flex items-center">
+                                <input type="text" id="detail-bibit-tinggi" placeholder="Placeholder"
+                                    class="w-full border border-gray-300 rounded-l px-3 py-2 text-sm" readonly>
+                                <span class="bg-gray-100 border border-l-0 border-gray-300 rounded-r px-3 py-2 text-sm text-gray-600">
+                                    cm
+                                </span>
+                            </div>
                         </div>
 
                         <div>
@@ -633,8 +645,8 @@
                     document.getElementById('detail-bibit-actual-id').value = id;
                     document.getElementById('detail-bibit-id').value = idBibit || id;
                     document.getElementById('detail-bibit-jenis').value = jenis;
-                    document.getElementById('detail-bibit-usia').value = usia ? usia + ' hari' : 'Tidak tersedia';
-                    document.getElementById('detail-bibit-tinggi').value = tinggi ? tinggi + ' cm' : 'Tidak tersedia';
+                    document.getElementById('detail-bibit-usia').value = usia || 'Tidak tersedia';
+                    document.getElementById('detail-bibit-tinggi').value = tinggi || 'Tidak tersedia';
                     document.getElementById('detail-bibit-lokasi').value = lokasi !== 'Tidak tersedia' ? lokasi : 'Tidak tersedia';
                     document.getElementById('detail-bibit-status').value = status;
                     document.getElementById('detail-bibit-nama').value = nama || 'Tidak tersedia';
@@ -750,52 +762,80 @@
             saveBibitBtn.addEventListener('click', function() {
                 const id = document.getElementById('detail-bibit-actual-id').value;
                 
-                // Get all the updated values and clean them
-                const data = {
-                    id: id,
-                    nama_bibit: document.getElementById('detail-bibit-nama').value.replace(' Tidak tersedia', ''),
-                    jenis_bibit: document.getElementById('detail-bibit-jenis').value,
-                    varietas: document.getElementById('detail-bibit-varietas').value.replace(' Tidak tersedia', ''),
-                    asal_bibit: document.getElementById('detail-bibit-asal').value.replace(' Tidak tersedia', ''),
-                    produktivitas: document.getElementById('detail-bibit-produktivitas').value.replace(' Tidak tersedia', ''),
-                    kondisi: document.getElementById('detail-bibit-status').value,
-                    media_tanam: document.getElementById('detail-bibit-media').value.replace(' Tidak tersedia', ''),
-                    nutrisi: document.getElementById('detail-bibit-nutrisi').value.replace(' Tidak tersedia', ''),
-                    status_hama: document.getElementById('detail-bibit-status-hama').value.replace(' Tidak tersedia', ''),
-                    catatan: document.getElementById('detail-bibit-catatan').value.replace(' Tidak tersedia', '')
-                };
+                // Create FormData object
+                const formData = new FormData();
+                
+                // Get numeric values and clean them
+                const tinggi = parseInt(document.getElementById('detail-bibit-tinggi').value.replace(/[^0-9]/g, '')) || 0;
+                const usia = parseInt(document.getElementById('detail-bibit-usia').value.replace(/[^0-9]/g, '')) || 0;
+                
+                // Append all form fields with proper data cleaning
+                formData.append('id', id);
+                formData.append('nama_bibit', document.getElementById('detail-bibit-nama').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('jenis_bibit', document.getElementById('detail-bibit-jenis').value.trim());
+                formData.append('varietas', document.getElementById('detail-bibit-varietas').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('asal_bibit', document.getElementById('detail-bibit-asal').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('produktivitas', document.getElementById('detail-bibit-produktivitas').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('kondisi', document.getElementById('detail-bibit-status').value.trim());
+                formData.append('media_tanam', document.getElementById('detail-bibit-media').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('nutrisi', document.getElementById('detail-bibit-nutrisi').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('status_hama', document.getElementById('detail-bibit-status-hama').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('catatan', document.getElementById('detail-bibit-catatan').value.replace(' Tidak tersedia', '').trim() || null);
+                formData.append('tinggi', tinggi.toString());
+                formData.append('usia', usia.toString());
 
-                console.log('Sending bibit update request:', data);
+                // Append image if selected
+                const imageInput = document.getElementById('detail-bibit-gambar-upload');
+                if (imageInput.files.length > 0) {
+                    formData.append('gambar_image', imageInput.files[0]);
+                }
+
+                // Add CSRF token
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+
+                // Show loading state
+                saveBibitBtn.disabled = true;
+                saveBibitBtn.textContent = 'Menyimpan...';
 
                 // Send update request
                 fetch('/bibit/update/' + id, {
-                    method: 'PUT',
+                    method: 'POST',
+                    body: formData,
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json'
+                        // Do not set Content-Type header, let the browser set it for FormData
                     },
-                    body: JSON.stringify(data)
                 })
                 .then(response => {
-                    console.log('Response status:', response.status);
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.text().then(text => {
+                            try {
+                                // Try to parse as JSON
+                                return Promise.reject(JSON.parse(text));
+                            } catch (e) {
+                                // If not JSON, reject with text
+                                return Promise.reject({ message: text });
+                            }
+                        });
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Response data:', data);
                     if (data.success) {
                         alert('Data bibit berhasil diperbarui!');
                         location.reload();
                     } else {
-                        alert('Gagal memperbarui data bibit: ' + (data.message || 'Terjadi kesalahan'));
+                        throw new Error(data.message || 'Gagal memperbarui data bibit');
                     }
                 })
                 .catch(error => {
                     console.error('Error details:', error);
-                    alert('Terjadi kesalahan: ' + error.message);
+                    alert('Terjadi kesalahan: ' + (error.message || 'Unknown error'));
+                })
+                .finally(() => {
+                    // Reset button state
+                    saveBibitBtn.disabled = false;
+                    saveBibitBtn.textContent = 'Simpan';
                 });
             });
 
@@ -836,28 +876,38 @@
             saveKayuBtn.addEventListener('click', function() {
                 const id = document.getElementById('detail-id').value;
                 
+                // Create FormData object
+                const formData = new FormData();
+                
                 // Get all the updated values and clean them
-                const data = {
-                    id: id,
-                    nama_kayu: document.getElementById('detail-nama').value.replace(' Tidak tersedia', ''),
-                    jenis_kayu: document.getElementById('detail-jenis').value,
-                    varietas: document.getElementById('detail-varietas').value.replace(' Tidak tersedia', ''),
-                    barcode: document.getElementById('detail-barcode').value.replace(' Tidak tersedia', ''),
-                    catatan: document.getElementById('detail-catatan').value.replace(' Tidak tersedia', ''),
-                    jumlah_stok: document.getElementById('detail-stok').value.replace(/[^0-9]/g, '') || '0'
-                };
+                formData.append('id', id);
+                formData.append('nama_kayu', document.getElementById('detail-nama').value.replace(' Tidak tersedia', ''));
+                formData.append('jenis_kayu', document.getElementById('detail-jenis').value);
+                formData.append('varietas', document.getElementById('detail-varietas').value.replace(' Tidak tersedia', ''));
+                formData.append('barcode', document.getElementById('detail-barcode').value.replace(' Tidak tersedia', ''));
+                formData.append('catatan', document.getElementById('detail-catatan').value.replace(' Tidak tersedia', ''));
+                formData.append('jumlah_stok', document.getElementById('detail-stok').value.replace(/[^0-9]/g, '') || '0');
 
-                console.log('Sending kayu update request:', data);
+                // Append image if selected
+                const imageInput = document.getElementById('detail-kayu-gambar-upload');
+                if (imageInput.files.length > 0) {
+                    formData.append('gambar_image', imageInput.files[0]);
+                }
+
+                // Add CSRF token
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+                formData.append('_method', 'PUT'); // For PUT request
+
+                console.log('Sending kayu update request with image');
 
                 // Send update request
                 fetch('/kayu/update/' + id, {
-                    method: 'PUT',
+                    method: 'POST', // Changed to POST because we're sending FormData
+                    body: formData,
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(data)
+                        // Do not set Content-Type header, let the browser set it for FormData
+                    }
                 })
                 .then(response => {
                     console.log('Response status:', response.status);
@@ -1046,6 +1096,23 @@
                         this.style.opacity = '1';
                     });
                 });
+            });
+
+            // Preview gambar baru Bibit
+            const bibitFileInput = document.getElementById('detail-bibit-gambar-upload');
+            bibitFileInput.addEventListener('change', function(event) {
+                const [file] = event.target.files;
+                if (file) {
+                    document.getElementById('detail-bibit-foto').src = URL.createObjectURL(file);
+                }
+            });
+            // Preview gambar baru Kayu
+            const kayuFileInput = document.getElementById('detail-kayu-gambar-upload');
+            kayuFileInput.addEventListener('change', function(event) {
+                const [file] = event.target.files;
+                if (file) {
+                    document.getElementById('detail-foto').src = URL.createObjectURL(file);
+                }
             });
         });
 

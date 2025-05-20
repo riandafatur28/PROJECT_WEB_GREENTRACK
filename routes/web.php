@@ -56,7 +56,7 @@ Route::prefix('bibit')->name('bibit.')->group(function () {
     Route::get('/', [ManajemenPohonBibitController::class, 'getBibit'])->name('index');
     Route::post('/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('update.status');
     Route::post('/store', [ManajemenPohonBibitController::class, 'storeBibit'])->name('store');
-    Route::put('/update/{id}', [ManajemenPohonBibitController::class, 'updateBibit'])->name('update');
+    Route::post('/update/{id}', [ManajemenPohonBibitController::class, 'updateBibit'])->name('update');
     Route::delete('/delete/{id}', [ManajemenPohonBibitController::class, 'deleteBibit'])->name('delete');
 });
 

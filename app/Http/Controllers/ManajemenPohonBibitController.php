@@ -139,7 +139,6 @@ class ManajemenPohonBibitController extends Controller
 
             return $timestamp;
         } catch (\Exception $e) {
-            Log::error('Error formatting timestamp: ' . $e->getMessage());
             return 'Format tanggal tidak valid';
         }
     }
@@ -318,17 +317,14 @@ class ManajemenPohonBibitController extends Controller
             }
 
         } catch (ConnectException $e) {
-            Log::error('Firestore connectivity error: ' . $e->getMessage());
             $errorMessage = 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda dan coba lagi nanti.';
         } catch (RequestException $e) {
-            Log::error('Firestore request error: ' . $e->getMessage());
             if ($e->getCode() == 6) { // cURL error 6: Could not resolve host
                 $errorMessage = 'Koneksi tidak stabil. Silakan periksa koneksi internet Anda dan coba lagi nanti.';
             } else {
                 $errorMessage = 'Terjadi kesalahan saat menghubungi server Firestore: ' . $e->getMessage();
             }
         } catch (Exception $e) {
-            Log::error('General error in Firestore access: ' . $e->getMessage());
             $errorMessage = 'Terjadi kesalahan: ' . $e->getMessage();
         }
 
@@ -413,32 +409,63 @@ class ManajemenPohonBibitController extends Controller
         // Default image
         $defaultImage = 'https://via.placeholder.com/250';
 
+        try {
+            // Jika field kosong atau null
         if (empty($imageField)) {
             return $defaultImage;
         }
 
-        // Jika gambar_image adalah array values
-        if (isset($imageField['arrayValue']) && isset($imageField['arrayValue']['values'])) {
-            $values = $imageField['arrayValue']['values'];
-            if (!empty($values) && isset($values[0]['stringValue'])) {
-                return $values[0]['stringValue'];
-            }
-        }
+            // Log struktur data untuk debugging
+            Log::info('Struktur data gambar:', ['imageField' => $imageField]);
 
-        // Jika gambar_image langsung berisi array dengan indeks numerik
-        if (is_array($imageField) && isset($imageField[0]['stringValue'])) {
+            // Jika gambar_image adalah arrayValue Firestore
+            if (isset($imageField['arrayValue'])) {
+                // Jika values ada dan tidak kosong
+                if (isset($imageField['arrayValue']['values']) && !empty($imageField['arrayValue']['values'])) {
+            $values = $imageField['arrayValue']['values'];
+                    // Ambil URL dari stringValue atau langsung dari string
+                    foreach ($values as $value) {
+                        if (isset($value['stringValue'])) {
+                            return $value['stringValue'];
+                        } elseif (is_string($value)) {
+                            return $value;
+                        }
+                    }
+                }
+                // Jika array kosong atau tidak ada values, return default
+                return $defaultImage;
+            }
+
+            // Jika gambar_image adalah array langsung
+            if (is_array($imageField) && isset($imageField[0])) {
+                if (is_string($imageField[0])) {
+                    return $imageField[0];
+                } elseif (isset($imageField[0]['stringValue'])) {
             return $imageField[0]['stringValue'];
+                }
         }
 
         // Jika gambar_image adalah string langsung
+            if (is_string($imageField)) {
+                return $imageField;
+            }
+
+            // Jika gambar_image adalah objek dengan stringValue
         if (isset($imageField['stringValue'])) {
             return $imageField['stringValue'];
         }
 
-        // Log struktur gambar yang tidak dikenali untuk debugging
-        Log::warning('Struktur gambar tidak dikenali: ' . json_encode($imageField));
+            // Log jika struktur tidak dikenali
+            Log::warning('Struktur gambar tidak dikenali:', ['data' => $imageField]);
 
         return $defaultImage;
+        } catch (\Exception $e) {
+            Log::error('Error dalam extractImageUrl:', [
+                'message' => $e->getMessage(),
+                'data' => $imageField
+            ]);
+        return $defaultImage;
+        }
     }
 
     // Tambahkan method untuk mengambil detail bibit untuk modal
@@ -521,13 +548,10 @@ class ManajemenPohonBibitController extends Controller
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 
         } catch (ConnectException $e) {
-            Log::error('Firestore connectivity error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
         } catch (RequestException $e) {
-            Log::error('Firestore request error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
         } catch (Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -618,13 +642,10 @@ class ManajemenPohonBibitController extends Controller
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 
         } catch (ConnectException $e) {
-            Log::error('Firestore connectivity error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
         } catch (RequestException $e) {
-            Log::error('Firestore request error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
         } catch (Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -655,13 +676,10 @@ class ManajemenPohonBibitController extends Controller
             return response()->json(['success' => true]);
 
         } catch (ConnectException $e) {
-            Log::error('Firestore connectivity error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
         } catch (RequestException $e) {
-            Log::error('Firestore request error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
         } catch (Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -692,13 +710,10 @@ class ManajemenPohonBibitController extends Controller
             return response()->json(['success' => true]);
 
         } catch (ConnectException $e) {
-            Log::error('Firestore connectivity error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
         } catch (RequestException $e) {
-            Log::error('Firestore request error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
         } catch (Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -730,13 +745,10 @@ class ManajemenPohonBibitController extends Controller
             return response()->json(['success' => $response->successful()]);
 
         } catch (ConnectException $e) {
-            Log::error('Firestore connectivity error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
         } catch (RequestException $e) {
-            Log::error('Firestore request error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
         } catch (Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -768,13 +780,10 @@ class ManajemenPohonBibitController extends Controller
             return response()->json(['success' => $response->successful()]);
 
         } catch (ConnectException $e) {
-            Log::error('Firestore connectivity error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
         } catch (RequestException $e) {
-            Log::error('Firestore request error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
         } catch (Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
@@ -796,14 +805,12 @@ class ManajemenPohonBibitController extends Controller
                     'message' => 'Bibit berhasil dihapus'
                 ]);
             } else {
-                Log::error('Firestore delete error: ' . $response->body());
                 return response()->json([
                     'success' => false,
                     'message' => 'Gagal menghapus bibit: ' . $response->body()
                 ], 500);
             }
         } catch (\Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -828,14 +835,12 @@ class ManajemenPohonBibitController extends Controller
                     'message' => 'Kayu berhasil dihapus'
                 ]);
             } else {
-                Log::error('Firestore delete error: ' . $response->body());
                 return response()->json([
                     'success' => false,
                     'message' => 'Gagal menghapus kayu: ' . $response->body()
                 ], 500);
             }
         } catch (\Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -847,41 +852,170 @@ class ManajemenPohonBibitController extends Controller
     public function updateBibit(Request $request, FirestoreService $firestore, $id)
     {
         try {
-            // Konversi data ke format Firestore
+            Log::info('Starting bibit update', [
+                'id' => $id,
+                'request_data' => $request->all()
+            ]);
+
+            // First, verify the document exists
+            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}";
+            $existingDoc = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+                ->get($url);
+
+            if (!$existingDoc->successful()) {
+                Log::error('Document not found', [
+                    'id' => $id,
+                    'response' => $existingDoc->body()
+                ]);
+                throw new \Exception('Document not found');
+            }
+
+            $existingFields = $existingDoc->json()['fields'] ?? [];
+            Log::info('Existing document fields:', ['fields' => $existingFields]);
+
+            // Prepare fields to update
             $fields = [];
             $fieldPaths = [];
-            foreach ($request->all() as $key => $value) {
-                if ($key !== 'id' && $key !== '_token' && $key !== 'gambar_image') {
-                    $fields[$key] = ['stringValue' => $value];
-                    $fieldPaths[] = $key;
+
+            // Handle numeric fields with proper type conversion
+            if ($request->has('tinggi')) {
+                $tinggi = intval($request->input('tinggi'));
+                $fields['tinggi'] = ['integerValue' => $tinggi];
+                $fieldPaths[] = 'tinggi';
+            }
+
+            if ($request->has('usia')) {
+                $usia = intval($request->input('usia'));
+                $fields['usia'] = ['integerValue' => $usia];
+                $fieldPaths[] = 'usia';
+            }
+
+            // Handle string fields
+            $stringFields = [
+                'nama_bibit', 'jenis_bibit', 'varietas', 'asal_bibit', 
+                'produktivitas', 'kondisi', 'media_tanam', 'nutrisi', 
+                'status_hama', 'catatan'
+            ];
+
+            foreach ($stringFields as $field) {
+                if ($request->has($field)) {
+                    $value = $request->input($field);
+                    if (!is_null($value) && $value !== '') {
+                        $fields[$field] = ['stringValue' => (string)$value];
+                        $fieldPaths[] = $field;
+                    }
                 }
             }
 
-            // URL API Firestore untuk update bibit
-            $fieldsString = implode('&updateMask.fieldPaths=', $fieldPaths);
-            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}?updateMask.fieldPaths={$fieldsString}";
-            $payload = ['fields' => $fields];
+            // Handle image upload if present
+            if ($request->hasFile('gambar_image')) {
+                $image = $request->file('gambar_image');
+                
+                // Validate image
+                $request->validate([
+                    'gambar_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+                ]);
 
-            // Melakukan permintaan PATCH ke Firestore
-            $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
-                ->patch($url, $payload);
+                try {
+                    $client = new \GuzzleHttp\Client();
+                    
+                    $formData = [
+                        [
+                            'name' => 'image',
+                            'contents' => fopen($image->getRealPath(), 'r'),
+                            'filename' => $image->getClientOriginalName()
+                        ]
+                    ];
 
-            if ($response->successful()) {
-                return response()->json(['success' => true]);
-            } else {
-                Log::error('Firestore update error: ' . $response->body());
-                return response()->json(['success' => false, 'message' => 'Gagal memperbarui data bibit'], 500);
+                    $imgbbResponse = $client->request('POST', 'https://api.imgbb.com/1/upload', [
+                        'multipart' => $formData,
+                        'query' => [
+                            'key' => '3c2af4d518d6ccc3c2d7d6f86bd7a1dc'
+                        ]
+                    ]);
+
+                    $imgbbData = json_decode($imgbbResponse->getBody(), true);
+                    
+                    if (isset($imgbbData['data']['url'])) {
+                        $imageUrl = $imgbbData['data']['url'];
+                        // Store image URL as array in Firestore format
+                        $fields['gambar_image'] = [
+                            'arrayValue' => [
+                                'values' => [
+                                    ['stringValue' => $imageUrl]
+                                ]
+                            ]
+                        ];
+                        $fieldPaths[] = 'gambar_image';
+                        Log::info('Image uploaded successfully', ['url' => $imageUrl]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Image upload failed', [
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
 
-        } catch (ConnectException $e) {
-            Log::error('Firestore connectivity error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
-        } catch (RequestException $e) {
-            Log::error('Firestore request error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
-        } catch (Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            // Update timestamp
+            $fields['updated_at'] = [
+                'timestampValue' => date('c')
+            ];
+            $fieldPaths[] = 'updated_at';
+
+            if (empty($fieldPaths)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No fields to update'
+                ], 400);
+            }
+
+            // Create update mask query string
+            $updateMaskPaths = implode('&', array_map(function($path) {
+                return "updateMask.fieldPaths=" . urlencode($path);
+            }, array_unique($fieldPaths)));
+
+            // Prepare update URL
+            $updateUrl = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}?{$updateMaskPaths}";
+            
+            Log::info('Sending update to Firestore', [
+                'url' => $updateUrl,
+                'fields' => $fields
+            ]);
+
+            // Make the update request
+            $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+                ->patch($updateUrl, [
+                    'fields' => $fields
+                ]);
+
+            if (!$response->successful()) {
+                Log::error('Firestore update failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                throw new \Exception('Firestore update failed: ' . $response->body());
+            }
+
+            Log::info('Update successful', [
+                'response' => $response->json()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data updated successfully',
+                'updated_fields' => $fieldPaths
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Update failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating data: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -889,41 +1023,187 @@ class ManajemenPohonBibitController extends Controller
     public function updateKayu(Request $request, FirestoreService $firestore, $id)
     {
         try {
-            // Konversi data ke format Firestore
-            $fields = [];
-            $fieldPaths = [];
-            foreach ($request->all() as $key => $value) {
-                if ($key !== 'id' && $key !== '_token' && $key !== 'gambar_image') {
-                    $fields[$key] = ['stringValue' => $value];
-                    $fieldPaths[] = $key;
+            Log::info('Starting kayu update', [
+                'id' => $id,
+                'request_data' => $request->all()
+            ]);
+
+            // First, verify the document exists and get current data
+            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}";
+            $existingDoc = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+                ->get($url);
+
+            if (!$existingDoc->successful()) {
+                Log::error('Document not found', [
+                    'id' => $id,
+                    'response' => $existingDoc->body()
+                ]);
+                throw new \Exception('Document not found');
+            }
+
+            $existingFields = $existingDoc->json()['fields'] ?? [];
+            Log::info('Existing document fields:', ['fields' => $existingFields]);
+
+            // Start with existing fields to preserve all data
+            $fields = $existingFields;
+
+            // Handle numeric fields with proper type conversion
+            if ($request->has('tinggi')) {
+                $tinggi = floatval($request->input('tinggi'));
+                $fields['tinggi'] = ['doubleValue' => $tinggi];
+            }
+
+            if ($request->has('usia')) {
+                $usia = intval($request->input('usia'));
+                $fields['usia'] = ['integerValue' => $usia];
+            }
+
+            if ($request->has('jumlah_stok')) {
+                $jumlahStok = intval($request->input('jumlah_stok'));
+                $fields['jumlah_stok'] = ['integerValue' => $jumlahStok];
+            }
+
+            // Handle string fields
+            $stringFields = [
+                'nama_kayu', 'jenis_kayu', 'varietas', 'barcode',
+                'batch_panen', 'catatan', 'status', 'id_user'
+            ];
+
+            foreach ($stringFields as $field) {
+                if ($request->has($field) && $request->input($field) !== null) {
+                    $fields[$field] = ['stringValue' => (string)$request->input($field)];
                 }
             }
 
-            // URL API Firestore untuk update kayu
-            $fieldsString = implode('&updateMask.fieldPaths=', $fieldPaths);
-            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}?updateMask.fieldPaths={$fieldsString}";
-            $payload = ['fields' => $fields];
+            // Handle lokasi_tanam as a map
+            $lokasiFields = ['kph', 'luas_petak', 'rkph', 'bkph', 'alamat'];
+            $lokasiUpdated = false;
+            $lokasiMap = isset($fields['lokasi_tanam']) ? $fields['lokasi_tanam'] : [
+                'mapValue' => [
+                    'fields' => [
+                        'kph' => ['stringValue' => ''],
+                        'luas_petak' => ['stringValue' => ''],
+                        'rkph' => ['stringValue' => ''],
+                        'lng' => ['integerValue' => 0],
+                        'lat' => ['integerValue' => 0],
+                        'bkph' => ['stringValue' => ''],
+                        'alamat' => ['stringValue' => '']
+                    ]
+                ]
+            ];
 
-            // Melakukan permintaan PATCH ke Firestore
-            $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
-                ->patch($url, $payload);
-
-            if ($response->successful()) {
-                return response()->json(['success' => true]);
-            } else {
-                Log::error('Firestore update error: ' . $response->body());
-                return response()->json(['success' => false, 'message' => 'Gagal memperbarui data kayu'], 500);
+            foreach ($lokasiFields as $field) {
+                if ($request->has("lokasi_$field")) {
+                    $lokasiMap['mapValue']['fields'][$field]['stringValue'] = $request->input("lokasi_$field");
+                    $lokasiUpdated = true;
+                }
             }
 
-        } catch (ConnectException $e) {
-            Log::error('Firestore connectivity error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'], 503);
-        } catch (RequestException $e) {
-            Log::error('Firestore request error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()], 500);
-        } catch (Exception $e) {
-            Log::error('General error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            if ($lokasiUpdated) {
+                $fields['lokasi_tanam'] = $lokasiMap;
+            }
+
+            // Handle image upload if present
+            if ($request->hasFile('gambar_image')) {
+                $image = $request->file('gambar_image');
+                
+                // Validate image
+                $request->validate([
+                    'gambar_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+                ]);
+
+                try {
+                    $client = new \GuzzleHttp\Client();
+                    
+                    $formData = [
+                        [
+                            'name' => 'image',
+                            'contents' => fopen($image->getRealPath(), 'r'),
+                            'filename' => $image->getClientOriginalName()
+                        ]
+                    ];
+
+                    $imgbbResponse = $client->request('POST', 'https://api.imgbb.com/1/upload', [
+                        'multipart' => $formData,
+                        'query' => [
+                            'key' => '3c2af4d518d6ccc3c2d7d6f86bd7a1dc'
+                        ]
+                    ]);
+
+                    $imgbbData = json_decode($imgbbResponse->getBody(), true);
+                    
+                    if (isset($imgbbData['data']['url'])) {
+                        $imageUrl = $imgbbData['data']['url'];
+                        // Store image URL as array in Firestore format
+                        $fields['gambar_image'] = [
+                            'arrayValue' => [
+                                'values' => [
+                                    ['stringValue' => $imageUrl]
+                                ]
+                            ]
+                        ];
+                        Log::info('Image uploaded successfully', ['url' => $imageUrl]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Image upload failed', [
+                        'error' => $e->getMessage()
+                    ]);
+                    throw new \Exception('Failed to upload image: ' . $e->getMessage());
+                }
+            }
+
+            // Update the updated_at timestamp
+            $fields['updated_at'] = [
+                'mapValue' => [
+                    'fields' => [
+                        '_seconds' => ['integerValue' => time()],
+                        '_nanoseconds' => ['integerValue' => 0]
+                    ]
+                ]
+            ];
+
+            // Prepare update URL - no need for update mask as we're sending all fields
+            $updateUrl = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}";
+            
+            Log::info('Sending update to Firestore', [
+                'url' => $updateUrl,
+                'fields' => $fields
+            ]);
+
+            // Make the update request
+            $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
+                ->patch($updateUrl, [
+                    'fields' => $fields
+                ]);
+
+            if (!$response->successful()) {
+                Log::error('Firestore update failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                throw new \Exception('Firestore update failed: ' . $response->body());
+            }
+
+            Log::info('Update successful', [
+                'response' => $response->json()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data updated successfully',
+                'data' => $response->json()
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Update failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating data: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
