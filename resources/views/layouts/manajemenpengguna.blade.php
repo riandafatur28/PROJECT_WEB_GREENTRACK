@@ -295,38 +295,53 @@
         function simpanPerubahan() {
             const nama = document.getElementById('modalNama').value;
             const email = document.getElementById('modalEmail').value;
+            const password = document.getElementById('password').value;
             const peran = document.getElementById('modalPeranSelect').value;
             const status = document.getElementById('modalStatusSelect').value;
             const mode = document.getElementById('modalMode').value;
             const photoUrl = document.getElementById('modalPhotoUrl').value;
 
+            if (mode === 'tambah' && !password) {
+                alert('Password harus diisi untuk admin baru!');
+                return;
+            }
+
             const data = {
-                nama,
-                email,
-                peran,
-                status,
+                nama_lengkap: nama,
+                email: email,
+                role: peran,
+                status: status,
                 photo_url: photoUrl
             };
 
-            if (mode === 'edit') data.id = document.getElementById('modalID').value;
+            if (mode === 'tambah') {
+                data.password = password;
+            }
 
-            const url = (mode === 'edit') ? '/update-admin' : '/add-admin';
+            const url = (mode === 'edit') ? '/update-admin' : '/register-admin';
 
             fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(res => res.json())
-                .then(data => {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
                     alert(data.message);
                     closeModal();
                     location.reload();
-                })
-                .catch(() => alert('Terjadi kesalahan.'));
+                } else {
+                    alert(data.message || 'Terjadi kesalahan saat menyimpan data.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menyimpan data.');
+            });
         }
 
         // Fungsi untuk menghapus admin

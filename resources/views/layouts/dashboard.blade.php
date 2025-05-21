@@ -177,7 +177,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var bibitCounts = @json($bibitCounts);
-            
+
             var options = {
                 series: [{
                     name: 'Jumlah Bibit',

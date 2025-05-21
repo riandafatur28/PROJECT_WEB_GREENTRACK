@@ -166,48 +166,21 @@ class ManajemenPenggunaController extends Controller
     }
 
     // Fungsi untuk menambah data admin baru dengan password
-    public function store(Request $request, FirestoreService $firestore)
+    public function store(Request $request)
     {
-        $nama = $request->input('nama');
-        $email = $request->input('email');
-        $peran = $request->input('peran');
-        $status = $request->input('status');
-        $password = $request->input('password'); // Ambil password dari request
-        $photoUrl = $request->input('photo_url', 'https://randomuser.me/api/portraits/lego/2.jpg'); // Default image if not provided
-
-        // Hash password untuk keamanan
-        $hashedPassword = Hash::make($password);
-
-        // Format data yang akan disimpan
-        $fields = [
-            'nama_lengkap' => ['stringValue' => $nama],
-            'email' => ['stringValue' => $email],
-            'role' => [
-                'arrayValue' => [
-                    'values' => [
-                        ['stringValue' => $peran]
-                    ]
-                ]
-            ],
-            'status' => ['stringValue' => $status],
-            'photo_url' => ['stringValue' => $photoUrl],
-            'password' => ['stringValue' => $hashedPassword], // Tambahkan password yang sudah di-hash
-            'created_at' => ['timestampValue' => date('c')], // Format ISO 8601
-            'updated_at' => ['timestampValue' => date('c')], // Format ISO 8601
-            'kode_otp' => ['stringValue' => ''],
-            'last_login' => ['nullValue' => null]
-        ];
-
-        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun";
-        $payload = ['fields' => $fields];
-
-        $response = Http::withToken($firestore->getAccessToken())
-            ->post($url, $payload);
-
-        return response()->json([
-            'success' => $response->successful(),
-            'message' => $response->successful() ? 'Admin berhasil ditambahkan' : 'Gagal menambahkan admin'
-        ]);
+        try {
+            // Redirect the request to the registerAdmin endpoint
+            $response = app(FirestoreController::class)->registerAdmin($request, app(FirestoreService::class));
+            
+            // Return the response directly
+            return $response;
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     // Fungsi untuk menghapus data admin berdasarkan ID

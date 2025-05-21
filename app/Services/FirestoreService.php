@@ -7,22 +7,65 @@ use Google\Auth\OAuth2;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Illuminate\Support\Facades\Storage;
 use Log;
+use Google\Cloud\Storage\StorageClient;
 
 class FirestoreService
 {
-    protected $accessToken;
-    protected $projectId;
+    private $projectId;
+    private $baseUrl = 'https://firestore.googleapis.com/v1';
+    private $keyFile;
 
     public function __construct()
     {
-        $jsonKey = storage_path('app/firebase-key.json');
-        $this->projectId = config('app.firebase_project_id', env('FIREBASE_PROJECT_ID'));
+        $this->projectId = 'green-track-firebase';
+        $this->keyFile = storage_path('app/firebase-key.json');
+    }
 
-        // Get Google OAuth2 token from service account
-        $scopes = ['https://www.googleapis.com/auth/datastore'];
+    public function getAccessToken()
+    {
+        $credentials = json_decode(file_get_contents($this->keyFile), true);
+        
+        $response = Http::post('https://oauth2.googleapis.com/token', [
+            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion' => $this->createJWT($credentials)
+        ]);
 
-        $credentials = new ServiceAccountCredentials($scopes, $jsonKey);
-        $this->accessToken = $credentials->fetchAuthToken()['access_token'];
+        if (!$response->successful()) {
+            throw new \Exception('Failed to get access token');
+        }
+
+        return $response->json()['access_token'];
+    }
+
+    private function createJWT($credentials)
+    {
+        $now = time();
+        $exp = $now + 3600;
+
+        $header = base64_encode(json_encode([
+            'alg' => 'RS256',
+            'typ' => 'JWT',
+            'kid' => $credentials['private_key_id']
+        ]));
+
+        $payload = base64_encode(json_encode([
+            'iss' => $credentials['client_email'],
+            'scope' => 'https://www.googleapis.com/auth/datastore',
+            'aud' => 'https://oauth2.googleapis.com/token',
+            'exp' => $exp,
+            'iat' => $now
+        ]));
+
+        $signature = '';
+        openssl_sign(
+            "$header.$payload",
+            $signature,
+            $credentials['private_key'],
+            'SHA256'
+        );
+        $signature = base64_encode($signature);
+
+        return "$header.$payload.$signature";
     }
 
     /**
@@ -63,14 +106,14 @@ class FirestoreService
             // Use runQuery for filtering
             $url = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents:runQuery";
 
-            $response = Http::withToken($this->accessToken)
+            $response = Http::withToken($this->getAccessToken())
                 ->post($url, $structuredQuery);
 
             return $this->processRunQueryResponse($response->json());
         }
 
         // Use standard get for non-filtered queries
-        $response = Http::withToken($this->accessToken)
+        $response = Http::withToken($this->getAccessToken())
             ->get($url, $query);
 
         return $response->json();
@@ -111,7 +154,7 @@ class FirestoreService
         try {
             $url = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/{$documentPath}";
 
-            $response = Http::withToken($this->accessToken)->get($url);
+            $response = Http::withToken($this->getAccessToken())->get($url);
 
             if ($response->successful()) {
                 return $response->json();
@@ -130,33 +173,37 @@ class FirestoreService
         return $this->projectId;
     }
 
-    public function getAccessToken()
-    {
-        return $this->accessToken;
-    }
-
     public function createDocument($collection, $data)
     {
-        $url = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/{$collection}";
+        $url = "{$this->baseUrl}/projects/{$this->projectId}/databases/(default)/documents/{$collection}";
+        
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->getAccessToken(),
+            'Content-Type' => 'application/json',
+        ])->post($url, $data);
 
-        $payload = [
-            'fields' => $this->formatFields($data),
-        ];
-
-        $response = Http::withToken($this->accessToken)->post($url, $payload);
+        if (!$response->successful()) {
+            throw new \Exception('Failed to create document');
+        }
 
         return $response->json();
     }
 
-    protected function formatFields($data)
+    public function createDocumentWithId($collection, $documentId, $data)
     {
-        $formatted = [];
-        foreach ($data as $key => $value) {
-            $formatted[$key] = ['stringValue' => (string) $value]; // ubah sesuai tipe (stringValue, integerValue, dll)
-        }
-        return $formatted;
-    }
+        $url = "{$this->baseUrl}/projects/{$this->projectId}/databases/(default)/documents/{$collection}?documentId={$documentId}";
+        
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->getAccessToken(),
+            'Content-Type' => 'application/json',
+        ])->post($url, $data);
 
+        if (!$response->successful()) {
+            throw new \Exception('Failed to create document: ' . $response->body());
+        }
+
+        return $response->json();
+    }
 }
 
 

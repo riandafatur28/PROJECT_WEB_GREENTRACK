@@ -36,8 +36,8 @@ class DashboardController extends Controller
                     
                     // Increment the count for this month
                     $bibitCounts[$month]++;
-                }
             }
+        }
         }
 
         // Get total bibit count
@@ -191,7 +191,7 @@ class DashboardController extends Controller
                         
                         // Only count if they are admin and their status is active
                         if ($isAdmin && (!isset($fields['status']['stringValue']) || $fields['status']['stringValue'] === 'Aktif')) {
-                            $totalAdmin++;
+                        $totalAdmin++;
                         }
                     }
                 }

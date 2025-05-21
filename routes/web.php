@@ -73,6 +73,9 @@ Route::post('/akun_superadmin', [FirestoreController::class, 'storeSuperAdmin'])
 Route::get('/register', [FirestoreController::class, 'showForm'])->name('register.form');
 Route::post('/register', [FirestoreController::class, 'handleForm'])->name('register.store');
 
+// Admin Registration Route
+Route::post('/register-admin', [FirestoreController::class, 'registerAdmin'])->name('register.admin');
+
 // Test Firebase Config (Opsional Debug)
 Route::get('/test-firebase', function () {
     $firebaseCredentials = Config::get('firebase.credentials');
