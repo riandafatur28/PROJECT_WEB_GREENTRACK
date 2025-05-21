@@ -155,7 +155,7 @@
                 onclick="event.stopPropagation()">
                 <button onclick="closeModal()"
                     class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
-                <h2 class="text-xl font-semibold text-gray-800 text-center">Data Admin</h2>
+                <h2 id="modalTitle" class="text-xl font-semibold text-gray-800 text-center">Data Admin</h2>
 
                 <div class="flex flex-col md:flex-row gap-6">
                     <div class="w-full md:w-1/2 flex flex-col">
@@ -170,50 +170,55 @@
 
                     <div class="w-full md:w-1/2 space-y-3">
                         <input type="hidden" id="modalMode">
-                        <div id="idField">
+                        <div id="idField" class="hidden">
                             <label class="text-gray-600 text-sm">ID Admin</label>
                             <input type="text" id="modalID" readonly
                                 class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
                         </div>
                         <div>
-                            <label class="text-gray-600 text-sm">Nama</label>
-                            <input type="text" id="modalNama"
+                            <label class="text-gray-600 text-sm">Nama Lengkap<span class="text-red-500">*</span></label>
+                            <input type="text" id="modalNama" required
                                 class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
                         </div>
                         <div>
-                            <label class="text-gray-600 text-sm">Email</label>
-                            <input type="email" id="modalEmail"
+                            <label class="text-gray-600 text-sm">Email<span class="text-red-500">*</span></label>
+                            <input type="email" id="modalEmail" required
                                 class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
                         </div>
-                        <div>
-                            <label class="text-gray-600 text-sm">Password</label>
+                        <div id="passwordField">
+                            <label class="text-gray-600 text-sm">Password<span class="text-red-500">*</span></label>
                             <input type="password" id="password" name="password"
                                 class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
+                            <p class="text-xs text-gray-500 mt-1">Password minimal 6 karakter</p>
                         </div>
                         <div>
-                            <label class="text-gray-600 text-sm">Peran</label>
-                            <select id="modalPeranSelect"
+                            <label class="text-gray-600 text-sm">Peran<span class="text-red-500">*</span></label>
+                            <select id="modalPeranSelect" required
                                 class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
                                 <option value="admin_penyemaian">Admin Penyemaian</option>
                                 <option value="admin_tpk">Admin TPK</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-gray-600 text-sm">Status</label>
-                            <select id="modalStatusSelect"
+                            <label class="text-gray-600 text-sm">Status<span class="text-red-500">*</span></label>
+                            <select id="modalStatusSelect" required
                                 class="w-full px-3 py-2 rounded-lg border bg-gray-100 text-gray-800">
                                 <option value="Aktif">Aktif</option>
                                 <option value="Nonaktif">Nonaktif</option>
                             </select>
                         </div>
                     </div>
+                </div>
 
-                    <div class="flex justify-end gap-2 pt-4">
-                        <button class="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600"
-                            onclick="simpanPerubahan()">Perbarui</button>
-                        <button class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600"
-                            onclick="hapusAdmin()">Hapus</button>
-                    </div>
+                <div class="flex justify-end gap-2 pt-4">
+                    <button id="updateButton"
+                        class="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600"
+                        onclick="simpanPerubahan()">Perbarui</button>
+                    <button id="deleteButton"
+                        class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600"
+                        onclick="hapusAdmin()">Hapus</button>
+                    <button class="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-600"
+                        onclick="closeModal()">Batal</button>
                 </div>
             </div>
         </div>
@@ -222,39 +227,131 @@
 
 @push('scripts')
     <script>
-        // Fungsi untuk membuka modal tambah atau edit admin
+        // Fungsi untuk menyimpan perubahan (tambah atau edit admin)
+        function simpanPerubahan() {
+            const mode = document.getElementById('modalMode').value;
+            const data = {
+                nama_lengkap: document.getElementById('modalNama').value,
+                email: document.getElementById('modalEmail').value,
+                role: document.getElementById('modalPeranSelect').value,
+                status: document.getElementById('modalStatusSelect').value,
+                photo_url: document.getElementById('modalPhotoUrl').value
+            };
+
+            // Validate required fields
+            if (!data.nama_lengkap || !data.email) {
+                alert('Nama dan email harus diisi!');
+                return;
+            }
+
+            if (mode === 'tambah') {
+                // For new admin, password is required
+                const password = document.getElementById('password').value;
+                if (!password) {
+                    alert('Password harus diisi untuk admin baru!');
+                    return;
+                }
+                data.password = password;
+
+                // Call register endpoint for new admin
+                fetch('/register-admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(handleResponse)
+                .catch(handleError);
+            } else {
+                // For editing, include the ID
+                data.id = document.getElementById('modalID').value;
+
+                // Call update endpoint for existing admin
+                fetch('/update-admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(handleResponse)
+                .catch(handleError);
+            }
+        }
+
+        // Helper function to handle API response
+        function handleResponse(response) {
+            return response.json().then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeModal();
+                    location.reload();
+                } else {
+                    throw new Error(data.message || 'Terjadi kesalahan saat menyimpan data.');
+                }
+            });
+        }
+
+        // Helper function to handle errors
+        function handleError(error) {
+            console.error('Error:', error);
+            alert(error.message || 'Terjadi kesalahan saat menyimpan data.');
+        }
+
+        // Fungsi untuk menampilkan modal tambah admin
         function showAddAdminModal() {
-            isEditMode = false; // Pastikan kita dalam mode tambah admin
+            isEditMode = false;
             document.getElementById('modalMode').value = 'tambah';
-            document.getElementById('modalID').value = ''; // Kosongkan ID
-            document.getElementById('modalNama').value = ''; // Kosongkan Nama
-            document.getElementById('modalEmail').value = ''; // Kosongkan Email
-            document.getElementById('modalPeranSelect').value = 'admin_penyemaian'; // Set default peran
-            document.getElementById('modalStatusSelect').value = 'Aktif'; // Set status default
-            document.getElementById('modalPhotoUrl').value =
-            'https://randomuser.me/api/portraits/lego/2.jpg'; // Foto default
-            document.getElementById('modalImage').src = 'https://randomuser.me/api/portraits/lego/2.jpg'; // Foto default
-            document.getElementById('idField').style.display = 'none'; // Sembunyikan ID Field saat tambah
+            document.getElementById('modalTitle').textContent = 'Tambah Admin Baru';
+            document.getElementById('password').required = true;
+            document.getElementById('password').parentElement.style.display = 'block';
+            
+            // Reset form fields
+            document.getElementById('modalID').value = '';
+            document.getElementById('modalNama').value = '';
+            document.getElementById('modalEmail').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('modalPeranSelect').value = 'admin_penyemaian';
+            document.getElementById('modalStatusSelect').value = 'Aktif';
+            document.getElementById('modalPhotoUrl').value = 'https://randomuser.me/api/portraits/lego/2.jpg';
+            document.getElementById('modalImage').src = 'https://randomuser.me/api/portraits/lego/2.jpg';
+            
+            // Hide ID field and delete button for new admin
+            document.getElementById('idField').style.display = 'none';
+            document.getElementById('deleteButton').style.display = 'none';
+            document.getElementById('updateButton').textContent = 'Tambah Admin';
+            
             openModal();
         }
 
-        // Fungsi untuk menampilkan modal untuk mengedit detail admin
+        // Fungsi untuk menampilkan modal edit admin
         function showAdminDetail(button) {
-            isEditMode = true; // Pastikan kita dalam mode edit
+            isEditMode = true;
             document.getElementById('modalMode').value = 'edit';
+            document.getElementById('modalTitle').textContent = 'Edit Data Admin';
+            document.getElementById('password').required = false;
+            document.getElementById('password').parentElement.style.display = 'none';
+            
+            // Set form fields with existing data
             document.getElementById('modalID').value = button.getAttribute('data-id');
             document.getElementById('modalNama').value = button.getAttribute('data-nama');
             document.getElementById('modalEmail').value = button.getAttribute('data-email');
-            document.getElementById('modalPeranSelect').value = button.getAttribute('data-peran').toLowerCase().replace(' ',
-                '_');
+            document.getElementById('modalPeranSelect').value = button.getAttribute('data-peran').toLowerCase().replace(' ', '_');
             document.getElementById('modalStatusSelect').value = button.getAttribute('data-status');
-
-            // Set photo URL
+            
+            // Set photo
             const photoUrl = button.getAttribute('data-photo');
             document.getElementById('modalPhotoUrl').value = photoUrl;
             document.getElementById('modalImage').src = photoUrl;
-
-            document.getElementById('idField').style.display = 'block'; // Tampilkan ID Field saat edit
+            
+            // Show ID field and delete button for existing admin
+            document.getElementById('idField').style.display = 'block';
+            document.getElementById('deleteButton').style.display = 'block';
+            document.getElementById('updateButton').textContent = 'Perbarui';
+            
             openModal();
         }
 
@@ -289,59 +386,6 @@
                 }
             };
             input.click(); // Memicu input file saat gambar diklik
-        }
-
-        // Fungsi untuk menyimpan perubahan (tambah atau edit admin)
-        function simpanPerubahan() {
-            const nama = document.getElementById('modalNama').value;
-            const email = document.getElementById('modalEmail').value;
-            const password = document.getElementById('password').value;
-            const peran = document.getElementById('modalPeranSelect').value;
-            const status = document.getElementById('modalStatusSelect').value;
-            const mode = document.getElementById('modalMode').value;
-            const photoUrl = document.getElementById('modalPhotoUrl').value;
-
-            if (mode === 'tambah' && !password) {
-                alert('Password harus diisi untuk admin baru!');
-                return;
-            }
-
-            const data = {
-                nama_lengkap: nama,
-                email: email,
-                role: peran,
-                status: status,
-                photo_url: photoUrl
-            };
-
-            if (mode === 'tambah') {
-                data.password = password;
-            }
-
-            const url = (mode === 'edit') ? '/update-admin' : '/register-admin';
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    closeModal();
-                    location.reload();
-                } else {
-                    alert(data.message || 'Terjadi kesalahan saat menyimpan data.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat menyimpan data.');
-            });
         }
 
         // Fungsi untuk menghapus admin

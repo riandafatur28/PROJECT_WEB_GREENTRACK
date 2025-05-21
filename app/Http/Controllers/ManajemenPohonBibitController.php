@@ -143,25 +143,57 @@ class ManajemenPohonBibitController extends Controller
         }
     }
 
+    private function countActiveAdmin(FirestoreService $firestore)
+    {
+        try {
+            $akunResponse = $firestore->getCollection('akun');
+            $totalActiveAdmin = 0;
+
+            if (isset($akunResponse['documents'])) {
+                foreach ($akunResponse['documents'] as $document) {
+                    $fields = $document['fields'] ?? [];
+                    
+                    // Check if the user has admin role
+                    if (isset($fields['role']['arrayValue']['values'])) {
+                        $roles = $fields['role']['arrayValue']['values'];
+                        $isAdmin = false;
+                        foreach ($roles as $role) {
+                            $roleValue = $role['stringValue'] ?? '';
+                            if (strpos($roleValue, 'admin_') === 0) {
+                                $isAdmin = true;
+                                break;
+                            }
+                        }
+                        
+                        // Only count if they are admin and their status is active or not set
+                        if ($isAdmin && (!isset($fields['status']['stringValue']) || $fields['status']['stringValue'] === 'Aktif')) {
+                            $totalActiveAdmin++;
+                        }
+                    }
+                }
+            }
+
+            return $totalActiveAdmin;
+        } catch (\Exception $e) {
+            Log::error('Error counting active admins: ' . $e->getMessage());
+            return 0;
+        }
+    }
+
     public function index(Request $request, FirestoreService $firestore)
     {
         $search = $request->input('search', '');
-        $page = $request->input('page', 1);
-        $perPage = 10;
         $sort = $request->input('sort', 'terbaru');
+        $page = max(1, intval($request->input('page', 1)));
+        $perPage = 10;
         $tab = $request->input('tab', 'bibit');
-
-        // Initialize
-        $bibit = [];
-        $kayu = [];
         $errorMessage = null;
 
         try {
-            // Ambil data bibit dan kayu dari Firestore
+            // Get bibit data
             $bibitResponse = $firestore->getCollection('bibit');
-            $kayuResponse = $firestore->getCollection('kayu');
+            $bibit = [];
 
-            // Proses data bibit
             if (isset($bibitResponse['documents'])) {
                 foreach ($bibitResponse['documents'] as $document) {
                     $fields = $document['fields'] ?? [];
@@ -233,7 +265,10 @@ class ManajemenPohonBibitController extends Controller
                 }
             }
 
-            // Proses data kayu
+            // Get kayu data
+            $kayuResponse = $firestore->getCollection('kayu');
+            $kayu = [];
+
             if (isset($kayuResponse['documents'])) {
                 foreach ($kayuResponse['documents'] as $document) {
                     $fields = $document['fields'] ?? [];
@@ -316,89 +351,99 @@ class ManajemenPohonBibitController extends Controller
                 }
             }
 
-        } catch (ConnectException $e) {
-            $errorMessage = 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda dan coba lagi nanti.';
-        } catch (RequestException $e) {
-            if ($e->getCode() == 6) { // cURL error 6: Could not resolve host
-                $errorMessage = 'Koneksi tidak stabil. Silakan periksa koneksi internet Anda dan coba lagi nanti.';
-            } else {
-                $errorMessage = 'Terjadi kesalahan saat menghubungi server Firestore: ' . $e->getMessage();
+            // Get active admin count
+            $totalActiveAdmin = $this->countActiveAdmin($firestore);
+
+            // Apply search filter after collecting data
+            if (!empty($search)) {
+                $bibit = array_filter($bibit, function($item) use ($search) {
+                    // Search in multiple fields
+                    return stripos($item['nama_bibit'], $search) !== false
+                        || stripos($item['id_bibit'], $search) !== false
+                        || stripos($item['jenis_bibit'], $search) !== false
+                        || stripos($item['tinggi'], $search) !== false
+                        || stripos($item['lokasi'], $search) !== false;
+                });
+
+                $kayu = array_filter($kayu, function($item) use ($search) {
+                    // Search in multiple fields
+                    return stripos($item['nama_kayu'], $search) !== false
+                        || stripos($item['id_kayu'], $search) !== false
+                        || stripos($item['jenis_kayu'], $search) !== false
+                        || stripos($item['tinggi'], $search) !== false
+                        || stripos($item['lokasi'], $search) !== false;
+                });
             }
-        } catch (Exception $e) {
-            $errorMessage = 'Terjadi kesalahan: ' . $e->getMessage();
+
+            // Apply sorting
+            if ($sort === 'terbaru') {
+                // Sort by created_at_timestamp (newest first)
+                usort($bibit, function($a, $b) {
+                    return $b['created_at_timestamp'] - $a['created_at_timestamp'];
+                });
+
+                usort($kayu, function($a, $b) {
+                    return $b['created_at_timestamp'] - $a['created_at_timestamp'];
+                });
+            } else {
+                // Sort by created_at_timestamp (oldest first)
+                usort($bibit, function($a, $b) {
+                    return $a['created_at_timestamp'] - $b['created_at_timestamp'];
+                });
+
+                usort($kayu, function($a, $b) {
+                    return $a['created_at_timestamp'] - $b['created_at_timestamp'];
+                });
+            }
+
+            $totalBibit = count($bibit);
+            $totalKayu = count($kayu);
+
+            // Pagination
+            $offsetBibit = ($page - 1) * $perPage;
+            $offsetKayu = ($page - 1) * $perPage;
+
+            $paginatedBibit = array_slice($bibit, $offsetBibit, $perPage);
+            $paginatedKayu = array_slice($kayu, $offsetKayu, $perPage);
+
+            // Calculate pagination info
+            $lastPage = ceil(max($totalBibit, $totalKayu) / $perPage);
+
+            // If lastPage is 0, set it to 1 to avoid pagination issues
+            $lastPage = max(1, $lastPage);
+
+            return view('layouts.manajemenkayubibit', [
+                'bibit' => $paginatedBibit,
+                'kayu' => $paginatedKayu,
+                'totalBibit' => $totalBibit,
+                'totalKayu' => $totalKayu,
+                'totalActiveAdmin' => $totalActiveAdmin,
+                'currentPage' => $page,
+                'perPage' => $perPage,
+                'lastPage' => $lastPage,
+                'search' => $search,
+                'sort' => $sort,
+                'tab' => $tab,
+                'errorMessage' => $errorMessage,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error in ManajemenPohonBibitController@index: ' . $e->getMessage());
+            return view('layouts.manajemenkayubibit', [
+                'bibit' => [],
+                'kayu' => [],
+                'totalBibit' => 0,
+                'totalKayu' => 0,
+                'totalActiveAdmin' => 0,
+                'currentPage' => 1,
+                'perPage' => $perPage,
+                'lastPage' => 1,
+                'search' => $search,
+                'sort' => $sort,
+                'tab' => $tab,
+                'errorMessage' => 'Terjadi kesalahan saat memuat data: ' . $e->getMessage(),
+            ]);
         }
-
-        // Apply search filter after collecting data
-        if (!empty($search)) {
-            $bibit = array_filter($bibit, function($item) use ($search) {
-                // Search in multiple fields
-                return stripos($item['nama_bibit'], $search) !== false
-                    || stripos($item['id_bibit'], $search) !== false
-                    || stripos($item['jenis_bibit'], $search) !== false
-                    || stripos($item['tinggi'], $search) !== false
-                    || stripos($item['lokasi'], $search) !== false;
-            });
-
-            $kayu = array_filter($kayu, function($item) use ($search) {
-                // Search in multiple fields
-                return stripos($item['nama_kayu'], $search) !== false
-                    || stripos($item['id_kayu'], $search) !== false
-                    || stripos($item['jenis_kayu'], $search) !== false
-                    || stripos($item['tinggi'], $search) !== false
-                    || stripos($item['lokasi'], $search) !== false;
-            });
-        }
-
-        // Apply sorting
-        if ($sort === 'terbaru') {
-            // Sort by created_at_timestamp (newest first)
-            usort($bibit, function($a, $b) {
-                return $b['created_at_timestamp'] - $a['created_at_timestamp'];
-            });
-
-            usort($kayu, function($a, $b) {
-                return $b['created_at_timestamp'] - $a['created_at_timestamp'];
-            });
-        } else {
-            // Sort by created_at_timestamp (oldest first)
-            usort($bibit, function($a, $b) {
-                return $a['created_at_timestamp'] - $b['created_at_timestamp'];
-            });
-
-            usort($kayu, function($a, $b) {
-                return $a['created_at_timestamp'] - $b['created_at_timestamp'];
-            });
-        }
-
-        $totalBibit = count($bibit);
-        $totalKayu = count($kayu);
-
-        // Pagination
-        $offsetBibit = ($page - 1) * $perPage;
-        $offsetKayu = ($page - 1) * $perPage;
-
-        $paginatedBibit = array_slice($bibit, $offsetBibit, $perPage);
-        $paginatedKayu = array_slice($kayu, $offsetKayu, $perPage);
-
-        // Calculate pagination info
-        $lastPage = ceil(max($totalBibit, $totalKayu) / $perPage);
-
-        // If lastPage is 0, set it to 1 to avoid pagination issues
-        $lastPage = max(1, $lastPage);
-
-        return view('layouts.manajemenkayubibit', [
-            'bibit' => $paginatedBibit,
-            'kayu' => $paginatedKayu,
-            'totalBibit' => $totalBibit,
-            'totalKayu' => $totalKayu,
-            'currentPage' => $page,
-            'perPage' => $perPage,
-            'lastPage' => $lastPage,
-            'search' => $search,
-            'sort' => $sort,
-            'tab' => $tab,
-            'errorMessage' => $errorMessage,
-        ]);
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Services\FirestoreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class ManajemenPenggunaController extends Controller
 {
@@ -115,35 +116,77 @@ class ManajemenPenggunaController extends Controller
     // Fungsi untuk mengupdate data admin
     public function updateAdmin(Request $request, FirestoreService $firestore)
     {
-        $id = $request->input('id');
-        $nama = $request->input('nama');
-        $peran = $request->input('peran');
-        $photoUrl = $request->input('photo_url'); // Tambahan untuk menerima photo_url
+        try {
+            $request->validate([
+                'id' => 'required',
+                'nama_lengkap' => 'required|string',
+                'email' => 'required|email',
+                'role' => 'required|in:admin_penyemaian,admin_tpk',
+                'status' => 'required|in:Aktif,Nonaktif',
+                'photo_url' => 'nullable|string'
+            ]);
 
-        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}?updateMask.fieldPaths=nama_lengkap&updateMask.fieldPaths=role" . ($photoUrl ? "&updateMask.fieldPaths=photo_url" : "");
+            $id = $request->input('id');
+            $now = now();
 
-        $payload = [
-            'fields' => [
-                'nama_lengkap' => ['stringValue' => $nama],
+            // Prepare the fields to update
+            $fields = [
+                'nama_lengkap' => ['stringValue' => $request->nama_lengkap],
+                'email' => ['stringValue' => $request->email],
                 'role' => [
                     'arrayValue' => [
                         'values' => [
-                            ['stringValue' => $peran]
+                            ['stringValue' => $request->role]
                         ]
                     ]
-                ]
-            ]
-        ];
+                ],
+                'status' => ['stringValue' => $request->status],
+                'updated_at' => ['timestampValue' => $now->toRfc3339String()]
+            ];
 
-        // Tambahkan photo_url ke payload jika ada
-        if ($photoUrl) {
-            $payload['fields']['photo_url'] = ['stringValue' => $photoUrl];
+            // Add photo_url if provided
+            if ($request->filled('photo_url')) {
+                $fields['photo_url'] = ['stringValue' => $request->photo_url];
+            }
+
+            // Create update mask for all fields
+            $updateMaskParams = array_map(function($field) {
+                return "updateMask.fieldPaths=" . $field;
+            }, array_keys($fields));
+
+            $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}?" . implode('&', $updateMaskParams);
+
+            $response = Http::withToken($firestore->getAccessToken())
+                ->patch($url, [
+                    'fields' => $fields
+                ]);
+
+            if (!$response->successful()) {
+                Log::error('Failed to update admin:', [
+                    'error' => $response->body(),
+                    'status' => $response->status()
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memperbarui data admin: ' . ($response->json()['error']['message'] ?? 'Unknown error')
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data admin berhasil diperbarui'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating admin:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
-
-        $response = Http::withToken($firestore->getAccessToken())
-            ->patch($url, $payload);
-
-        return response()->json(['success' => $response->successful(), 'message' => 'Admin berhasil diperbarui']);
     }
 
     // Fungsi untuk mengupdate status admin
