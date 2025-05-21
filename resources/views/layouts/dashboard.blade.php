@@ -1,5 +1,4 @@
 @extends('layouts.app')
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 @section('content')
     <div class="container mx-auto px-4 py-6">
@@ -18,9 +17,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Bibit</p>
-                        <h2 class="text-xl font-bold text-black-600">
-                            {{ number_format($totalBibit) }}
-                        </h2>
+                        <h2 class="text-xl font-bold text-black-600">{{ number_format($totalBibit) }}</h2>
                     </div>
                 </div>
 
@@ -54,7 +51,9 @@
             <div class="bg-white p-6 rounded-3xl shadow">
                 <h3 class="text-xl font-bold mb-2">Bibit Dalam Penyemaian</h3>
                 <p class="text-base text-gray-600 mb-4">Total Bibit {{ number_format($totalBibit) }}</p>
-                <div id="bibitChart" style="height: 400px;"></div>
+                <div id="bibitChart" style="height: 400px;">
+                    <div id="bibitChart"></div> <!-- Placeholder for ApexChart -->
+                </div>
             </div>
 
             <!-- Kayu TPK Chart -->
@@ -62,7 +61,7 @@
                 <h3 class="text-xl font-bold mb-2">Kayu di TPK</h3>
                 <p class="text-base text-gray-600 mb-4">Total Kayu {{ number_format($totalKayu) }}</p>
                 <div style="height: 300px;">
-                    <canvas id="kayuTPKChart"></canvas>
+                    <canvas id="kayuTPKChart"></canvas> <!-- Placeholder for Chart.js -->
                 </div>
             </div>
 
@@ -84,7 +83,7 @@
                             <tr>
                                 <td class="py-4">
                                     <div class="flex items-center gap-3">
-                                        <img src="https://i.pravatar.cc/64?u={{ urlencode($activity['nama']) }}"
+                                        <img src="{{ !empty($activity['image']) ? $activity['image'] : 'https://i.pravatar.cc/64?u=' . urlencode($activity['nama']) }}"
                                             alt="{{ $activity['nama'] }}" class="w-12 h-12 rounded-full">
                                         <div class="ml-6">
                                             <div class="text-xl font-semibold">{{ $activity['nama'] }}</div>
@@ -93,9 +92,7 @@
                                     </div>
                                 </td>
                                 <td class="py-4">{{ $activity['keterangan'] }}</td>
-                                <td class="py-4 font-semibold">
-                                    {{ $activity['waktu'] ? \Carbon\Carbon::parse($activity['waktu'])->diffForHumans() : '-' }}
-                                </td>
+                                <td class="py-4 font-semibold">{{ $activity['waktu'] }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -117,10 +114,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Kayu TPK Chart (Doughnut Chart)
             const dataKayuTPK = {
                 labels: ['Tersedia', 'Terjual', 'Rusak'],
                 datasets: [{
-                    data: [500, 250, 50],
+                    data: [500, 250, 50], // Replace with real data
                     backgroundColor: ['#4CAF50', '#F1EFFB', '#604008'],
                     hoverOffset: 4
                 }]
@@ -150,18 +148,18 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Ambil data jumlah bibit yang dikirim dari controller Laravel
-            var bibitCounts = @json($bibitCounts); // Mengambil data jumlah bibit dari controller
+            var bibitCounts = @json($bibitCounts); // Data from the controller
 
             var options = {
                 series: [{
                     name: 'Jumlah Bibit',
-                    data: bibitCounts // Menggunakan data jumlah bibit yang didapat dari Firestore
+                    data: bibitCounts // Using data passed from the controller
                 }],
                 chart: {
                     type: 'bar',
                     height: 400
                 },
-                colors: ['#F2FCF1'], // Warna dasar chart
+                colors: ['#F2FCF1'], // Chart color
                 plotOptions: {
                     bar: {
                         horizontal: false,

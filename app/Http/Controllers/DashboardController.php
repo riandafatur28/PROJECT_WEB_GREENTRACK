@@ -10,6 +10,9 @@ class DashboardController extends Controller
 {
     public function index(FirestoreService $firestore, Request $request)
     {
+        // Set Carbon locale to Bahasa Indonesia
+        Carbon::setLocale('id');
+
         // Handle filtering based on dates
         $filter = $request->input('filter', 'all');
         $dateFilter = $this->getDateFilter($filter);
@@ -48,9 +51,9 @@ class DashboardController extends Controller
         if (isset($response['documents'])) {
             // Sort the documents by date (newest first)
             usort($response['documents'], function($a, $b) {
-                $dateA = $a['fields']['tanggal']['stringValue'] ?? '';
-                $dateB = $b['fields']['tanggal']['stringValue'] ?? '';
-                return strcmp($dateB, $dateA);
+                $dateA = $a['fields']['timestamp']['timestampValue'] ?? '';
+                $dateB = $b['fields']['timestamp']['timestampValue'] ?? '';
+                return strcmp($dateB, $dateA); // Descending order
             });
 
             // Take only the first 10 documents
@@ -60,20 +63,28 @@ class DashboardController extends Controller
                 $fields = $document['fields'] ?? [];
                 $id = basename($document['name']);
 
-                // Check for image
-                $imageUrl = isset($fields['image']['stringValue']) ? $fields['image']['stringValue'] : null;
+                // Get userRole from document and format it
+                $roles = isset($fields['userRole']['stringValue']) ? $this->formatRole($fields['userRole']['stringValue']) : 'Tidak ada role';
 
-                // Get role from ID mapping
-                $roles = isset($fields['role']['arrayValue']['values']) ? $this->formatRole($fields['role']['arrayValue']['values']) : 'Tidak ada role';
+                // Get the timestamp and format the date
+                $timestamp = $this->getTimestampValue($fields);
+                $carbonDate = Carbon::createFromTimestamp($timestamp);
+
+                // Get user photo URL and parse the userName
+                $userPhotoUrl = isset($fields['userPhotoUrl']['stringValue']) && !empty($fields['userPhotoUrl']['stringValue'])
+                                ? $fields['userPhotoUrl']['stringValue']
+                                : 'https://via.placeholder.com/150';  // Default image if not available
+
+                $userName = $fields['userName']['stringValue'] ?? '-';
 
                 $activities[] = [
                     'id' => $id,
-                    'nama' => $fields['userName']['stringValue'] ?? '-',
+                    'nama' => $userName,
                     'userRole' => $roles,
                     'keterangan' => $fields['description']['stringValue'] ?? '-',
-                    'detail' => isset($fields['metadata']['fields']['catatan']['stringValue']) ? $fields['metadata']['fields']['catatan']['stringValue'] : 'Tidak ada catatan',
-                    'waktu' => isset($fields['tanggal']['stringValue']) ? $this->formatDate($fields['tanggal']['stringValue']) : null,
-                    'image' => $imageUrl,
+                    'detail' => $fields['description']['stringValue'] ?? '-',
+                    'waktu' => $carbonDate->diffForHumans(), // Format waktu relatif
+                    'image' => $userPhotoUrl,  // Use the user's photo URL from Firestore
                 ];
             }
         }
@@ -144,22 +155,23 @@ class DashboardController extends Controller
         return $dateFilter;
     }
 
-    // Format the date
-    private function formatDate($dateString)
+    // Format the timestamp
+    private function getTimestampValue($fields)
     {
-        try {
-            $date = Carbon::parse($dateString);
-            return $date->diffForHumans();
-        } catch (\Exception $e) {
-            return null;
+        if (isset($fields['timestamp']['timestampValue'])) {
+            return strtotime($fields['timestamp']['timestampValue']);
         }
+        if (isset($fields['createdAt']['timestampValue'])) {
+            return strtotime($fields['createdAt']['timestampValue']);
+        }
+        return time(); // Default to current time if timestamp is not found
     }
 
     // Format roles into a string
-    private function formatRole(array $roles): string
+    private function formatRole($roleString): string
     {
-        return implode(', ', array_map(function ($role) {
-            return $role['stringValue'] ?? 'Unknown';
-        }, $roles));
+        $roleString = str_replace('UserRole.', '', $roleString); // Remove "UserRole."
+        $roleString = preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $roleString); // camelCase to spaces
+        return ucwords($roleString); // Capitalize the first letter of each word
     }
 }
