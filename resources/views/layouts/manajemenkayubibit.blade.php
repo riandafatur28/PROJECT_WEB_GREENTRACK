@@ -58,7 +58,7 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Admin Aktif</p>
-                        <h2 class="text-xl font-bold text-black-600">9</h2>
+                        <h2 class="text-xl font-bold text-black-600">{{ $totalActiveAdmin }}</h2>
                         <div class="flex mt-1">
                             <img class="w-6 h-6 rounded-full border-2 border-white -ml-2 first:ml-0"
                                 src="https://randomuser.me/api/portraits/women/1.jpg" alt="Admin 1">

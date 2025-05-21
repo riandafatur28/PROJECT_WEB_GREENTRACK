@@ -40,6 +40,7 @@
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Admin</p>
                         <h2 class="text-xl font-bold text-black-600">{{ $totalAdmin }}</h2>
+                        <p class="text-sm text-gray-500">{{ $totalActiveAdmin }} Admin Aktif</p>
                     </div>
                 </div>
             </div>
@@ -59,7 +60,7 @@
                 <h3 class="text-xl font-bold mb-2">Kayu di TPK</h3>
                 <p class="text-base text-gray-600 mb-4">Total Kayu {{ number_format($totalKayu) }}</p>
                 <div style="height: 300px;">
-                    <canvas id="kayuTPKChart"></canvas> <!-- Placeholder for Chart.js -->
+                    <canvas id="kayuTPKChart"></canvas>
                 </div>
             </div>
 
@@ -123,10 +124,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Kayu TPK Chart (Doughnut Chart)
+            const kayuData = @json($kayuData);
+            
             const dataKayuTPK = {
                 labels: ['Tersedia', 'Terjual', 'Rusak'],
                 datasets: [{
-                    data: [500, 250, 50], // Replace with real data
+                    data: [
+                        kayuData.tersedia,
+                        kayuData.terjual,
+                        kayuData.rusak
+                    ],
                     backgroundColor: ['#4CAF50', '#F1EFFB', '#604008'],
                     hoverOffset: 4
                 }]
@@ -140,7 +147,22 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    return `${label}: ${value.toLocaleString('id-ID')} kayu`;
+                                }
+                            }
                         }
                     }
                 }

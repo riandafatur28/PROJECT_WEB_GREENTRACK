@@ -47,16 +47,46 @@ class DashboardController extends Controller
         $totalAkun = $this->countTotalAkun($firestore);
 
         // Ambil total admin dari Firestore
-        $totalAdmin = $this->countTotalAdmin($firestore);
+        $adminCounts = $this->countTotalAdmin($firestore);
+        $totalAdmin = $adminCounts['total'];
+        $totalActiveAdmin = $adminCounts['active'];
 
         // Ambil data aktivitas dari Firestore
         $response = $firestore->getCollection('activities', $dateFilter);
 
         $activities = [];
 
-        // Get total kayu count (no need for ID filtering)
+        // Get total kayu count and process kayu data
         $kayuResponse = $firestore->getCollection('kayu');
-        $totalKayu = count($kayuResponse['documents'] ?? []);
+        $totalKayu = 0;
+        $kayuData = [
+            'tersedia' => 0,
+            'terjual' => 0,
+            'rusak' => 0
+        ];
+
+        if (isset($kayuResponse['documents'])) {
+            foreach ($kayuResponse['documents'] as $document) {
+                $fields = $document['fields'] ?? [];
+                $jumlahStok = $fields['jumlah_stok']['integerValue'] ?? 0;
+                $totalKayu += $jumlahStok;
+                
+                // Assuming status is stored in the document, if not, you might need to adjust this
+                $status = $fields['status']['stringValue'] ?? 'tersedia';
+                
+                switch (strtolower($status)) {
+                    case 'terjual':
+                        $kayuData['terjual'] += $jumlahStok;
+                        break;
+                    case 'rusak':
+                        $kayuData['rusak'] += $jumlahStok;
+                        break;
+                    default:
+                        $kayuData['tersedia'] += $jumlahStok;
+                        break;
+                }
+            }
+        }
 
         // Process activities data
         if (isset($response['documents'])) {
@@ -132,8 +162,10 @@ class DashboardController extends Controller
             'totalKayu' => $totalKayu,
             'totalAkun' => $totalAkun,
             'totalAdmin' => $totalAdmin,
+            'totalActiveAdmin' => $totalActiveAdmin,
             'filter' => $filter,
-            'bibitCounts' => array_values($bibitCounts) // Make sure we send the counts as array values
+            'bibitCounts' => array_values($bibitCounts), // Make sure we send the counts as array values
+            'kayuData' => $kayuData
         ]);
     }
 
@@ -143,20 +175,41 @@ class DashboardController extends Controller
         try {
             $akunResponse = $firestore->getCollection('akun');
             $totalAdmin = 0;
+            $totalActiveAdmin = 0;
 
             if (isset($akunResponse['documents'])) {
                 foreach ($akunResponse['documents'] as $document) {
                     $fields = $document['fields'] ?? [];
-                    $role = $fields['role']['stringValue'] ?? '';
-                    if (strtolower($role) === 'admin') {
-                        $totalAdmin++;
+                    
+                    // Check if the user has admin role (either admin_penyemaian or admin_tpk)
+                    if (isset($fields['role']['arrayValue']['values'])) {
+                        $roles = $fields['role']['arrayValue']['values'];
+                        foreach ($roles as $role) {
+                            $roleValue = $role['stringValue'] ?? '';
+                            if (strpos($roleValue, 'admin_') === 0) {
+                                $totalAdmin++;
+                                
+                                // Check if admin is active
+                                $status = $fields['status']['stringValue'] ?? 'Aktif';
+                                if ($status === 'Aktif') {
+                                    $totalActiveAdmin++;
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
             }
 
-            return $totalAdmin;
+            return [
+                'total' => $totalAdmin,
+                'active' => $totalActiveAdmin
+            ];
         } catch (\Exception $e) {
-            return 0;
+            return [
+                'total' => 0,
+                'active' => 0
+            ];
         }
     }
 
