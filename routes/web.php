@@ -13,7 +13,6 @@ use App\Http\Controllers\FirestoreController;
 use App\Http\Controllers\HistoryBarcodeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ManajemenKayuBibitController;
 
 // Login & Auth
 Route::get('/login', fn() => view('layouts.login'))->name('login');
@@ -33,7 +32,7 @@ Route::post('/update-status', [ManajemenPenggunaController::class, 'updateStatus
 Route::post('/add-admin', [ManajemenPenggunaController::class, 'store'])->name('admin.store');
 
 // Manajemen Kayu & Bibit
-Route::get('/manajemen-kayu-bibit', [ManajemenKayuBibitController::class, 'index'])->name('manajemenkayubibit');
+Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])->name('manajemenkayubibit');
 Route::post('/bibit/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('bibit.update.status');
 Route::post('/kayu/update-status', [ManajemenPohonBibitController::class, 'updateKayuStatus'])->name('kayu.update.status');
 Route::post('/edit-bibit', [ManajemenPohonBibitController::class, 'editBibit']);
@@ -52,14 +51,14 @@ Route::prefix('kayu')->name('kayu.')->group(function () {
 });
 
 // Routes untuk Bibit
-// Route::prefix('bibit')->name('bibit.')->group(function () {
-//     Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])->name('manajemenkayubibit');
-//     Route::get('/', [ManajemenPohonBibitController::class, 'getBibit'])->name('index');
-//     Route::post('/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('update.status');
-//     Route::post('/store', [ManajemenPohonBibitController::class, 'storeBibit'])->name('store');
-//     Route::post('/update/{id}', [ManajemenPohonBibitController::class, 'updateBibit'])->name('update');
-//     Route::delete('/delete/{id}', [ManajemenPohonBibitController::class, 'deleteBibit'])->name('delete');
-// });
+Route::prefix('bibit')->name('bibit.')->group(function () {
+    Route::get('/manajemen-kayu-bibit', [ManajemenPohonBibitController::class, 'index'])->name('manajemenkayubibit');
+    Route::get('/', [ManajemenPohonBibitController::class, 'getBibit'])->name('index');
+    Route::post('/update-status', [ManajemenPohonBibitController::class, 'updateBibitStatus'])->name('update.status');
+    Route::post('/store', [ManajemenPohonBibitController::class, 'storeBibit'])->name('store');
+    Route::post('/update/{id}', [ManajemenPohonBibitController::class, 'updateBibit'])->name('update');
+    Route::delete('/delete/{id}', [ManajemenPohonBibitController::class, 'deleteBibit'])->name('delete');
+});
 
 // Riwayat / History
 Route::get('/history-perawatan', [HistoryPerawatanController::class, 'index'])->name('historyperawatan');

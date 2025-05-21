@@ -40,7 +40,6 @@
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Admin</p>
                         <h2 class="text-xl font-bold text-black-600">{{ $totalAdmin }}</h2>
-                        <p class="text-sm text-gray-500">{{ $totalActiveAdmin }} Admin Aktif</p>
                     </div>
                 </div>
             </div>

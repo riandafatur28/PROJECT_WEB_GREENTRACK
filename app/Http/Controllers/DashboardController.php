@@ -47,9 +47,7 @@ class DashboardController extends Controller
         $totalAkun = $this->countTotalAkun($firestore);
 
         // Ambil total admin dari Firestore
-        $adminCounts = $this->countTotalAdmin($firestore);
-        $totalAdmin = $adminCounts['total'];
-        $totalActiveAdmin = $adminCounts['active'];
+        $totalAdmin = $this->countTotalAdmin($firestore);
 
         // Ambil data aktivitas dari Firestore
         $response = $firestore->getCollection('activities', $dateFilter);
@@ -162,7 +160,6 @@ class DashboardController extends Controller
             'totalKayu' => $totalKayu,
             'totalAkun' => $totalAkun,
             'totalAdmin' => $totalAdmin,
-            'totalActiveAdmin' => $totalActiveAdmin,
             'filter' => $filter,
             'bibitCounts' => array_values($bibitCounts), // Make sure we send the counts as array values
             'kayuData' => $kayuData
@@ -175,7 +172,6 @@ class DashboardController extends Controller
         try {
             $akunResponse = $firestore->getCollection('akun');
             $totalAdmin = 0;
-            $totalActiveAdmin = 0;
 
             if (isset($akunResponse['documents'])) {
                 foreach ($akunResponse['documents'] as $document) {
@@ -184,32 +180,26 @@ class DashboardController extends Controller
                     // Check if the user has admin role (either admin_penyemaian or admin_tpk)
                     if (isset($fields['role']['arrayValue']['values'])) {
                         $roles = $fields['role']['arrayValue']['values'];
+                        $isAdmin = false;
                         foreach ($roles as $role) {
                             $roleValue = $role['stringValue'] ?? '';
                             if (strpos($roleValue, 'admin_') === 0) {
-                                $totalAdmin++;
-                                
-                                // Check if admin is active
-                                $status = $fields['status']['stringValue'] ?? 'Aktif';
-                                if ($status === 'Aktif') {
-                                    $totalActiveAdmin++;
-                                }
+                                $isAdmin = true;
                                 break;
                             }
+                        }
+                        
+                        // Only count if they are admin and their status is active
+                        if ($isAdmin && (!isset($fields['status']['stringValue']) || $fields['status']['stringValue'] === 'Aktif')) {
+                            $totalAdmin++;
                         }
                     }
                 }
             }
 
-            return [
-                'total' => $totalAdmin,
-                'active' => $totalActiveAdmin
-            ];
+            return $totalAdmin;
         } catch (\Exception $e) {
-            return [
-                'total' => 0,
-                'active' => 0
-            ];
+            return 0;
         }
     }
 
