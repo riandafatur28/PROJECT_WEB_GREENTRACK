@@ -21,13 +21,6 @@
                         <h2 class="text-xl font-bold text-black-600">
                             {{ number_format($totalBibit) }}
                         </h2>
-                        <p class="text-xs text-green-500 mt-1 flex items-center">
-                            <svg class="w-4 h-4 text-green-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                            </svg>
-                            16% bulan ini
-                        </p>
                     </div>
                 </div>
 
@@ -39,17 +32,10 @@
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Kayu</p>
                         <h2 class="text-xl font-bold text-black-600">{{ number_format($totalKayu) }}</h2>
-                        <p class="text-xs text-red-500 mt-1 flex items-center">
-                            <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                            1% bulan ini
-                        </p>
                     </div>
                 </div>
 
-                <!-- Admin Aktif -->
+                <!-- Total Admin -->
                 <div class="flex items-center px-4 py-4 md:py-0">
                     <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
                         <img src="/assets/images/admin.svg" alt="New Icon" class="w-8 h-8">
@@ -82,18 +68,7 @@
 
             <div class="md:col-span-2 bg-white p-6 rounded-3xl shadow">
                 <div class="flex justify-between items-center mb-4">
-                    <!-- Teks Aktifitas Terbaru -->
                     <h3 class="text-xl font-semibold">Aktivitas Terbaru</h3>
-
-                    <!-- Kontainer untuk Input Pencarian dan Dropdown Urutkan Berdasarkan -->
-                    <div class="flex gap-4 items-center">
-                        <!-- Input Pencarian -->
-                        <div class="relative w-full md:w-48">
-                            <input type="text" placeholder="Cari"
-                                class="pl-8 pr-3 py-1 w-full border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
-                            <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
-                        </div>
-                    </div>
                 </div>
 
                 <table class="w-full text-sm text-left text-gray-600 border-collapse">
@@ -128,7 +103,6 @@
                             </tr>
                         @endforelse
                     </tbody>
-
                 </table>
             </div>
         </div>
@@ -141,7 +115,6 @@
     <!-- CDN ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-    <!-- Script Kayu TPK Chart -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const dataKayuTPK = {
@@ -173,13 +146,6 @@
             }
         });
     </script>
-
-    <style>
-        /* Tambahkan gaya ini agar bar berubah warna saat hover */
-        #bibitChart .apexcharts-bar-series .apexcharts-series path:hover {
-            fill: #8DD88D !important;
-        }
-    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

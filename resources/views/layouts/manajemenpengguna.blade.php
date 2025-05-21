@@ -18,65 +18,65 @@
                         <span>Tambahkan Admin</span>
                     </button>
 
-                    <<!-- Search and Sort Form -->
-                        <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
-                            <form method="GET" action="{{ url()->current() }}">
-                                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                    <!-- Search Input -->
-                                    <div class="relative w-full md:w-1/2">
-                                        <input type="text" name="search" value="{{ $search ?? '' }}"
-                                            placeholder="Cari nama, email, atau peran admin..."
-                                            class="pl-10 pr-3 py-2 w-full border rounded-lg bg-green-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300">
-                                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                    <!-- Search and Sort Form -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
+                        <form method="GET" action="{{ url()->current() }}">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <!-- Search Input -->
+                                <div class="relative w-full md:w-1/2">
+                                    <input type="text" name="search" value="{{ $search ?? '' }}"
+                                        placeholder="Cari nama, email, atau peran admin..."
+                                        class="pl-10 pr-3 py-2 w-full border rounded-lg bg-green-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                            fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                <!-- Sort and Filter Controls -->
+                                <div class="flex gap-4">
+                                    <div>
+                                        <select name="sort"
+                                            class="border rounded-lg bg-green-50 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                            <option value="terbaru"
+                                                {{ ($sortOrder ?? 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru
+                                            </option>
+                                            <option value="terlama" {{ ($sortOrder ?? '') == 'terlama' ? 'selected' : '' }}>
+                                                Terlama</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="submit"
+                                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1"
+                                            viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                        Filter
+                                    </button>
+
+                                    @if (!empty($search) || ($sortOrder ?? '') != 'terbaru')
+                                        <a href="{{ url()->current() }}"
+                                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20"
                                                 fill="currentColor">
                                                 <path fill-rule="evenodd"
-                                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                                    d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
                                                     clip-rule="evenodd" />
                                             </svg>
-                                        </span>
-                                    </div>
-
-                                    <!-- Sort and Filter Controls -->
-                                    <div class="flex gap-4">
-                                        <div>
-                                            <select name="sort"
-                                                class="border rounded-lg bg-green-50 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300">
-                                                <option value="terbaru"
-                                                    {{ ($sortOrder ?? 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru
-                                                </option>
-                                                <option value="terlama"
-                                                    {{ ($sortOrder ?? '') == 'terlama' ? 'selected' : '' }}>Terlama</option>
-                                            </select>
-                                        </div>
-
-                                        <button type="submit"
-                                            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1"
-                                                viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd"
-                                                    d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                            Filter
-                                        </button>
-
-                                        @if (!empty($search) || ($sortOrder ?? '') != 'terbaru')
-                                            <a href="{{ url()->current() }}"
-                                                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1"
-                                                    viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                        d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                                Reset
-                                            </a>
-                                        @endif
-                                    </div>
+                                            Reset
+                                        </a>
+                                    @endif
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 

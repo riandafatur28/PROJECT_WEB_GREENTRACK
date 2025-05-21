@@ -17,18 +17,22 @@
                 <div class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-3 md:space-y-0">
                     <!-- Pencarian -->
                     <div id="search-bar" class="relative w-full md:w-auto">
-                        <input type="text" placeholder="Cari" id="searchPerawatan"
-                            class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
-                        <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                        <form action="{{ route('historyperawatan') }}" method="GET" class="flex items-center">
+                            <input type="text" name="search" value="{{ $search }}" placeholder="Cari"
+                                id="searchPerawatan"
+                                class="pl-8 pr-3 py-1 w-full md:w-48 border rounded-lg bg-green-100 text-gray-800 focus:outline-none">
+                            <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                        </form>
                     </div>
 
                     <!-- Dropdown Urutkan -->
                     <div id="sort-dropdown" class="flex flex-col md:flex-row md:items-center">
                         <label class="text-gray-600 text-sm">Urutkan:</label>
-                        <select id="sortKayu"
-                            class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto">
-                            <option value="terbaru">Terbaru</option>
-                            <option value="terlama">Terlama</option>
+                        <select name="sort"
+                            class="ml-1 text-gray-800 font-semibold border bg-gray-100 px-2 py-1 rounded-lg w-full md:w-auto"
+                            onchange="this.form.submit()">
+                            <option value="desc" {{ $sortOrder == 'desc' ? 'selected' : '' }}>Terbaru</option>
+                            <option value="asc" {{ $sortOrder == 'asc' ? 'selected' : '' }}>Terlama</option>
                         </select>
                     </div>
                 </div>
@@ -66,15 +70,48 @@
             </div>
 
             <!-- Pagination -->
-            <div class="flex justify-between items-center mt-6">
+            <div class="flex justify-between mt-8">
                 <p class="text-sm text-gray-500">
-                    Menampilkan {{ count($perawatan) }} dari total {{ $total }} entri
+                    Menampilkan data {{ ($currentPage - 1) * $perPage + 1 }} hingga
+                    {{ min($currentPage * $perPage, $total) }} dari {{ $total }} entri
                 </p>
-                <div>
-                    <button class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">«</button>
-                    <button class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">1</button>
-                    <button class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">2</button>
-                    <button class="px-4 py-2 bg-gray-200 rounded-md text-sm text-gray-500 hover:bg-gray-300">»</button>
+                <div class="flex space-x-1" id="pagination-links">
+                    <!-- Previous Page Button -->
+                    @if ($currentPage > 1)
+                        <a href="{{ route('historyperawatan', ['page' => $currentPage - 1, 'search' => request('search'), 'sort' => request('sort')]) }}"
+                            class="px-3 py-1 border border-gray-300 rounded text-sm text-blue-600 hover:bg-blue-50">
+                            ‹
+                        </a>
+                    @endif
+
+                    <!-- Page Numbers -->
+                    @php
+                        $startPage = max(1, $currentPage - 2);
+                        $endPage = min($startPage + 4, ceil($total / $perPage));
+                    @endphp
+
+                    @for ($i = $startPage; $i <= $endPage; $i++)
+                        <a href="{{ route('historyperawatan', ['page' => $i, 'search' => request('search'), 'sort' => request('sort')]) }}"
+                            class="px-3 py-1 border border-gray-300 rounded text-sm {{ $i == $currentPage ? 'bg-green-500 text-white' : 'text-blue-600 hover:bg-blue-50' }}">
+                            {{ $i }}
+                        </a>
+                    @endfor
+
+                    <!-- Next Page Button -->
+                    @if ($currentPage < ceil($total / $perPage))
+                        <a href="{{ route('historyperawatan', ['page' => $currentPage + 1, 'search' => request('search'), 'sort' => request('sort')]) }}"
+                            class="px-3 py-1 border border-gray-300 rounded text-sm text-blue-600 hover:bg-blue-50">
+                            ›
+                        </a>
+                    @endif
+
+                    <!-- Last Page Button -->
+                    @if ($currentPage < ceil($total / $perPage))
+                        <a href="{{ route('historyperawatan', ['page' => ceil($total / $perPage), 'search' => request('search'), 'sort' => request('sort')]) }}"
+                            class="px-3 py-1 border border-gray-300 rounded text-sm text-blue-600 hover:bg-blue-50">
+                            »
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

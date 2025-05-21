@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Services\FirestoreService;
@@ -18,10 +19,9 @@ class DashboardController extends Controller
         $bibitCounts = [];
 
         if (isset($bibitResponse['documents'])) {
-            // Asumsikan data bibit ada dalam dokumen yang memiliki data yang sesuai
             foreach ($bibitResponse['documents'] as $document) {
                 $fields = $document['fields'] ?? [];
-                $jumlah = $fields['jumlah']['integerValue'] ?? 0;  // Mengambil jumlah bibit
+                $jumlah = $fields['jumlah']['integerValue'] ?? 0;
                 $bibitCounts[] = $jumlah;
             }
         }
@@ -38,11 +38,11 @@ class DashboardController extends Controller
         $activities = [];
 
         // Get total bibit count (no need for ID filtering)
-        $totalBibit = count($bibitCounts);  // Counting total bibit from Firestore data
+        $totalBibit = count($bibitCounts);
 
         // Get total kayu count (no need for ID filtering)
         $kayuResponse = $firestore->getCollection('kayu');
-        $totalKayu = count($kayuResponse['documents'] ?? []);  // Counting total kayu
+        $totalKayu = count($kayuResponse['documents'] ?? []);
 
         // Process activities data
         if (isset($response['documents'])) {
@@ -50,7 +50,7 @@ class DashboardController extends Controller
             usort($response['documents'], function($a, $b) {
                 $dateA = $a['fields']['tanggal']['stringValue'] ?? '';
                 $dateB = $b['fields']['tanggal']['stringValue'] ?? '';
-                return strcmp($dateB, $dateA); // Descending order
+                return strcmp($dateB, $dateA);
             });
 
             // Take only the first 10 documents
@@ -63,7 +63,7 @@ class DashboardController extends Controller
                 // Check for image
                 $imageUrl = isset($fields['image']['stringValue']) ? $fields['image']['stringValue'] : null;
 
-                // Get role from ID mapping (remove the ID mapping, assuming role exists in the document)
+                // Get role from ID mapping
                 $roles = isset($fields['role']['arrayValue']['values']) ? $this->formatRole($fields['role']['arrayValue']['values']) : 'Tidak ada role';
 
                 $activities[] = [
@@ -71,65 +71,35 @@ class DashboardController extends Controller
                     'nama' => $fields['userName']['stringValue'] ?? '-',
                     'userRole' => $roles,
                     'keterangan' => $fields['description']['stringValue'] ?? '-',
-                    'detail' => isset($fields['metadata']['fields']['catatan']['stringValue'])
-                                ? $fields['metadata']['fields']['catatan']['stringValue']
-                                : 'Tidak ada catatan',
-                    'waktu' => isset($fields['tanggal']['stringValue'])
-                                ? $this->formatDate($fields['tanggal']['stringValue'])
-                                : null,
+                    'detail' => isset($fields['metadata']['fields']['catatan']['stringValue']) ? $fields['metadata']['fields']['catatan']['stringValue'] : 'Tidak ada catatan',
+                    'waktu' => isset($fields['tanggal']['stringValue']) ? $this->formatDate($fields['tanggal']['stringValue']) : null,
                     'image' => $imageUrl,
                 ];
             }
         }
 
-        // Return view without pagination
         return view('layouts.dashboard', [
             'activities' => $activities,
             'totalActivities' => count($response['documents'] ?? []),
             'totalBibit' => $totalBibit,
             'totalKayu' => $totalKayu,
-            'totalAkun' => $totalAkun,  // Tambahkan total akun ke view
-            'totalAdmin' => $totalAdmin, // Tambahkan total admin ke view
+            'totalAkun' => $totalAkun,
+            'totalAdmin' => $totalAdmin,
             'filter' => $filter,
             'bibitCounts' => $bibitCounts
         ]);
     }
 
-    /**
-     * Menghitung total akun dari collection 'akun'
-     */
-    private function countTotalAkun(FirestoreService $firestore)
-    {
-        try {
-            // Ambil data akun dari Firestore
-            $akunResponse = $firestore->getCollection('akun');
-
-            // Hitung total dokumen dalam koleksi
-            $totalAkun = count($akunResponse['documents'] ?? []);
-
-            return $totalAkun;
-        } catch (\Exception $e) {
-            // Jika gagal, kembalikan 0
-            return 0;
-        }
-    }
-
-    /**
-     * Menghitung total admin dari collection 'akun'
-     */
+    // Count total admin from the 'akun' collection
     private function countTotalAdmin(FirestoreService $firestore)
     {
         try {
-            // Ambil data akun dari Firestore
             $akunResponse = $firestore->getCollection('akun');
-
             $totalAdmin = 0;
 
-            if (isset($akunResponse['documents']) && !empty($akunResponse['documents'])) {
+            if (isset($akunResponse['documents'])) {
                 foreach ($akunResponse['documents'] as $document) {
                     $fields = $document['fields'] ?? [];
-
-                    // Periksa apakah role adalah 'admin' (assuming there's a role field)
                     $role = $fields['role']['stringValue'] ?? '';
                     if (strtolower($role) === 'admin') {
                         $totalAdmin++;
@@ -139,17 +109,25 @@ class DashboardController extends Controller
 
             return $totalAdmin;
         } catch (\Exception $e) {
-            // Log the error for debugging
-            // \Log::error('Error in countTotalAdmin: ' . $e->getMessage());
             return 0;
         }
     }
 
-    // Helper function to get the date filter based on the selected filter
+    // Count total accounts from the 'akun' collection
+    private function countTotalAkun(FirestoreService $firestore)
+    {
+        try {
+            $akunResponse = $firestore->getCollection('akun');
+            return count($akunResponse['documents'] ?? []);
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    // Get the date filter based on selected filter
     private function getDateFilter($filter)
     {
         $dateFilter = [];
-
         switch ($filter) {
             case '30_days':
                 $dateFilter = ['start' => Carbon::now()->subDays(30)->toDateString(), 'end' => Carbon::now()->toDateString()];
@@ -161,26 +139,23 @@ class DashboardController extends Controller
                 $dateFilter = ['start' => Carbon::today()->toDateString(), 'end' => Carbon::today()->toDateString()];
                 break;
             default:
-                // No date filter, get all records
                 break;
         }
-
         return $dateFilter;
     }
 
-    // Format the date string into a shorter format without day information
+    // Format the date
     private function formatDate($dateString)
     {
         try {
-            $dateString = preg_replace('/\.\d+$/', '', $dateString); // Removing any microseconds part
             $date = Carbon::parse($dateString);
-            return $date->diffForHumans(); // Format like "1 minute ago", "1 hour ago", etc.
+            return $date->diffForHumans();
         } catch (\Exception $e) {
             return null;
         }
     }
 
-    // Format roles into a comma-separated string
+    // Format roles into a string
     private function formatRole(array $roles): string
     {
         return implode(', ', array_map(function ($role) {
