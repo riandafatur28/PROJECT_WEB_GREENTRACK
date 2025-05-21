@@ -20,15 +20,28 @@ class DashboardController extends Controller
 
         // Ambil data bibit dari Firestore
         $bibitResponse = $firestore->getCollection('bibit');
-        $bibitCounts = [];
+        
+        // Initialize array untuk menyimpan jumlah bibit per bulan
+        $bibitCounts = array_fill(0, 12, 0); // Initialize with 0 for all 12 months
 
         if (isset($bibitResponse['documents'])) {
             foreach ($bibitResponse['documents'] as $document) {
                 $fields = $document['fields'] ?? [];
-                $jumlah = $fields['jumlah']['integerValue'] ?? 0;
-                $bibitCounts[] = $jumlah;
+                
+                // Get the created_at timestamp
+                if (isset($fields['created_at']['timestampValue'])) {
+                    $timestamp = strtotime($fields['created_at']['timestampValue']);
+                    $date = Carbon::createFromTimestamp($timestamp);
+                    $month = $date->month - 1; // Array is 0-based, months are 1-based
+                    
+                    // Increment the count for this month
+                    $bibitCounts[$month]++;
+                }
             }
         }
+
+        // Get total bibit count
+        $totalBibit = array_sum($bibitCounts);
 
         // Hitung total akun
         $totalAkun = $this->countTotalAkun($firestore);
@@ -40,9 +53,6 @@ class DashboardController extends Controller
         $response = $firestore->getCollection('activities', $dateFilter);
 
         $activities = [];
-
-        // Get total bibit count (no need for ID filtering)
-        $totalBibit = count($bibitCounts);
 
         // Get total kayu count (no need for ID filtering)
         $kayuResponse = $firestore->getCollection('kayu');
@@ -123,7 +133,7 @@ class DashboardController extends Controller
             'totalAkun' => $totalAkun,
             'totalAdmin' => $totalAdmin,
             'filter' => $filter,
-            'bibitCounts' => $bibitCounts
+            'bibitCounts' => array_values($bibitCounts) // Make sure we send the counts as array values
         ]);
     }
 

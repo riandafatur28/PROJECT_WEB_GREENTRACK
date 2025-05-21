@@ -51,9 +51,7 @@
             <div class="bg-white p-6 rounded-3xl shadow">
                 <h3 class="text-xl font-bold mb-2">Bibit Dalam Penyemaian</h3>
                 <p class="text-base text-gray-600 mb-4">Total Bibit {{ number_format($totalBibit) }}</p>
-                <div id="bibitChart" style="height: 400px;">
-                    <div id="bibitChart"></div> <!-- Placeholder for ApexChart -->
-                </div>
+                <div id="bibitChart" style="height: 400px;"></div>
             </div>
 
             <!-- Kayu TPK Chart -->
@@ -157,53 +155,94 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Ambil data jumlah bibit yang dikirim dari controller Laravel
-            var bibitCounts = @json($bibitCounts); // Data from the controller
-
+            var bibitCounts = @json($bibitCounts);
+            
             var options = {
                 series: [{
                     name: 'Jumlah Bibit',
-                    data: bibitCounts // Using data passed from the controller
+                    data: bibitCounts
                 }],
                 chart: {
                     type: 'bar',
-                    height: 400
+                    height: 400,
+                    toolbar: {
+                        show: true
+                    },
+                    zoom: {
+                        enabled: false
+                    }
                 },
-                colors: ['#F2FCF1'], // Chart color
+                colors: ['#4CAF50'],
                 plotOptions: {
                     bar: {
                         horizontal: false,
-                        columnWidth: '75%',
-                        borderRadius: 10,
+                        columnWidth: '60%',
+                        borderRadius: 6,
+                        dataLabels: {
+                            position: 'top'
+                        }
                     }
                 },
                 dataLabels: {
-                    enabled: false,
+                    enabled: true,
+                    formatter: function(val) {
+                        return val.toLocaleString('id-ID');
+                    },
+                    offsetY: -20,
                     style: {
-                        colors: ['#000']
+                        fontSize: '12px',
+                        colors: ['#304758']
                     }
                 },
                 stroke: {
-                    show: false
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
                 },
                 xaxis: {
-                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
-                        'Dec'
-                    ]
+                    categories: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                    labels: {
+                        rotate: -45,
+                        style: {
+                            fontSize: '12px'
+                        }
+                    }
                 },
                 yaxis: {
                     title: {
-                        text: 'Jumlah Bibit'
+                        text: 'Jumlah Bibit',
+                        style: {
+                            fontSize: '14px'
+                        }
+                    },
+                    labels: {
+                        formatter: function(val) {
+                            return val.toLocaleString('id-ID');
+                        }
                     }
                 },
                 fill: {
-                    opacity: 1
+                    opacity: 1,
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        shadeIntensity: 0.3,
+                        opacityFrom: 0.9,
+                        opacityTo: 0.8
+                    }
                 },
                 tooltip: {
                     y: {
                         formatter: function(val) {
-                            return val + " bibit";
+                            return val.toLocaleString('id-ID') + " bibit";
                         }
+                    }
+                },
+                grid: {
+                    borderColor: '#f1f1f1',
+                    row: {
+                        colors: ['transparent', 'transparent']
                     }
                 }
             };
