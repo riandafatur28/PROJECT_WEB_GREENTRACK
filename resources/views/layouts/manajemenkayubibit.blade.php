@@ -23,13 +23,6 @@
                         <h2 class="text-xl font-bold text-black-600">
                             {{ number_format($totalBibit) }}
                         </h2>
-                        <p class="text-xs text-green-500 mt-1 flex items-center">
-                            <svg class="w-4 h-4 text-green-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                            </svg>
-                            16% bulan ini
-                        </p>
                     </div>
                 </div>
 
@@ -41,13 +34,6 @@
                     <div class="ml-4">
                         <p class="text-gray-600 text-sm">Total Kayu</p>
                         <h2 class="text-xl font-bold text-black-600">{{ number_format($totalKayu) }}</h2>
-                        <p class="text-xs text-red-500 mt-1 flex items-center">
-                            <svg class="w-4 h-4 text-red-500 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                            1% bulan ini
-                        </p>
                     </div>
                 </div>
 
@@ -133,14 +119,11 @@
                                 <td class="px-2 py-1">
                                     <select
                                         class="status-dropdown px-2 py-1 rounded-lg border text-xs md:text-sm bg-green-300"
-                                        data-id="{{ $item['id'] }}" data-type="bibit"
-                                        onchange="updateBackground(this)">
-                                        <option value="Penyemaian"
-                                            {{ $item['status'] == 'Penyemaian' ? 'selected' : '' }}>
+                                        data-id="{{ $item['id'] }}" data-type="bibit" onchange="updateBackground(this)">
+                                        <option value="Penyemaian" {{ $item['status'] == 'Penyemaian' ? 'selected' : '' }}>
                                             Penyemaian
                                         </option>
-                                        <option value="Siap Tanam"
-                                            {{ $item['status'] == 'Siap Tanam' ? 'selected' : '' }}>
+                                        <option value="Siap Tanam" {{ $item['status'] == 'Siap Tanam' ? 'selected' : '' }}>
                                             Siap Tanam
                                         </option>
                                     </select>
@@ -151,8 +134,7 @@
                                         data-id="{{ $item['id'] }}" data-id-bibit="{{ $item['id_bibit'] ?? '' }}"
                                         data-jenis="{{ $item['jenis_bibit'] }}" data-tinggi="{{ $item['tinggi'] }}"
                                         data-lokasi="{{ $item['lokasi'] }}" data-status="{{ $item['status'] }}"
-                                        data-usia="{{ $item['usia'] ?? '' }}"
-                                        data-nama="{{ $item['nama_bibit'] ?? '' }}"
+                                        data-usia="{{ $item['usia'] ?? '' }}" data-nama="{{ $item['nama_bibit'] ?? '' }}"
                                         data-varietas="{{ $item['varietas'] ?? '' }}"
                                         data-produktivitas="{{ $item['produktivitas'] ?? '' }}"
                                         data-asal="{{ $item['asal_bibit'] ?? '' }}"

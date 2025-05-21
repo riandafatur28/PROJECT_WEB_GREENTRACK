@@ -20,20 +20,20 @@ class DashboardController extends Controller
 
         // Ambil data bibit dari Firestore
         $bibitResponse = $firestore->getCollection('bibit');
-        
+
         // Initialize array untuk menyimpan jumlah bibit per bulan
         $bibitCounts = array_fill(0, 12, 0); // Initialize with 0 for all 12 months
 
         if (isset($bibitResponse['documents'])) {
             foreach ($bibitResponse['documents'] as $document) {
                 $fields = $document['fields'] ?? [];
-                
+
                 // Get the created_at timestamp
                 if (isset($fields['created_at']['timestampValue'])) {
                     $timestamp = strtotime($fields['created_at']['timestampValue']);
                     $date = Carbon::createFromTimestamp($timestamp);
                     $month = $date->month - 1; // Array is 0-based, months are 1-based
-                    
+
                     // Increment the count for this month
                     $bibitCounts[$month]++;
             }
@@ -68,10 +68,10 @@ class DashboardController extends Controller
                 $fields = $document['fields'] ?? [];
                 $jumlahStok = $fields['jumlah_stok']['integerValue'] ?? 0;
                 $totalKayu += $jumlahStok;
-                
+
                 // Assuming status is stored in the document, if not, you might need to adjust this
                 $status = $fields['status']['stringValue'] ?? 'tersedia';
-                
+
                 switch (strtolower($status)) {
                     case 'terjual':
                         $kayuData['terjual'] += $jumlahStok;
@@ -176,7 +176,7 @@ class DashboardController extends Controller
             if (isset($akunResponse['documents'])) {
                 foreach ($akunResponse['documents'] as $document) {
                     $fields = $document['fields'] ?? [];
-                    
+
                     // Check if the user has admin role (either admin_penyemaian or admin_tpk)
                     if (isset($fields['role']['arrayValue']['values'])) {
                         $roles = $fields['role']['arrayValue']['values'];
@@ -188,7 +188,7 @@ class DashboardController extends Controller
                                 break;
                             }
                         }
-                        
+
                         // Only count if they are admin and their status is active
                         if ($isAdmin && (!isset($fields['status']['stringValue']) || $fields['status']['stringValue'] === 'Aktif')) {
                         $totalAdmin++;

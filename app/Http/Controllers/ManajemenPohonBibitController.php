@@ -152,7 +152,7 @@ class ManajemenPohonBibitController extends Controller
             if (isset($akunResponse['documents'])) {
                 foreach ($akunResponse['documents'] as $document) {
                     $fields = $document['fields'] ?? [];
-                    
+
                     // Check if the user has admin role
                     if (isset($fields['role']['arrayValue']['values'])) {
                         $roles = $fields['role']['arrayValue']['values'];
@@ -164,7 +164,7 @@ class ManajemenPohonBibitController extends Controller
                                 break;
                             }
                         }
-                        
+
                         // Only count if they are admin and their status is active or not set
                         if ($isAdmin && (!isset($fields['status']['stringValue']) || $fields['status']['stringValue'] === 'Aktif')) {
                             $totalActiveAdmin++;
@@ -267,12 +267,13 @@ class ManajemenPohonBibitController extends Controller
 
             // Get kayu data
             $kayuResponse = $firestore->getCollection('kayu');
-            $kayu = [];
+        $totalKayu = 0;
 
             if (isset($kayuResponse['documents'])) {
                 foreach ($kayuResponse['documents'] as $document) {
-                    $fields = $document['fields'] ?? [];
-                    $id = basename($document['name']);
+                   $fields = $document['fields'] ?? [];
+                $jumlahStok = $fields['jumlah_stok']['integerValue'] ?? 0;
+                $totalKayu += $jumlahStok;
 
                     // Ambil gambar kayu dari Firestore
                     $gambarUrl = $this->extractImageUrl($fields['gambar_image'] ?? null);
@@ -721,10 +722,10 @@ class ManajemenPohonBibitController extends Controller
 
             // URL API Firestore untuk update status bibit
             $url = $getUrl;
-            
+
             // Get existing fields
             $existingFields = $currentDoc->json()['fields'] ?? [];
-            
+
             // Update only the kondisi field
             $existingFields['kondisi'] = ['stringValue' => $status];
 
@@ -763,7 +764,7 @@ class ManajemenPohonBibitController extends Controller
                 'error' => $e->getMessage()
             ]);
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'
             ], 503);
         } catch (RequestException $e) {
@@ -772,7 +773,7 @@ class ManajemenPohonBibitController extends Controller
                 'error_code' => $e->getCode()
             ]);
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()
             ], 500);
         } catch (Exception $e) {
@@ -780,7 +781,7 @@ class ManajemenPohonBibitController extends Controller
                 'error' => $e->getMessage()
             ]);
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
@@ -796,7 +797,7 @@ class ManajemenPohonBibitController extends Controller
         try {
             // URL API Firestore untuk update status kayu
             $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}";
-            
+
             // Fields to update
             $fields = [
                 'status' => ['stringValue' => $status],
@@ -850,7 +851,7 @@ class ManajemenPohonBibitController extends Controller
                 'error' => $e->getMessage()
             ]);
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Tidak dapat terhubung ke server Firestore. Silakan periksa koneksi internet Anda.'
             ], 503);
         } catch (RequestException $e) {
@@ -858,7 +859,7 @@ class ManajemenPohonBibitController extends Controller
                 'error' => $e->getMessage()
             ]);
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Terjadi kesalahan saat menghubungi server: ' . $e->getMessage()
             ], 500);
         } catch (Exception $e) {
@@ -866,7 +867,7 @@ class ManajemenPohonBibitController extends Controller
                 'error' => $e->getMessage()
             ]);
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
@@ -1046,8 +1047,8 @@ class ManajemenPohonBibitController extends Controller
 
             // Handle string fields
             $stringFields = [
-                'nama_bibit', 'jenis_bibit', 'varietas', 'asal_bibit', 
-                'produktivitas', 'kondisi', 'media_tanam', 'nutrisi', 
+                'nama_bibit', 'jenis_bibit', 'varietas', 'asal_bibit',
+                'produktivitas', 'kondisi', 'media_tanam', 'nutrisi',
                 'status_hama', 'catatan'
             ];
 
@@ -1064,7 +1065,7 @@ class ManajemenPohonBibitController extends Controller
             // Handle image upload if present
             if ($request->hasFile('gambar_image')) {
                 $image = $request->file('gambar_image');
-                
+
                 // Validate image
                 $request->validate([
                     'gambar_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -1072,7 +1073,7 @@ class ManajemenPohonBibitController extends Controller
 
                 try {
                     $client = new \GuzzleHttp\Client();
-                    
+
                     $formData = [
                         [
                             'name' => 'image',
@@ -1089,7 +1090,7 @@ class ManajemenPohonBibitController extends Controller
                     ]);
 
                     $imgbbData = json_decode($imgbbResponse->getBody(), true);
-                    
+
                     if (isset($imgbbData['data']['url'])) {
                         $imageUrl = $imgbbData['data']['url'];
                         // Store image URL as array in Firestore format
@@ -1130,7 +1131,7 @@ class ManajemenPohonBibitController extends Controller
 
             // Prepare update URL
             $updateUrl = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}?{$updateMaskPaths}";
-            
+
             Log::info('Sending update to Firestore', [
                 'url' => $updateUrl,
                 'fields' => $fields
@@ -1165,7 +1166,7 @@ class ManajemenPohonBibitController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating data: ' . $e->getMessage()
@@ -1212,13 +1213,13 @@ class ManajemenPohonBibitController extends Controller
                 $fields['tinggi'] = ['doubleValue' => $tinggi];
                 Log::info('Updated tinggi value:', ['tinggi' => $tinggi]);
             }
-            
+
             if (isset($requestData['usia'])) {
                 $usia = (int)$requestData['usia'];
                 $fields['usia'] = ['integerValue' => $usia];
                 Log::info('Updated usia value:', ['usia' => $usia]);
             }
-            
+
             if (isset($requestData['jumlah_stok'])) {
                 $jumlahStok = (int)$requestData['jumlah_stok'];
                 $fields['jumlah_stok'] = ['integerValue' => $jumlahStok];
@@ -1236,7 +1237,7 @@ class ManajemenPohonBibitController extends Controller
             // Handle image upload if present
             if ($request->hasFile('gambar_image')) {
                 $image = $request->file('gambar_image');
-                
+
                 // Validate image
                 $request->validate([
                     'gambar_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -1244,7 +1245,7 @@ class ManajemenPohonBibitController extends Controller
 
                 try {
                     $client = new \GuzzleHttp\Client();
-                    
+
                     $formData = [
                         [
                             'name' => 'image',
@@ -1261,7 +1262,7 @@ class ManajemenPohonBibitController extends Controller
                     ]);
 
                     $imgbbData = json_decode($imgbbResponse->getBody(), true);
-                    
+
                     if (isset($imgbbData['data']['url'])) {
                         $imageUrl = $imgbbData['data']['url'];
                         // Store image URL as array in Firestore format
