@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\FirestoreService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -61,6 +62,7 @@ class DashboardController extends Controller
 
             foreach ($documents as $document) {
                 $fields = $document['fields'] ?? [];
+                Log::info('Isi fields:', $fields);
                 $id = basename($document['name']);
 
                 // Get userRole from document and format it
@@ -70,12 +72,36 @@ class DashboardController extends Controller
                 $timestamp = $this->getTimestampValue($fields);
                 $carbonDate = Carbon::createFromTimestamp($timestamp);
 
-                // Get user photo URL and parse the userName
-                $userPhotoUrl = isset($fields['userPhotoUrl']['stringValue']) && !empty($fields['userPhotoUrl']['stringValue'])
-                                ? $fields['userPhotoUrl']['stringValue']
-                                : 'https://via.placeholder.com/150';  // Default image if not available
+                // Cek userPhotoUrl di fields utama, jika tidak ada cek di metadata->fields
+                if (
+                    isset($fields['userPhotoUrl']['stringValue']) &&
+                    !empty($fields['userPhotoUrl']['stringValue'])
+                ) {
+                    $userPhotoUrl = $fields['userPhotoUrl']['stringValue'];
+                } elseif (
+                    isset($fields['metadata']['mapValue']['fields']['userPhotoUrl']['stringValue']) &&
+                    !empty($fields['metadata']['mapValue']['fields']['userPhotoUrl']['stringValue'])
+                ) {
+                    $userPhotoUrl = $fields['metadata']['mapValue']['fields']['userPhotoUrl']['stringValue'];
+                } else {
+                    $userPhotoUrl = 'https://via.placeholder.com/150'; // Default image if not available
+                }
+                Log::info('userPhoto:', ['userPhotoUrl' => $userPhotoUrl]);
 
-                $userName = $fields['userName']['stringValue'] ?? '-';
+                // Cek userName di fields utama, jika tidak ada cek di metadata->fields
+                if (
+                    isset($fields['userName']['stringValue']) &&
+                    !empty($fields['userName']['stringValue'])
+                ) {
+                    $userName = $fields['userName']['stringValue'];
+                } elseif (
+                    isset($fields['metadata']['mapValue']['fields']['userName']['stringValue']) &&
+                    !empty($fields['metadata']['mapValue']['fields']['userName']['stringValue'])
+                ) {
+                    $userName = $fields['metadata']['mapValue']['fields']['userName']['stringValue'];
+                } else {
+                    $userName = '-';
+                }
 
                 $activities[] = [
                     'id' => $id,

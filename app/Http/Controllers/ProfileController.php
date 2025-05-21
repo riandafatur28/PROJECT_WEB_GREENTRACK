@@ -52,7 +52,7 @@ class ProfileController extends Controller
 
             // Dapatkan data pengguna
             $userData = $document->data();
-            Log::info('Data pengguna berhasil diambil');
+            Log::info('Data pengguna berhasil diambil', ['userData' => $userData]);
 
             // Simpan data pengguna dalam session untuk akses mudah di view
             Session::put('user_nama', $userData['nama_lengkap'] ?? '');  // Fixed 'nama' to 'nama_lengkap'

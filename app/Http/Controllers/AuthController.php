@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\FirestoreService;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -26,6 +27,8 @@ class AuthController extends Controller
                 $fields['password']['stringValue'] === $request->password; // plain text cocok
         });
 
+        Log::info('Data pengguna berhasil diambil', ['userData' => $matchingUser]);
+
         if (!$matchingUser) {
             return back()->withErrors(['email' => 'Email atau password salah.']);
         }
@@ -35,7 +38,7 @@ class AuthController extends Controller
 
         // Simpan data user ke session
         session([
-            'user_email' => $fields['email']['stringValue'],
+            'email' => $fields['email']['stringValue'],
             'user_nama' => $fields['nama_lengkap']['stringValue'] ?? '(Tidak diketahui)',
             'role' => $fields['role']['stringValue'] ?? 'super admin',
         ]);

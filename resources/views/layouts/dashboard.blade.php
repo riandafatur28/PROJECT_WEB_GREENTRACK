@@ -95,6 +95,16 @@
                                 <td class="py-4 font-semibold">{{ $activity['waktu'] }}</td>
                             </tr>
                         @empty
+                            @foreach ($activities as $activity)
+                                <div>
+                                    <h4>{{ $activity['nama'] }}</h4>
+                                    <p>{{ $activity['userRole'] }}</p>
+                                    <p>{{ $activity['keterangan'] }}</p>
+                                    <p>{{ $activity['waktu'] }}</p>
+                                    <img src="{{ $activity['image'] }}" alt="{{ $activity['nama'] }}">
+                                </div>
+                            @endforeach
+
                             <tr>
                                 <td colspan="3" class="py-4 text-center text-gray-400">Tidak ada aktivitas terbaru</td>
                             </tr>
