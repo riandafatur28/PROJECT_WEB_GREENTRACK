@@ -15,7 +15,7 @@
         <div class="relative flex flex-col items-center">
             <div class="w-52 h-52 bg-gray-200 rounded-full flex justify-center items-center cursor-not-allowed"
                 id="imageContainer">
-                <img id="profileImage" src="https://via.placeholder.com/200" alt="Profile"
+                <img id="profileImage" src="{{ session('profile_image') ?: 'https://via.placeholder.com/200' }}" alt="Profile"
                     class="w-48 h-48 rounded-full object-cover">
                 <input type="file" id="profileImageInput" accept="image/*" class="hidden">
             </div>
@@ -23,12 +23,12 @@
         </div>
 
         <!-- Form Input -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-8 w-full max-w-4xl">
+        <div class="grid grid-cols-1 gap-6 mt-8 w-full max-w-4xl">
             <div>
                 <label class="block text-gray-700 text-lg">Nama</label>
                 <input type="text" id="nama"
                     class="editable-input w-full border px-4 py-3 rounded-lg text-lg bg-white text-gray-500"
-                    value="{{ session('user_nama') }}I" readonly>
+                    value="{{ session('user_nama') }}" readonly>
             </div>
             <div>
                 <label class="block text-gray-700 text-lg">Email</label>
@@ -37,14 +37,12 @@
                     value="{{ session('email') }}" readonly>
             </div>
 
-            @for ($i = 1; $i <= 4; $i++)
-                <div>
-                    <label class="block text-gray-700 text-lg">Posisi {{ $i }}</label>
-                    <input type="text"
-                        class="editable-input w-full border px-4 py-3 rounded-lg text-lg bg-white text-gray-500"
-                        value="{{ session('role') }}" placeholder="Masukkan teks..." readonly>
-                </div>
-            @endfor
+            <div>
+                <label class="block text-gray-700 text-lg">Role</label>
+                <input type="text" id="role"
+                    class="editable-input w-full border px-4 py-3 rounded-lg text-lg bg-white text-gray-500"
+                    value="{{ session('role') }}" readonly>
+            </div>
         </div>
 
         <!-- Tombol -->
@@ -53,8 +51,12 @@
                 id="saveButton" disabled>Simpan</button>
             <button class="bg-gray-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-600 w-full md:w-auto"
                 id="editButton">Edit</button>
-            <button class="bg-red-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-red-700 w-full md:w-auto"
-                id="logoutButton">Keluar</button>
+            <form action="{{ route('login') }}" method="POST">
+                @csrf
+                <button type="submit"
+                    class="bg-red-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-red-700 w-full md:w-auto"
+                    id="logoutButton">Keluar</button>
+            </form>
         </div>
     </div>
 @endsection
@@ -63,6 +65,7 @@
     <script>
         let editMode = false;
 
+        // Toggle edit mode
         document.getElementById('editButton').addEventListener('click', function() {
             editMode = true;
 
@@ -75,7 +78,7 @@
 
             document.getElementById('saveButton').removeAttribute('disabled');
 
-            // Aktifkan klik gambar
+            // Enable image change
             const imageContainer = document.getElementById('imageContainer');
             imageContainer.classList.remove('cursor-not-allowed');
             imageContainer.classList.add('cursor-pointer');
@@ -87,7 +90,7 @@
             });
         });
 
-        // Preview gambar
+        // Handle profile image change
         document.getElementById('profileImageInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -99,12 +102,12 @@
             }
         });
 
-        // Logout
+        // Logout action - handled via form submit
         document.getElementById('logoutButton').addEventListener('click', function() {
-            window.location.href = '{{ route('login') }}';
+            // This is handled via a form submission now
         });
 
-        // Kembali
+        // Close profile
         function closeProfile() {
             window.history.back();
         }

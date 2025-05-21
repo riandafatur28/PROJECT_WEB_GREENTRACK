@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -11,8 +10,8 @@ class ProfileController extends Controller
 {
     protected $firestore;
     protected $storage;
-    protected $documentId = '0PpJI9n682OAFWv4tabd'; // ID dokumen dari URL Anda
-    protected $collection = 'akun_superadmin'; // Nama koleksi dari URL Anda
+    protected $documentId = '0PpJI9n682OAFWv4tabd'; // Replace with your document ID
+    protected $collection = 'akun_superadmin'; // Collection name in Firestore
 
     public function __construct()
     {
@@ -21,7 +20,7 @@ class ProfileController extends Controller
             $this->storage = Firebase::storage();
         } catch (\Exception $e) {
             Log::error('Error inisialisasi Firebase: ' . $e->getMessage());
-            // Lanjutkan eksekusi, kita akan menangani error di method
+            // Continue execution, we'll handle error in method
         }
     }
 
@@ -56,13 +55,12 @@ class ProfileController extends Controller
             Log::info('Data pengguna berhasil diambil');
 
             // Simpan data pengguna dalam session untuk akses mudah di view
-            Session::put('user_nama', $userData['nama'] ?? '');
-            Session::put('email', $userData['email'] ?? '');
-            Session::put('role', $userData['role'] ?? '');
-            Session::put('profile_image', $userData['profile_image'] ?? '');
+            Session::put('user_nama', $userData['nama_lengkap'] ?? '');  // Fixed 'nama' to 'nama_lengkap'
+            Session::put('email', $userData['email'] ?? '');  // Fixed 'email'
+            Session::put('role', $userData['role'] ?? '');  // Fixed 'role'
+            Session::put('profile_image', $userData['profile_image'] ?? '');  // Handling profile image
 
             // Anda juga dapat menyimpan field lain sesuai kebutuhan
-            // Jika Anda memiliki array positions
             $positions = $userData['positions'] ?? ['', '', '', ''];
             for ($i = 1; $i <= 4; $i++) {
                 Session::put("position_$i", $positions[$i-1] ?? '');
@@ -71,8 +69,6 @@ class ProfileController extends Controller
             return view('profile');
         } catch (\Exception $e) {
             Log::error('Error memuat profil: ' . $e->getMessage());
-            // Alih-alih redirect, tampilkan saja view profile dengan error
-            // Ini akan membantu mendiagnosis apakah masalahnya ada di route atau di Firebase
             return view('profile')->with('error', 'Gagal memuat profil: ' . $e->getMessage());
         }
     }
@@ -90,16 +86,16 @@ class ProfileController extends Controller
             }
 
             $data = [
-                'nama' => $request->input('nama'),
+                'nama_lengkap' => $request->input('nama'),
                 'email' => $request->input('email'),
-                // Tambahkan positions jika ada di form Anda
+                'role' => $request->input('role'),
                 'positions' => [
                     $request->input('position_1', ''),
                     $request->input('position_2', ''),
                     $request->input('position_3', ''),
                     $request->input('position_4', '')
                 ],
-                'updated_at' => date('Y-m-d H:i:s')
+                'updated_at' => now()->toDateTimeString()
             ];
 
             // Tangani upload gambar profil jika disediakan

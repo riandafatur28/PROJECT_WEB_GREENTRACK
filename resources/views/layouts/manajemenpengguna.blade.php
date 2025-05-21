@@ -18,11 +18,11 @@
                         <span>Tambahkan Admin</span>
                     </button>
 
-                    <!-- Search and Sort Form -->
+                    <!-- Form Pencarian dan Dropdown Pengurutan -->
                     <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
                         <form method="GET" action="{{ url()->current() }}">
                             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                <!-- Search Input -->
+                                <!-- Kolom Pencarian -->
                                 <div class="relative w-full md:w-1/2">
                                     <input type="text" name="search" value="{{ $search ?? '' }}"
                                         placeholder="Cari nama, email, atau peran admin..."
@@ -37,42 +37,17 @@
                                     </span>
                                 </div>
 
-                                <!-- Sort and Filter Controls -->
-                                <div class="flex gap-4">
-                                    <div>
-                                        <select name="sort"
-                                            class="border rounded-lg bg-green-50 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300">
-                                            <option value="terbaru"
-                                                {{ ($sortOrder ?? 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru
-                                            </option>
-                                            <option value="terlama" {{ ($sortOrder ?? '') == 'terlama' ? 'selected' : '' }}>
-                                                Terlama</option>
-                                        </select>
-                                    </div>
-
-                                    <button type="submit"
-                                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1"
-                                            viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd"
-                                                d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        Filter
-                                    </button>
-
-                                    @if (!empty($search) || ($sortOrder ?? '') != 'terbaru')
-                                        <a href="{{ url()->current() }}"
-                                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20"
-                                                fill="currentColor">
-                                                <path fill-rule="evenodd"
-                                                    d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                            Reset
-                                        </a>
-                                    @endif
+                                <!-- Dropdown Urutkan -->
+                                <div>
+                                    <select name="sort"
+                                        class="border rounded-lg bg-green-50 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-300"
+                                        onchange="this.form.submit()">
+                                        <option value="terbaru"
+                                            {{ ($sortOrder ?? 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru
+                                        </option>
+                                        <option value="terlama" {{ ($sortOrder ?? '') == 'terlama' ? 'selected' : '' }}>
+                                            Terlama</option>
+                                    </select>
                                 </div>
                             </div>
                         </form>
@@ -184,7 +159,6 @@
 
                 <div class="flex flex-col md:flex-row gap-6">
                     <div class="w-full md:w-1/2 flex flex-col">
-                        <!-- Perbaikan tampilan foto di modal: Menggunakan container dan memastikan gambar sesuai proporsi asli -->
                         <div class="bg-gray-200 rounded-lg overflow-hidden flex-grow flex justify-center items-center">
                             <img id="modalImage" src="https://randomuser.me/api/portraits/lego/2.jpg"
                                 class="max-w-full max-h-full object-contain cursor-pointer" alt="Foto Admin"
@@ -244,31 +218,29 @@
             </div>
         </div>
     </div>
-    </div>
 @endsection
 
 @push('scripts')
     <script>
-        let isEditMode = false;
-
-        // Show modal to add new admin
+        // Fungsi untuk membuka modal tambah atau edit admin
         function showAddAdminModal() {
-            isEditMode = false;
+            isEditMode = false; // Pastikan kita dalam mode tambah admin
             document.getElementById('modalMode').value = 'tambah';
-            document.getElementById('modalID').value = '';
-            document.getElementById('modalNama').value = '';
-            document.getElementById('modalEmail').value = '';
-            document.getElementById('modalPeranSelect').value = 'admin_penyemaian';
-            document.getElementById('modalStatusSelect').value = 'Aktif';
-            document.getElementById('modalPhotoUrl').value = 'https://randomuser.me/api/portraits/lego/2.jpg';
-            document.getElementById('modalImage').src = 'https://randomuser.me/api/portraits/lego/2.jpg';
-            document.getElementById('idField').style.display = 'none';
+            document.getElementById('modalID').value = ''; // Kosongkan ID
+            document.getElementById('modalNama').value = ''; // Kosongkan Nama
+            document.getElementById('modalEmail').value = ''; // Kosongkan Email
+            document.getElementById('modalPeranSelect').value = 'admin_penyemaian'; // Set default peran
+            document.getElementById('modalStatusSelect').value = 'Aktif'; // Set status default
+            document.getElementById('modalPhotoUrl').value =
+            'https://randomuser.me/api/portraits/lego/2.jpg'; // Foto default
+            document.getElementById('modalImage').src = 'https://randomuser.me/api/portraits/lego/2.jpg'; // Foto default
+            document.getElementById('idField').style.display = 'none'; // Sembunyikan ID Field saat tambah
             openModal();
         }
 
-        // Show modal to edit admin details
+        // Fungsi untuk menampilkan modal untuk mengedit detail admin
         function showAdminDetail(button) {
-            isEditMode = true;
+            isEditMode = true; // Pastikan kita dalam mode edit
             document.getElementById('modalMode').value = 'edit';
             document.getElementById('modalID').value = button.getAttribute('data-id');
             document.getElementById('modalNama').value = button.getAttribute('data-nama');
@@ -282,25 +254,44 @@
             document.getElementById('modalPhotoUrl').value = photoUrl;
             document.getElementById('modalImage').src = photoUrl;
 
-            document.getElementById('idField').style.display = 'block';
+            document.getElementById('idField').style.display = 'block'; // Tampilkan ID Field saat edit
             openModal();
         }
 
-        // Open modal
+        // Fungsi untuk membuka modal
         function openModal() {
             const modal = document.getElementById("adminModal");
             modal.classList.remove("hidden");
             modal.classList.add("flex");
         }
 
-        // Close modal
+        // Fungsi untuk menutup modal
         function closeModal() {
             const modal = document.getElementById("adminModal");
             modal.classList.add("hidden");
             modal.classList.remove("flex");
         }
 
-        // Save changes (add or edit admin)
+        // Fungsi untuk upload gambar saat mengklik gambar di modal
+        function uploadImage() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('modalImage').src = event.target.result;
+                        document.getElementById('modalPhotoUrl').value = event.target.result; // Set URL gambar
+                    };
+                    reader.readAsDataURL(file); // Membaca file gambar dan mengubah menjadi URL data
+                }
+            };
+            input.click(); // Memicu input file saat gambar diklik
+        }
+
+        // Fungsi untuk menyimpan perubahan (tambah atau edit admin)
         function simpanPerubahan() {
             const nama = document.getElementById('modalNama').value;
             const email = document.getElementById('modalEmail').value;
@@ -338,7 +329,7 @@
                 .catch(() => alert('Terjadi kesalahan.'));
         }
 
-        // Delete admin
+        // Fungsi untuk menghapus admin
         function hapusAdmin() {
             const id = document.getElementById('modalID').value;
 
@@ -362,82 +353,5 @@
                     .catch(() => alert('Terjadi kesalahan.'));
             }
         }
-
-        // Upload image function - Ditingkatkan untuk menyimpan URL
-        function uploadImage() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    // Untuk demo, kita hanya menampilkan preview dan menggunakan URL gambar statis
-                    // Di implementasi nyata, Anda akan mengupload ke Firebase Storage dan mendapatkan URL
-
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        document.getElementById('modalImage').src = event.target.result;
-
-                        // Ini hanya untuk demo - dalam aplikasi nyata, Anda akan mengupload ke Firebase Storage
-                        // dan menggunakan URL yang dikembalikan
-                        simulateUpload(event.target.result);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
-        }
-
-        // Fungsi simulasi untuk upload (dalam implementasi nyata, ini akan mengupload ke Firebase Storage)
-        function simulateUpload(dataUrl) {
-            // Contoh URL gambar - dalam implementasi nyata, Anda akan mendapatkan URL dari Firebase Storage
-            const exampleUrls = [
-                'https://iili.io/3S3Pxqu.jpg',
-                'https://randomuser.me/api/portraits/men/1.jpg',
-                'https://randomuser.me/api/portraits/women/2.jpg',
-                'https://randomuser.me/api/portraits/lego/3.jpg'
-            ];
-
-            // Pilih URL secara acak untuk demo
-            const randomUrl = exampleUrls[Math.floor(Math.random() * exampleUrls.length)];
-
-            // Dalam aplikasi nyata, Anda akan mengirim file ke server dan mendapatkan URL dari respons
-            setTimeout(() => {
-                document.getElementById('modalPhotoUrl').value = randomUrl;
-                console.log('Photo URL set to:', randomUrl);
-            }, 500);
-        }
-
-        // Update the status of admin
-        function updateStatus(select) {
-            const status = select.value;
-            const id = select.dataset.id;
-            select.classList.toggle('bg-green-300', status === 'Aktif');
-            select.classList.toggle('bg-red-300', status === 'Nonaktif');
-
-            fetch('/update-status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: JSON.stringify({
-                        id,
-                        status
-                    })
-                })
-                .then(response => response.ok ? console.log('Status updated') : alert('Gagal update'))
-                .catch(() => alert('Terjadi kesalahan'));
-        }
-
-        // Search form handling
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    window.location.href = '{{ route('manajemenpengguna.index') }}?search=' + this.value;
-                }
-            });
-        });
     </script>
 @endpush
