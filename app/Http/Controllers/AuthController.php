@@ -11,7 +11,7 @@ use Carbon\Carbon;
 class AuthController extends Controller
 {
     private $apiKey = 'AIzaSyAqFuhrg16_t6qeY-0YgqLf_LSgWBPOIzA'; // Firebase Web API Key
-    
+
     public function handleLogin(Request $request, FirestoreService $firestore)
     {
         $request->validate([
@@ -29,7 +29,7 @@ class AuthController extends Controller
                 'password' => $request->password,
                 'returnSecureToken' => true
             ]);
-            
+
             if (!$response->successful()) {
                 Log::error('Firebase Auth Login Error:', [
                     'error' => $response->json()['error']['message'] ?? 'Unknown error',
@@ -37,28 +37,28 @@ class AuthController extends Controller
                 ]);
                 return back()->withErrors(['email' => 'Email atau password salah.']);
             }
-            
+
             $authData = $response->json();
             $uid = $authData['localId']; // Firebase UID
-            
+
             // 2. Cek di koleksi akun_superadmin
             $superAdmins = $firestore->getCollection('akun_superadmin');
             $isSuperAdmin = false;
             $matchingUser = null;
-            
+
             // Cari user dengan firebase_uid yang cocok (format baru)
             $matchingUser = collect($superAdmins['documents'] ?? [])->first(function ($doc) use ($uid) {
                 if (!isset($doc['fields'])) return false;
-                
+
                 $fields = $doc['fields'];
-                return isset($fields['firebase_uid']['stringValue']) && 
+                return isset($fields['firebase_uid']['stringValue']) &&
                        $fields['firebase_uid']['stringValue'] === $uid;
             });
-            
+
             if ($matchingUser) {
                 $isSuperAdmin = true;
                 $fields = $matchingUser['fields'];
-                
+
                 // Simpan data user ke session
                 session([
                     'email' => $fields['email']['stringValue'],
@@ -67,13 +67,13 @@ class AuthController extends Controller
                     'firebase_uid' => $uid,
                     'firebase_token' => $authData['idToken'] // Menyimpan token untuk API calls
                 ]);
-                
+
                 // Update last_login di Firestore
                 if (isset($matchingUser['name'])) {
                     $documentPath = $matchingUser['name'];
                     $pathParts = explode('/', $documentPath);
                     $documentId = end($pathParts);
-                    
+
                     $updateData = [
                         'fields' => [
                             'last_login' => [
@@ -84,20 +84,20 @@ class AuthController extends Controller
                             ]
                         ]
                     ];
-                    
+
                     // Format dokumen untuk update
                     $firestore->updateDocument('akun_superadmin', $documentId, $updateData);
                 }
-                
+
                 return redirect('/dashboard');
             }
-            
+
             // 3. Jika bukan super admin, cek di koleksi akun (admin biasa)
             $adminUsers = $firestore->getCollection('akun');
             $matchingAdmin = collect($adminUsers['documents'] ?? [])->first(function ($doc) use ($uid) {
                 return $doc['name'] === "projects/green-track-firebase/databases/(default)/documents/akun/{$uid}";
             });
-            
+
             if (!$matchingAdmin) {
                 Log::warning('User authenticated via Firebase but not found in Firestore', [
                     'email' => $request->email,
@@ -105,12 +105,12 @@ class AuthController extends Controller
                 ]);
                 return back()->withErrors(['email' => 'Akun tidak ditemukan di database.']);
             }
-            
+
             // Admin biasa ditemukan
             $fields = $matchingAdmin['fields'];
             $roleArray = $fields['role']['arrayValue']['values'] ?? [];
             $roleName = !empty($roleArray) ? $roleArray[0]['stringValue'] : 'admin';
-            
+
             session([
                 'email' => $fields['email']['stringValue'],
                 'user_nama' => $fields['nama_lengkap']['stringValue'] ?? '(Tidak diketahui)',
@@ -118,7 +118,7 @@ class AuthController extends Controller
                 'firebase_uid' => $uid,
                 'firebase_token' => $authData['idToken']
             ]);
-            
+
             return redirect('/dashboard');
         }
         catch (\Exception $e) {
@@ -148,24 +148,24 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'requestType' => 'PASSWORD_RESET',
             ]);
-            
+
             if (!$response->successful()) {
                 $errorMessage = $response->json()['error']['message'] ?? 'Unknown error';
                 Log::error('Firebase Auth Forgot Password Error:', [
                     'error' => $errorMessage,
                     'email' => $request->email
                 ]);
-                
+
                 if ($errorMessage === 'EMAIL_NOT_FOUND') {
                     return back()->withErrors(['email' => 'Email tidak terdaftar dalam sistem.']);
                 }
-                
+
                 return back()->withErrors(['email' => 'Gagal mengirim email reset password: ' . $errorMessage]);
             }
-            
+
             // Email telah terkirim - redirect ke halaman konfirmasi
             return redirect()->route('resendotp')->with('success', 'Tautan reset password telah dikirim ke email Anda.');
-            
+
         } catch (\Exception $e) {
             Log::error('Forgot Password Error:', [
                 'error' => $e->getMessage(),
@@ -194,7 +194,7 @@ class AuthController extends Controller
                 'oobCode' => $request->oobCode,
                 'newPassword' => $request->password,
             ]);
-            
+
             if (!$response->successful()) {
                 $errorMessage = $response->json()['error']['message'] ?? 'Unknown error';
                 Log::error('Firebase Auth Reset Password Error:', [
@@ -202,10 +202,10 @@ class AuthController extends Controller
                 ]);
                 return back()->withErrors(['oobCode' => 'Gagal reset password: ' . $errorMessage]);
             }
-            
+
             // Password telah berhasil direset
             return redirect()->route('login')->with('success', 'Password Anda telah berhasil diperbarui. Silakan login dengan password baru.');
-            
+
         } catch (\Exception $e) {
             Log::error('Reset Password Error:', [
                 'error' => $e->getMessage(),

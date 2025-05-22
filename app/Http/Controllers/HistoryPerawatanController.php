@@ -10,99 +10,70 @@ class HistoryPerawatanController extends Controller
     {
         // Ambil parameter dari request
         $search = $request->input('search', '');
-        $sortOrder = $request->input('sort', 'desc'); // Default: 'desc' untuk Terbaru, 'asc' untuk Terlama
-        $page = $request->input('page', 1); // Halaman untuk pagination
-        $perPage = 10; // Menampilkan 10 data per halaman
+        $sortOrder = $request->input('sort', 'desc'); // 'desc' untuk Terbaru, 'asc' untuk Terlama
+        $page = (int) $request->input('page', 1);
+        $perPage = 10;
 
-        // Siapkan filter pencarian
-        $filter = null;
-        if (!empty($search)) {
-            // Pencarian di beberapa field: Nama Admin, Jenis Perawatan, Nama Bibit, Waktu, dan Detail
-            $filter = [
-                'fieldFilter' => [
-                    'op' => 'OR', // Menggabungkan beberapa kondisi dengan OR
-                    'filters' => [
-                        [
-                            'fieldFilter' => [
-                                'field' => ['fieldPath' => 'created_by_name'], // Nama Admin
-                                'op' => '==', // Gunakan kesamaan, bukan ARRAY_CONTAINS
-                                'value' => ['stringValue' => $search]
-                            ]
-                        ],
-                        [
-                            'fieldFilter' => [
-                                'field' => ['fieldPath' => 'jenis_perawatan'], // Jenis Perawatan
-                                'op' => '==', // Gunakan kesamaan, bukan ARRAY_CONTAINS
-                                'value' => ['stringValue' => $search]
-                            ]
-                        ],
-                        [
-                            'fieldFilter' => [
-                                'field' => ['fieldPath' => 'nama_bibit'], // Nama Bibit
-                                'op' => '==', // Gunakan kesamaan, bukan ARRAY_CONTAINS
-                                'value' => ['stringValue' => $search]
-                            ]
-                        ],
-                        [
-                            'fieldFilter' => [
-                                'field' => ['fieldPath' => 'waktu'], // Waktu
-                                'op' => '==', // Gunakan kesamaan, bukan ARRAY_CONTAINS
-                                'value' => ['stringValue' => $search]
-                            ]
-                        ],
-                        [
-                            'fieldFilter' => [
-                                'field' => ['fieldPath' => 'catatan'], // Detail
-                                'op' => '==', // Gunakan kesamaan, bukan ARRAY_CONTAINS
-                                'value' => ['stringValue' => $search]
-                            ]
-                        ]
-                    ]
-                ]
-            ];
-        }
-
-        // Set urutan berdasarkan 'created_at' field
-        $orderBy = [
-            'field' => ['fieldPath' => 'created_at'],
-            'direction' => $sortOrder == 'desc' ? 'DESCENDING' : 'ASCENDING' // Urutkan berdasarkan 'created_at'
-        ];
-
-        // Ambil data dari Firestore
+        // Ambil semua data dari Firestore (tanpa filter, filter di PHP)
         $response = $firestore->getCollection('jadwal_perawatan', [
-            'filter' => $filter,
-            'orderBy' => $orderBy,
-            'pageSize' => $perPage,
-            'pageToken' => $page > 1 ? $this->getPageToken($page) : null
+            'orderBy' => [
+                'field' => ['fieldPath' => 'created_at'],
+                'direction' => $sortOrder == 'desc' ? 'DESCENDING' : 'ASCENDING'
+            ],
+            // Tidak pakai pageSize agar bisa filter multi-field di PHP
         ]);
 
-        // Proses data yang diambil dan format waktu relatif
-        $perawatan = [];
-        $total = 0;
-
+        $allPerawatan = [];
         if (isset($response['documents'])) {
             foreach ($response['documents'] as $document) {
                 $fields = $document['fields'] ?? [];
                 $id = basename($document['name']);
-
-                // Ambil timestamp untuk format waktu relatif
                 $timestamp = $this->getTimestampValue($fields);
 
-                $perawatan[] = [
+                $item = [
                     'id' => $id,
                     'nama' => $fields['created_by_name']['stringValue'] ?? '-',
                     'userRole' => isset($fields['role']['arrayValue']['values'])
-                                    ? $this->formatRole($fields['role']['arrayValue']['values'])
-                                    : 'Tidak ada role',
+                        ? $this->formatRole($fields['role']['arrayValue']['values'])
+                        : 'Tidak ada role',
                     'keterangan' => $fields['jenis_perawatan']['stringValue'] ?? '-',
                     'nama_bibit' => $fields['nama_bibit']['stringValue'] ?? '-',
                     'detail' => $fields['catatan']['stringValue'] ?? '-',
                     'waktu' => $this->getWaktuRelatif($timestamp),
+                    'timestamp' => $timestamp,
                 ];
 
-                $total++;
+                // Multi-field search (case-insensitive)
+                if ($search) {
+                    $searchLower = strtolower($search);
+                    $match = false;
+                    foreach (['created_by_name', 'jenis_perawatan', 'nama_bibit', 'waktu', 'catatan'] as $field) {
+                        $value = strtolower($fields[$field]['stringValue'] ?? '');
+                        if (strpos($value, $searchLower) !== false) {
+                            $match = true;
+                            break;
+                        }
+                    }
+                    if (!$match) continue;
+                }
+
+                $allPerawatan[] = $item;
             }
         }
+
+        // Sorting ulang di PHP jika perlu (jaga-jaga)
+        usort($allPerawatan, function ($a, $b) use ($sortOrder) {
+            if ($sortOrder == 'desc') {
+                return $b['timestamp'] <=> $a['timestamp'];
+            } else {
+                return $a['timestamp'] <=> $b['timestamp'];
+            }
+        });
+
+        // Pagination manual
+        $total = count($allPerawatan);
+        $offset = ($page - 1) * $perPage;
+        $perawatan = array_slice($allPerawatan, $offset, $perPage);
 
         return view('layouts.historyperawatan', [
             'perawatan' => $perawatan,
@@ -110,7 +81,7 @@ class HistoryPerawatanController extends Controller
             'currentPage' => $page,
             'perPage' => $perPage,
             'search' => $search,
-            'sortOrder' => $sortOrder // Mengirimkan parameter sort ke view
+            'sortOrder' => $sortOrder
         ]);
     }
 
@@ -194,11 +165,5 @@ class HistoryPerawatanController extends Controller
         }
 
         return time(); // Default waktu jika tidak ada timestamp
-    }
-
-    // Fungsi untuk menangani page token untuk pagination
-    private function getPageToken($page)
-    {
-        return 'page_token_' . $page; // Sesuaikan jika Firestore menggunakan pagination dengan token
     }
 }

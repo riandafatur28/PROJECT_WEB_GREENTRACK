@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Google\Auth\OAuth2;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Illuminate\Support\Facades\Storage;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Google\Cloud\Storage\StorageClient;
 
 class FirestoreService
@@ -24,7 +24,7 @@ class FirestoreService
     public function getAccessToken()
     {
         $credentials = json_decode(file_get_contents($this->keyFile), true);
-        
+
         $response = Http::post('https://oauth2.googleapis.com/token', [
             'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
             'assertion' => $this->createJWT($credentials)
@@ -173,26 +173,58 @@ class FirestoreService
         return $this->projectId;
     }
 
-    public function createDocument($collection, $data)
-    {
-        $url = "{$this->baseUrl}/projects/{$this->projectId}/databases/(default)/documents/{$collection}";
-        
+public function createDocument($collection, $data)
+{
+    // Menyusun payload untuk Firestore
+    $payload = [
+        'fields' => []
+    ];
+
+    // Menambahkan data ke dalam 'fields' sesuai dengan skema yang diinginkan
+    foreach ($data as $key => $value) {
+        $payload['fields'][$key] = [
+            'stringValue' => $value
+        ];
+    }
+
+    // Menentukan URL untuk Firestore API
+    $url = "{$this->baseUrl}/projects/{$this->projectId}/databases/(default)/documents/{$collection}";
+
+    try {
+        // Melakukan permintaan POST ke Firestore untuk membuat dokumen
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->getAccessToken(),
             'Content-Type' => 'application/json',
-        ])->post($url, $data);
+        ])->post($url, $payload);
 
+        // Memeriksa apakah respons berhasil
         if (!$response->successful()) {
-            throw new \Exception('Failed to create document');
+            $errorMessage = $response->json()['error']['message'] ?? 'Unknown error';
+            Log::error('Failed to create Firestore document', [
+                'url' => $url,
+                'status_code' => $response->status(),
+                'error_message' => $errorMessage,
+                'data_sent' => $data,
+            ]);
+            throw new \Exception('Failed to create document: ' . $errorMessage);
         }
 
         return $response->json();
+    } catch (\Exception $e) {
+        Log::error('Error creating Firestore document', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'data_sent' => $data,
+        ]);
+        throw $e;
     }
+}
+
 
     public function createDocumentWithId($collection, $documentId, $data)
     {
         $url = "{$this->baseUrl}/projects/{$this->projectId}/databases/(default)/documents/{$collection}?documentId={$documentId}";
-        
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->getAccessToken(),
             'Content-Type' => 'application/json',
@@ -217,12 +249,12 @@ class FirestoreService
     {
         // Extract just the document ID if a full path is provided
         $documentPath = str_contains($documentId, '/') ? $documentId : "{$collection}/{$documentId}";
-        
+
         $url = "{$this->baseUrl}/projects/{$this->projectId}/databases/(default)/documents/{$documentPath}";
-        
+
         // Data harus sudah dalam format Firestore fields, jadi kita tidak perlu konversi lagi
         // Contoh format: ['fields' => ['key' => ['stringValue' => 'value']]]
-        
+
         // Use PATCH request
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->getAccessToken(),
@@ -235,7 +267,7 @@ class FirestoreService
 
         return $response->json();
     }
-    
+
     /**
      * Helper to convert PHP array to Firestore array value format
      */
@@ -261,7 +293,7 @@ class FirestoreService
         }
         return $result;
     }
-    
+
     /**
      * Helper to convert associative array to Firestore map format
      */
@@ -287,11 +319,11 @@ class FirestoreService
         }
         return $fields;
     }
-    
+
     /**
      * Check if array is associative
      */
-    private function isAssoc(array $array) 
+    private function isAssoc(array $array)
     {
         return array_keys($array) !== range(0, count($array) - 1);
     }

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 class FirestoreController extends Controller
 {
     private $apiKey = 'AIzaSyAqFuhrg16_t6qeY-0YgqLf_LSgWBPOIzA'; // Your Firebase Web API Key
-    
+
     public function index(FirestoreService $firestore)
     {
         $documents = $firestore->getCollection('users');
@@ -215,14 +215,14 @@ class FirestoreController extends Controller
                     ],
                     'dashboard' => [
                         'mapValue' => [
-                            'fields' => $request->role === 'admin_penyemaian' ? 
+                            'fields' => $request->role === 'admin_penyemaian' ?
                                 [
                                     'total_bibit_dipindai' => ['integerValue' => 0],
                                     'bibit_siap_tanam' => ['integerValue' => 0],
                                     'butuh_perhatian' => ['integerValue' => 0],
                                     'total_bibit' => ['integerValue' => 0],
                                     'last_updated' => ['timestampValue' => $now->toRfc3339String()]
-                                ] : 
+                                ] :
                                 [
                                     'total_batch' => ['integerValue' => 0],
                                     'total_kayu' => ['integerValue' => 0],
@@ -263,9 +263,9 @@ class FirestoreController extends Controller
 
 /*
 untuk list bibit
-sub colection bibit/id_bibit/document 
+sub colection bibit/id_bibit/document
 untuk list kayu
-sub collection kayu/id kayu/document_kayu  
+sub collection kayu/id kayu/document_kayu
 
 untuk pengguna:
 sub collection akun/ id account/ document
