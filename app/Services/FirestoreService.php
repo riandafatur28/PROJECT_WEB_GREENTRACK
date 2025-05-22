@@ -204,6 +204,97 @@ class FirestoreService
 
         return $response->json();
     }
+
+    /**
+     * Update an existing document
+     *
+     * @param string $collection Collection name
+     * @param string $documentId Document ID or path
+     * @param array $data Data to update (already in Firestore format with fields)
+     * @return array Updated document data
+     */
+    public function updateDocument($collection, $documentId, $data)
+    {
+        // Extract just the document ID if a full path is provided
+        $documentPath = str_contains($documentId, '/') ? $documentId : "{$collection}/{$documentId}";
+        
+        $url = "{$this->baseUrl}/projects/{$this->projectId}/databases/(default)/documents/{$documentPath}";
+        
+        // Data harus sudah dalam format Firestore fields, jadi kita tidak perlu konversi lagi
+        // Contoh format: ['fields' => ['key' => ['stringValue' => 'value']]]
+        
+        // Use PATCH request
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->getAccessToken(),
+            'Content-Type' => 'application/json',
+        ])->patch($url, $data);
+
+        if (!$response->successful()) {
+            throw new \Exception('Failed to update document: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+    
+    /**
+     * Helper to convert PHP array to Firestore array value format
+     */
+    private function convertArrayToFirestore($array)
+    {
+        $result = [];
+        foreach ($array as $value) {
+            if (is_string($value)) {
+                $result[] = ['stringValue' => $value];
+            } elseif (is_int($value)) {
+                $result[] = ['integerValue' => $value];
+            } elseif (is_float($value)) {
+                $result[] = ['doubleValue' => $value];
+            } elseif (is_bool($value)) {
+                $result[] = ['booleanValue' => $value];
+            } elseif (is_null($value)) {
+                $result[] = ['nullValue' => null];
+            } elseif (is_array($value) && !$this->isAssoc($value)) {
+                $result[] = ['arrayValue' => ['values' => $this->convertArrayToFirestore($value)]];
+            } elseif (is_array($value)) {
+                $result[] = ['mapValue' => ['fields' => $this->convertAssocArrayToFirestore($value)]];
+            }
+        }
+        return $result;
+    }
+    
+    /**
+     * Helper to convert associative array to Firestore map format
+     */
+    private function convertAssocArrayToFirestore($array)
+    {
+        $fields = [];
+        foreach ($array as $key => $value) {
+            if (is_string($value)) {
+                $fields[$key] = ['stringValue' => $value];
+            } elseif (is_int($value)) {
+                $fields[$key] = ['integerValue' => $value];
+            } elseif (is_float($value)) {
+                $fields[$key] = ['doubleValue' => $value];
+            } elseif (is_bool($value)) {
+                $fields[$key] = ['booleanValue' => $value];
+            } elseif (is_null($value)) {
+                $fields[$key] = ['nullValue' => null];
+            } elseif (is_array($value) && !$this->isAssoc($value)) {
+                $fields[$key] = ['arrayValue' => ['values' => $this->convertArrayToFirestore($value)]];
+            } elseif (is_array($value)) {
+                $fields[$key] = ['mapValue' => ['fields' => $this->convertAssocArrayToFirestore($value)]];
+            }
+        }
+        return $fields;
+    }
+    
+    /**
+     * Check if array is associative
+     */
+    private function isAssoc(array $array) 
+    {
+        return array_keys($array) !== range(0, count($array) - 1);
+    }
 }
 
 

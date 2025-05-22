@@ -49,27 +49,100 @@ class FirestoreController extends Controller
 
     public function storeSuperAdmin(Request $request, FirestoreService $firestore)
     {
-        $request->validate([
-            'nama_lengkap' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:6',
-        ]);
+        try {
+            // 1. Validasi request
+            $request->validate([
+                'nama_lengkap' => 'required',
+                'email' => 'required|email',
+                'password' => 'required|min:6',
+            ]);
 
-        $data = [
-            'email' => $request->email,
-            'nama_lengkap' => $request->nama_lengkap,
-            'password' => $request->password,
-            'kode_otp' => str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT),
-            'role' => 'super admin',
-            'created_at' => now()->toISOString(),
-            'updated_at' => now()->toISOString(),
-            'last_login' => null,
-            'last_login_ip' => $request->ip(),
-        ];
+            // 2. Buat user di Firebase Auth untuk mendapatkan UID
+            $response = Http::withHeaders([
+                'X-Firebase-Client' => 'greentrack-web-app',
+                'Content-Type' => 'application/json'
+            ])->post("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" . $this->apiKey, [
+                'email' => $request->email,
+                'password' => $request->password,
+                'returnSecureToken' => true
+            ]);
 
-        $firestore->createDocument('akun_superadmin', $data);
+            if (!$response->successful()) {
+                $errorMessage = $response->json()['error']['message'] ?? 'Unknown error';
+                Log::error('Firebase Auth Error:', [
+                    'error' => $errorMessage,
+                    'response' => $response->json()
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal membuat akun super admin: ' . $errorMessage
+                ], 400);
+            }
 
-        return 'Super admin berhasil terdaftar!';
+            $userData = $response->json();
+            $uid = $userData['localId']; // Firebase UID
+
+            // 3. Buat dokumen di Firestore dengan data super admin menggunakan format yang benar
+            $now = Carbon::now();
+            $superAdminData = [
+                'fields' => [
+                    'email' => [
+                        'stringValue' => $request->email
+                    ],
+                    'nama_lengkap' => [
+                        'stringValue' => $request->nama_lengkap
+                    ],
+                    'password' => [
+                        'stringValue' => $request->password
+                    ],
+                    'kode_otp' => [
+                        'stringValue' => str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT)
+                    ],
+                    'role' => [
+                        'stringValue' => 'super admin'
+                    ],
+                    'created_at' => [
+                        'timestampValue' => $now->toRfc3339String()
+                    ],
+                    'updated_at' => [
+                        'timestampValue' => $now->toRfc3339String()
+                    ],
+                    'last_login' => [
+                        'nullValue' => null
+                    ],
+                    'last_login_ip' => [
+                        'stringValue' => $request->ip()
+                    ],
+                    'firebase_uid' => [
+                        'stringValue' => $uid
+                    ]
+                ]
+            ];
+
+            // Gunakan UID sebagai ID dokumen
+            $result = $firestore->createDocumentWithId('akun_superadmin', $uid, $superAdminData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Super admin berhasil terdaftar!',
+                'data' => [
+                    'uid' => $uid,
+                    'email' => $request->email,
+                    'nama_lengkap' => $request->nama_lengkap,
+                    'role' => 'super admin'
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Super Admin Registration Error:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function registerAdmin(Request $request, FirestoreService $firestore)

@@ -92,6 +92,7 @@ Route::get('/password-link-sent', fn() => view('layouts.password-link-sent'))->n
 
 // Halaman Lupa Sandi (Menampilkan Formulir Email)
 Route::get('/forgotpassword', fn() => view('layouts.forgotpassword'))->name('forgotpassword');
+Route::post('/forgotpassword', [AuthController::class, 'forgotPassword'])->name('forgotpassword.submit');
 
 // Resend OTP (Untuk Pengguna yang Tidak Menerima Email)
 Route::get('/resendotp', fn() => view('layouts.resendotp'))->name('resendotp');
