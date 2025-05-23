@@ -1,3 +1,4 @@
+{{-- filepath: d:\project\laravel_project\PROJECT_WEB_GREENTRACK\resources\views\layouts\profile.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Profile')
@@ -13,10 +14,10 @@
 
         <!-- Foto Profil -->
         <div class="relative flex flex-col items-center">
-            <div class="w-52 h-52 bg-gray-200 rounded-full flex justify-center items-center cursor-not-allowed"
+            <div class="w-52 h-52 bg-gray-200 rounded-full flex justify-center items-center cursor-pointer"
                 id="imageContainer">
-                <img id="profileImage" src="{{ session('profile_image') ?: 'https://via.placeholder.com/200' }}" alt="Profile"
-                    class="w-48 h-48 rounded-full object-cover">
+                <img id="profileImage" src="{{ asset('assets/images/profile.jpg') }}" alt="Profile"
+                    class="w-52 h-52 object-cover rounded-full">
                 <input type="file" id="profileImageInput" accept="image/*" class="hidden">
             </div>
             <h2 class="text-2xl font-bold mt-6">{{ session('user_nama') }}</h2>

@@ -69,10 +69,12 @@
 
 
 
+    <!-- Foto Profil -->
     <a href="{{ route('profile') }}"
         class="block p-4 border-t flex items-center w-[90%] mx-auto mb-6 hover:bg-gray-100 rounded-lg transition"
         id="profile-link">
-        <img src="https://via.placeholder.com/50" alt="Profile" class="w-12 h-12 rounded-full">
+        <img src="{{ asset('assets/images/profile.jpg') }}" alt="Profile"
+            class="w-12 h-12 rounded-full object-cover border-2 border-green-500 shadow-sm">
         <div class="ml-3">
             <p class="text-gray-800 font-semibold menu-text">{{ session('user_nama') }}</p>
             <p class="text-gray-600 text-sm">{{ session('role') }}</p>
