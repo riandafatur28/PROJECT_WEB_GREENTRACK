@@ -74,15 +74,19 @@ class AuthController extends Controller
                     $pathParts = explode('/', $documentPath);
                     $documentId = end($pathParts);
                     
+                    // Ambil data existing fields
+                    $existingFields = $matchingUser['fields'];
+                    
+                    // Update hanya last_login dan last_login_ip
+                    $existingFields['last_login'] = [
+                        'timestampValue' => Carbon::now()->toRfc3339String()
+                    ];
+                    $existingFields['last_login_ip'] = [
+                        'stringValue' => $request->ip()
+                    ];
+                    
                     $updateData = [
-                        'fields' => [
-                            'last_login' => [
-                                'timestampValue' => Carbon::now()->toRfc3339String()
-                            ],
-                            'last_login_ip' => [
-                                'stringValue' => $request->ip()
-                            ]
-                        ]
+                        'fields' => $existingFields
                     ];
                     
                     // Format dokumen untuk update
