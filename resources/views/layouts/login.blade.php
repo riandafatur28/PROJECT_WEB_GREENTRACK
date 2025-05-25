@@ -20,10 +20,10 @@
                 Silahkan Login Terlebih Dahulu
             </h3>
             @if ($errors->any())
-    <div style="color:red;">
-        <strong>{{ $errors->first() }}</strong>
-    </div>
-@endif
+                <div style="color:red;">
+                    <strong>{{ $errors->first() }}</strong>
+                </div>
+            @endif
             <form method="POST" action="/login" autocomplete="off">
                 @csrf
                 <div>
@@ -73,10 +73,14 @@
                 </div>
 
                 <div class="mt-6">
-                    <button
-                        class="w-full bg-white text-green-600 py-2 rounded-md border border-green-600 hover:bg-green-200">
-                        Kembali
-                    </button>
+                    <a href="{{ url('/') }}">
+                        <button
+                            class="w-full bg-white text-green-600 py-2 rounded-md border border-green-600 hover:bg-green-200">
+                            Kembali
+                        </button>
+                    </a>
+
+
                 </div>
             </form>
         </div>
