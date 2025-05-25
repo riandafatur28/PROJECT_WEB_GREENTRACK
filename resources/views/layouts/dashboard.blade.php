@@ -64,13 +64,40 @@
             </div>
 
             <!-- Aktivitas Terbaru -->
-            <div class="md:col-span-2 bg-white p-6 rounded-3xl shadow">
+            <div class="md:col-span-2 bg-white p-4 md:p-6 rounded-3xl shadow">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-semibold">Aktivitas Terbaru</h3>
                 </div>
 
-                <!-- Added overflow-x-auto to enable horizontal scroll on smaller screens -->
-                <div class="overflow-x-auto">
+                <!-- Mobile View (Card Layout) -->
+                <div class="block md:hidden space-y-4">
+                    @forelse ($activities as $activity)
+                        <div class="bg-white border border-gray-100 rounded-lg p-4">
+                            <!-- User Info Section -->
+                            <div class="flex items-center gap-3 mb-2">
+                                <img src="{{ !empty($activity['image']) ? $activity['image'] : 'https://i.pravatar.cc/64?u=' . urlencode($activity['nama']) }}"
+                                    alt="{{ $activity['nama'] }}" class="w-10 h-10 rounded-full object-cover">
+                                <div class="flex-1">
+                                    <h4 class="text-base font-semibold text-gray-800">{{ $activity['nama'] }}</h4>
+                                    <p class="text-sm text-gray-500">{{ $activity['userRole'] }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Activity Details -->
+                            <div class="mt-3 pl-2">
+                                <p class="text-gray-600 text-sm">{{ $activity['keterangan'] }}</p>
+                                <p class="text-gray-400 text-xs mt-2">{{ $activity['waktu'] }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center text-gray-400 py-4">
+                            Tidak ada aktivitas terbaru
+                        </div>
+                    @endforelse
+                </div>
+
+                <!-- Desktop View (Table Layout) -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-600 border-collapse">
                         <thead>
                             <tr class="text-[#B5B7C0] border-b border-[#B5B7C0]">
@@ -97,7 +124,8 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="py-4 text-center text-gray-400">Tidak ada aktivitas terbaru
+                                    <td colspan="3" class="py-4 text-center text-gray-400">
+                                        Tidak ada aktivitas terbaru
                                     </td>
                                 </tr>
                             @endforelse

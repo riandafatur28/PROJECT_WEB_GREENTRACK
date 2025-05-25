@@ -22,26 +22,25 @@ class DashboardController extends Controller
         $bibitResponse = $firestore->getCollection('bibit');
 
         // Initialize array untuk menyimpan jumlah bibit per bulan
-        $bibitCounts = array_fill(0, 12, 0); // Initialize with 0 for all 12 months
 
-        if (isset($bibitResponse['documents'])) {
-            foreach ($bibitResponse['documents'] as $document) {
-                $fields = $document['fields'] ?? [];
+$bibitCounts = array_fill(0, 12, 0);
 
-                // Get the created_at timestamp
-                if (isset($fields['created_at']['timestampValue'])) {
-                    $timestamp = strtotime($fields['created_at']['timestampValue']);
-                    $date = Carbon::createFromTimestamp($timestamp);
-                    $month = $date->month - 1; // Array is 0-based, months are 1-based
-
-                    // Increment the count for this month
-                    $bibitCounts[$month]++;
-            }
+if (isset($bibitResponse['documents'])) {
+    foreach ($bibitResponse['documents'] as $document) {
+        $fields = $document['fields'] ?? [];
+        if (isset($fields['created_at']['timestampValue'])) {
+            $timestamp = strtotime($fields['created_at']['timestampValue']);
+            $month = (int)date('n', $timestamp) - 1;
+        } else {
+            // Jika tidak ada created_at, masukkan ke bulan sekarang
+            $month = (int)date('n') - 1;
         }
-        }
+        $bibitCounts[$month]++;
+    }
+}
 
         // Get total bibit count
-        $totalBibit = array_sum($bibitCounts);
+        $totalBibit = isset($bibitResponse['documents']) ? count($bibitResponse['documents']) : 0;
 
         // Hitung total akun
         $totalAkun = $this->countTotalAkun($firestore);

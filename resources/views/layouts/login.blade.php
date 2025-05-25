@@ -72,6 +72,7 @@
                     </button>
                 </div>
 
+
                 <div class="mt-6">
                     <a href="{{ url('/') }}">
                         <button
