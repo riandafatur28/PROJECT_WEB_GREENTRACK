@@ -255,30 +255,30 @@
 
                 // Call register endpoint for new admin
                 fetch('/register-admin', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(handleResponse)
-                .catch(handleError);
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(handleResponse)
+                    .catch(handleError);
             } else {
                 // For editing, include the ID
                 data.id = document.getElementById('modalID').value;
 
                 // Call update endpoint for existing admin
                 fetch('/update-admin', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(handleResponse)
-                .catch(handleError);
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(handleResponse)
+                    .catch(handleError);
             }
         }
 
@@ -308,7 +308,7 @@
             document.getElementById('modalTitle').textContent = 'Tambah Admin Baru';
             document.getElementById('password').required = true;
             document.getElementById('password').parentElement.style.display = 'block';
-            
+
             // Reset form fields
             document.getElementById('modalID').value = '';
             document.getElementById('modalNama').value = '';
@@ -318,12 +318,12 @@
             document.getElementById('modalStatusSelect').value = 'Aktif';
             document.getElementById('modalPhotoUrl').value = 'https://randomuser.me/api/portraits/lego/2.jpg';
             document.getElementById('modalImage').src = 'https://randomuser.me/api/portraits/lego/2.jpg';
-            
+
             // Hide ID field and delete button for new admin
             document.getElementById('idField').style.display = 'none';
             document.getElementById('deleteButton').style.display = 'none';
             document.getElementById('updateButton').textContent = 'Tambah Admin';
-            
+
             openModal();
         }
 
@@ -334,24 +334,25 @@
             document.getElementById('modalTitle').textContent = 'Edit Data Admin';
             document.getElementById('password').required = false;
             document.getElementById('password').parentElement.style.display = 'none';
-            
+
             // Set form fields with existing data
             document.getElementById('modalID').value = button.getAttribute('data-id');
             document.getElementById('modalNama').value = button.getAttribute('data-nama');
             document.getElementById('modalEmail').value = button.getAttribute('data-email');
-            document.getElementById('modalPeranSelect').value = button.getAttribute('data-peran').toLowerCase().replace(' ', '_');
+            document.getElementById('modalPeranSelect').value = button.getAttribute('data-peran').toLowerCase().replace(' ',
+                '_');
             document.getElementById('modalStatusSelect').value = button.getAttribute('data-status');
-            
+
             // Set photo
             const photoUrl = button.getAttribute('data-photo');
             document.getElementById('modalPhotoUrl').value = photoUrl;
             document.getElementById('modalImage').src = photoUrl;
-            
+
             // Show ID field and delete button for existing admin
             document.getElementById('idField').style.display = 'block';
             document.getElementById('deleteButton').style.display = 'block';
             document.getElementById('updateButton').textContent = 'Perbarui';
-            
+
             openModal();
         }
 

@@ -9,7 +9,7 @@
 
         <!-- Card Statistik -->
         <div class="bg-white p-6 rounded-3xl shadow-md mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x md:divide-gray-300">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:divide-x md:divide-gray-300">
                 <!-- Total Bibit -->
                 <div class="flex items-center px-4 py-4 md:py-0">
                     <div class="bg-green-100 p-3 rounded-full flex-shrink-0">
@@ -63,52 +63,47 @@
                 </div>
             </div>
 
+            <!-- Aktivitas Terbaru -->
             <div class="md:col-span-2 bg-white p-6 rounded-3xl shadow">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-semibold">Aktivitas Terbaru</h3>
                 </div>
 
-                <table class="w-full text-sm text-left text-gray-600 border-collapse">
-                    <thead>
-                        <tr class="text-[#B5B7C0] border-b border-[#B5B7C0]">
-                            <th class="py-2">Nama</th>
-                            <th class="py-2">Aktivitas</th>
-                            <th class="py-2">Waktu</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($activities as $activity)
-                            <tr>
-                                <td class="py-4">
-                                    <div class="flex items-center gap-3">
-                                        <img src="{{ !empty($activity['image']) ? $activity['image'] : 'https://i.pravatar.cc/64?u=' . urlencode($activity['nama']) }}"
-                                            alt="{{ $activity['nama'] }}" class="w-12 h-12 rounded-full">
-                                        <div class="ml-6">
-                                            <div class="text-xl font-semibold">{{ $activity['nama'] }}</div>
-                                            <div class="text-sm text-gray-400">{{ $activity['userRole'] }}</div>
+                <!-- Added overflow-x-auto to enable horizontal scroll on smaller screens -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-600 border-collapse">
+                        <thead>
+                            <tr class="text-[#B5B7C0] border-b border-[#B5B7C0]">
+                                <th class="py-2">Nama</th>
+                                <th class="py-2">Aktivitas</th>
+                                <th class="py-2">Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($activities as $activity)
+                                <tr>
+                                    <td class="py-4">
+                                        <div class="flex items-center gap-3">
+                                            <img src="{{ !empty($activity['image']) ? $activity['image'] : 'https://i.pravatar.cc/64?u=' . urlencode($activity['nama']) }}"
+                                                alt="{{ $activity['nama'] }}" class="w-12 h-12 rounded-full">
+                                            <div class="ml-6">
+                                                <div class="text-xl font-semibold">{{ $activity['nama'] }}</div>
+                                                <div class="text-sm text-gray-400">{{ $activity['userRole'] }}</div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="py-4">{{ $activity['keterangan'] }}</td>
-                                <td class="py-4 font-semibold">{{ $activity['waktu'] }}</td>
-                            </tr>
-                        @empty
-                            @foreach ($activities as $activity)
-                                <div>
-                                    <h4>{{ $activity['nama'] }}</h4>
-                                    <p>{{ $activity['userRole'] }}</p>
-                                    <p>{{ $activity['keterangan'] }}</p>
-                                    <p>{{ $activity['waktu'] }}</p>
-                                    <img src="{{ $activity['image'] }}" alt="{{ $activity['nama'] }}">
-                                </div>
-                            @endforeach
-
-                            <tr>
-                                <td colspan="3" class="py-4 text-center text-gray-400">Tidak ada aktivitas terbaru</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                    </td>
+                                    <td class="py-4">{{ $activity['keterangan'] }}</td>
+                                    <td class="py-4 font-semibold">{{ $activity['waktu'] }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="py-4 text-center text-gray-400">Tidak ada aktivitas terbaru
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -124,7 +119,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Kayu TPK Chart (Doughnut Chart)
             const kayuData = @json($kayuData);
-            
+
             const dataKayuTPK = {
                 labels: ['Tersedia', 'Terjual', 'Rusak'],
                 datasets: [{
@@ -221,7 +216,9 @@
                     colors: ['transparent']
                 },
                 xaxis: {
-                    categories: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                    categories: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+                        'September', 'Oktober', 'November', 'Desember'
+                    ],
                     labels: {
                         rotate: -45,
                         style: {

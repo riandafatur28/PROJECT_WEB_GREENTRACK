@@ -180,7 +180,7 @@ class ManajemenPohonBibitController extends Controller
         }
     }
 
-    public function index(Request $request, FirestoreService $firestore)
+   public function index(Request $request, FirestoreService $firestore)
     {
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'terbaru');
@@ -198,23 +198,14 @@ class ManajemenPohonBibitController extends Controller
                 foreach ($bibitResponse['documents'] as $document) {
                     $fields = $document['fields'] ?? [];
                     $id = basename($document['name']);
-
-                    // Penanganan gambar yang lebih baik
                     $gambarUrl = $this->extractImageUrl($fields['gambar_image'] ?? null);
-
-                    // Enhanced location extraction
                     $lokasi = $this->extractNestedLocation($fields['lokasi_tanam'] ?? []);
-
-                    // Convert numeric values to string as requested
                     $tinggiValue = isset($fields['tinggi']['integerValue'])
                         ? (string)$fields['tinggi']['integerValue']
                         : (isset($fields['tinggi']['numberValue']) ? (string)$fields['tinggi']['numberValue'] : '0');
-
                     $usiaValue = isset($fields['usia']['integerValue'])
                         ? (string)$fields['usia']['integerValue']
                         : (isset($fields['usia']['numberValue']) ? (string)$fields['usia']['numberValue'] : '0');
-
-                    // Format dates
                     $tanggalPembibitan = '';
                     if (isset($fields['tanggal_pembibitan']['timestampValue'])) {
                         $tanggalPembibitan = $this->formatTimestamp($fields['tanggal_pembibitan']['timestampValue']);
@@ -223,15 +214,12 @@ class ManajemenPohonBibitController extends Controller
                     } elseif (isset($fields['tanggal_pembibitanSl']['stringValue'])) {
                         $tanggalPembibitan = $fields['tanggal_pembibitanSl']['stringValue'];
                     }
-
                     $createdAt = isset($fields['created_at']['timestampValue']) ?
                         strtotime($fields['created_at']['timestampValue']) : 0;
-
                     $namaBibit = $fields['nama_bibit']['stringValue'] ?? 'Tidak tersedia';
                     $jenisBibit = $fields['jenis_bibit']['stringValue'] ?? 'Tidak tersedia';
                     $idBibit = $fields['id_bibit']['stringValue'] ?? 'Tidak tersedia';
 
-                    // Use the generated location in your array with new fields
                     $bibit[] = [
                         'id' => $id,
                         'id_bibit' => $idBibit,
@@ -265,43 +253,37 @@ class ManajemenPohonBibitController extends Controller
                 }
             }
 
-            // Get kayu data
+            // Get kayu data & total stok kayu
             $kayuResponse = $firestore->getCollection('kayu');
-        $totalKayu = 0;
+            $kayu = [];
+            $totalKayuStok = 0;
 
             if (isset($kayuResponse['documents'])) {
                 foreach ($kayuResponse['documents'] as $document) {
-                   $fields = $document['fields'] ?? [];
-                $jumlahStok = $fields['jumlah_stok']['integerValue'] ?? 0;
-                $totalKayu += $jumlahStok;
+                    $fields = $document['fields'] ?? [];
+                    $id = basename($document['name']);
+                    $jumlahStok = 0;
+                    if (isset($fields['jumlah_stok']['integerValue'])) {
+                        $jumlahStok = (int)$fields['jumlah_stok']['integerValue'];
+                    } elseif (isset($fields['jumlah_stok']['numberValue'])) {
+                        $jumlahStok = (int)$fields['jumlah_stok']['numberValue'];
+                    }
+                    $totalKayuStok += $jumlahStok;
 
-                    // Ambil gambar kayu dari Firestore
                     $gambarUrl = $this->extractImageUrl($fields['gambar_image'] ?? null);
-
-                    // Enhanced location extraction
                     $lokasi = $this->extractNestedLocation($fields['lokasi_tanam'] ?? []);
-
-                    // Convert numeric values to string as requested
                     $tinggiValue = isset($fields['tinggi']['integerValue'])
                         ? (string)$fields['tinggi']['integerValue']
                         : (isset($fields['tinggi']['numberValue']) ? (string)$fields['tinggi']['numberValue'] : '0');
-
-                    // Make sure tinggi is not zero for display
                     if ($tinggiValue === '0') {
                         $tinggiValue = isset($fields['panjang']['integerValue'])
                             ? (string)$fields['panjang']['integerValue']
-                            : (isset($fields['panjang']['numberValue']) ? (string)$fields['panjang']['numberValue'] : '10'); // Default to 10 if no value
+                            : (isset($fields['panjang']['numberValue']) ? (string)$fields['panjang']['numberValue'] : '10');
                     }
-
-                    $jumlahStokValue = isset($fields['jumlah_stok']['integerValue'])
-                        ? (string)$fields['jumlah_stok']['integerValue']
-                        : (isset($fields['jumlah_stok']['numberValue']) ? (string)$fields['jumlah_stok']['numberValue'] : '0');
-
+                    $jumlahStokValue = (string)$jumlahStok;
                     $usiaValue = isset($fields['usia']['integerValue'])
                         ? (string)$fields['usia']['integerValue']
                         : (isset($fields['usia']['numberValue']) ? (string)$fields['usia']['numberValue'] : '0');
-
-                    // Handle tanggal_lahir_pohon and tanggal_panen
                     $tanggalLahirPohon = 'Tidak tersedia';
                     if (isset($fields['tanggal_lahir_pohon']['integerValue'])) {
                         $tanggalLahirPohon = $this->formatTimestamp($fields['tanggal_lahir_pohon']['integerValue']);
@@ -310,20 +292,16 @@ class ManajemenPohonBibitController extends Controller
                     } elseif (isset($fields['tanggal_lahir_pohon']['timestampValue'])) {
                         $tanggalLahirPohon = $this->formatTimestamp($fields['tanggal_lahir_pohon']['timestampValue']);
                     }
-
                     $tanggalPanen = 'Tidak tersedia';
                     if (isset($fields['tanggal_panen']['timestampValue'])) {
                         $tanggalPanen = $this->formatTimestamp($fields['tanggal_panen']['timestampValue']);
                     }
-
                     $createdAt = isset($fields['created_at']['timestampValue']) ?
                         strtotime($fields['created_at']['timestampValue']) : 0;
-
                     $namaKayu = $fields['nama_kayu']['stringValue'] ?? 'Tidak tersedia';
                     $jenisKayu = $fields['jenis_kayu']['stringValue'] ?? 'Tidak tersedia';
                     $idKayu = $fields['id_kayu']['stringValue'] ?? 'Tidak tersedia';
 
-                    // Ambil data kayu dari Firestore dengan fields baru
                     $kayu[] = [
                         'id' => $id,
                         'id_kayu' => $idKayu,
@@ -351,6 +329,52 @@ class ManajemenPohonBibitController extends Controller
                     ];
                 }
             }
+
+            $totalBibit = count($bibit);
+
+            // Pagination
+            $offsetBibit = ($page - 1) * $perPage;
+            $offsetKayu = ($page - 1) * $perPage;
+            $paginatedBibit = array_slice($bibit, $offsetBibit, $perPage);
+            $paginatedKayu = array_slice($kayu, $offsetKayu, $perPage);
+
+            $totalActiveAdmin = $this->countActiveAdmin($firestore);
+
+            // Calculate pagination info
+            $lastPage = ceil(max($totalBibit, count($kayu)) / $perPage);
+            $lastPage = max(1, $lastPage);
+
+            return view('layouts.manajemenkayubibit', [
+                'bibit' => $paginatedBibit,
+                'kayu' => $paginatedKayu,
+                'totalBibit' => $totalBibit,
+                'totalKayu' => $totalKayuStok, // <-- total stok kayu
+                'totalActiveAdmin' => $totalActiveAdmin,
+                'currentPage' => $page,
+                'perPage' => $perPage,
+                'lastPage' => $lastPage,
+                'search' => $search,
+                'sort' => $sort,
+                'tab' => $tab,
+                'errorMessage' => $errorMessage,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ManajemenPohonBibitController@index: ' . $e->getMessage());
+            return view('layouts.manajemenkayubibit', [
+                'bibit' => [],
+                'kayu' => [],
+                'totalBibit' => 0,
+                'totalKayu' => 0,
+                'totalActiveAdmin' => 0,
+                'currentPage' => 1,
+                'perPage' => $perPage,
+                'lastPage' => 1,
+                'search' => $search,
+                'sort' => $sort,
+                'tab' => $tab,
+                'errorMessage' => 'Terjadi kesalahan saat memuat data: ' . $e->getMessage(),
+            ]);
+
 
             // Get active admin count
             $totalActiveAdmin = $this->countActiveAdmin($firestore);
@@ -1003,6 +1027,9 @@ class ManajemenPohonBibitController extends Controller
         }
     }
 
+// ...existing code...
+
+    // Fungsi untuk mengupdate bibit
     // Fungsi untuk mengupdate bibit
     public function updateBibit(Request $request, FirestoreService $firestore, $id)
     {
@@ -1012,10 +1039,8 @@ class ManajemenPohonBibitController extends Controller
                 'request_data' => $request->all()
             ]);
 
-            // First, verify the document exists
             $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}";
-            $existingDoc = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
-                ->get($url);
+            $existingDoc = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())->get($url);
 
             if (!$existingDoc->successful()) {
                 Log::error('Document not found', [
@@ -1028,30 +1053,25 @@ class ManajemenPohonBibitController extends Controller
             $existingFields = $existingDoc->json()['fields'] ?? [];
             Log::info('Existing document fields:', ['fields' => $existingFields]);
 
-            // Prepare fields to update
             $fields = [];
             $fieldPaths = [];
 
-            // Handle numeric fields with proper type conversion
             if ($request->has('tinggi')) {
                 $tinggi = intval($request->input('tinggi'));
                 $fields['tinggi'] = ['integerValue' => $tinggi];
                 $fieldPaths[] = 'tinggi';
             }
-
             if ($request->has('usia')) {
                 $usia = intval($request->input('usia'));
                 $fields['usia'] = ['integerValue' => $usia];
                 $fieldPaths[] = 'usia';
             }
 
-            // Handle string fields
             $stringFields = [
                 'nama_bibit', 'jenis_bibit', 'varietas', 'asal_bibit',
                 'produktivitas', 'kondisi', 'media_tanam', 'nutrisi',
                 'status_hama', 'catatan'
             ];
-
             foreach ($stringFields as $field) {
                 if ($request->has($field)) {
                     $value = $request->input($field);
@@ -1062,18 +1082,14 @@ class ManajemenPohonBibitController extends Controller
                 }
             }
 
-            // Handle image upload if present
+            // --- Gambar: gunakan display_url jika ada, fallback ke url ---
             if ($request->hasFile('gambar_image')) {
                 $image = $request->file('gambar_image');
-
-                // Validate image
                 $request->validate([
                     'gambar_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
                 ]);
-
                 try {
                     $client = new \GuzzleHttp\Client();
-
                     $formData = [
                         [
                             'name' => 'image',
@@ -1081,19 +1097,24 @@ class ManajemenPohonBibitController extends Controller
                             'filename' => $image->getClientOriginalName()
                         ]
                     ];
-
                     $imgbbResponse = $client->request('POST', 'https://api.imgbb.com/1/upload', [
                         'multipart' => $formData,
                         'query' => [
                             'key' => '3c2af4d518d6ccc3c2d7d6f86bd7a1dc'
                         ]
                     ]);
-
                     $imgbbData = json_decode($imgbbResponse->getBody(), true);
 
-                    if (isset($imgbbData['data']['url'])) {
+                    // Gunakan display_url jika ada, jika tidak pakai url
+                    if (isset($imgbbData['data']['display_url'])) {
+                        $imageUrl = $imgbbData['data']['display_url'];
+                    } elseif (isset($imgbbData['data']['url'])) {
                         $imageUrl = $imgbbData['data']['url'];
-                        // Store image URL as array in Firestore format
+                    } else {
+                        $imageUrl = null;
+                    }
+
+                    if ($imageUrl) {
                         $fields['gambar_image'] = [
                             'arrayValue' => [
                                 'values' => [
@@ -1109,9 +1130,11 @@ class ManajemenPohonBibitController extends Controller
                         'error' => $e->getMessage()
                     ]);
                 }
+            } else if (isset($existingFields['gambar_image'])) {
+                $fields['gambar_image'] = $existingFields['gambar_image'];
+                $fieldPaths[] = 'gambar_image';
             }
 
-            // Update timestamp
             $fields['updated_at'] = [
                 'timestampValue' => date('c')
             ];
@@ -1124,12 +1147,9 @@ class ManajemenPohonBibitController extends Controller
                 ], 400);
             }
 
-            // Create update mask query string
             $updateMaskPaths = implode('&', array_map(function($path) {
                 return "updateMask.fieldPaths=" . urlencode($path);
             }, array_unique($fieldPaths)));
-
-            // Prepare update URL
             $updateUrl = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/bibit/{$id}?{$updateMaskPaths}";
 
             Log::info('Sending update to Firestore', [
@@ -1137,7 +1157,6 @@ class ManajemenPohonBibitController extends Controller
                 'fields' => $fields
             ]);
 
-            // Make the update request
             $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
                 ->patch($updateUrl, [
                     'fields' => $fields
@@ -1155,10 +1174,16 @@ class ManajemenPohonBibitController extends Controller
                 'response' => $response->json()
             ]);
 
+            $newImageUrl = null;
+            if (isset($fields['gambar_image']['arrayValue']['values'][0]['stringValue'])) {
+                $newImageUrl = $fields['gambar_image']['arrayValue']['values'][0]['stringValue'];
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data updated successfully',
-                'updated_fields' => $fieldPaths
+                'updated_fields' => $fieldPaths,
+                'gambar_image' => $newImageUrl
             ]);
 
         } catch (\Exception $e) {
@@ -1166,7 +1191,6 @@ class ManajemenPohonBibitController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating data: ' . $e->getMessage()
@@ -1178,16 +1202,13 @@ class ManajemenPohonBibitController extends Controller
     public function updateKayu(Request $request, FirestoreService $firestore, $id)
     {
         try {
-            // Log the incoming request
             Log::info('Starting kayu update', [
                 'id' => $id,
                 'request_data' => $request->all()
             ]);
 
-            // Get existing document first
             $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/kayu/{$id}";
-            $existingDoc = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
-                ->get($url);
+            $existingDoc = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())->get($url);
 
             if (!$existingDoc->successful()) {
                 Log::error('Document not found', [
@@ -1200,33 +1221,23 @@ class ManajemenPohonBibitController extends Controller
             $existingFields = $existingDoc->json()['fields'] ?? [];
             Log::info('Existing document fields:', ['fields' => $existingFields]);
 
-            // Decode the JSON data from the request
             $requestData = json_decode($request->input('data'), true);
             Log::info('Decoded request data:', ['data' => $requestData]);
-
-            // Prepare fields to update while preserving existing fields
             $fields = $existingFields;
 
-            // Update numeric fields with proper types
             if (isset($requestData['tinggi'])) {
                 $tinggi = (float)$requestData['tinggi'];
                 $fields['tinggi'] = ['doubleValue' => $tinggi];
-                Log::info('Updated tinggi value:', ['tinggi' => $tinggi]);
             }
-
             if (isset($requestData['usia'])) {
                 $usia = (int)$requestData['usia'];
                 $fields['usia'] = ['integerValue' => $usia];
-                Log::info('Updated usia value:', ['usia' => $usia]);
             }
-
             if (isset($requestData['jumlah_stok'])) {
                 $jumlahStok = (int)$requestData['jumlah_stok'];
                 $fields['jumlah_stok'] = ['integerValue' => $jumlahStok];
-                Log::info('Updated jumlah_stok value:', ['jumlah_stok' => $jumlahStok]);
             }
 
-            // Update string fields
             $stringFields = ['nama_kayu', 'jenis_kayu', 'varietas', 'barcode', 'catatan', 'status'];
             foreach ($stringFields as $field) {
                 if (isset($requestData[$field]) && !is_null($requestData[$field])) {
@@ -1234,18 +1245,14 @@ class ManajemenPohonBibitController extends Controller
                 }
             }
 
-            // Handle image upload if present
+            // --- Gambar: gunakan display_url jika ada, fallback ke url ---
             if ($request->hasFile('gambar_image')) {
                 $image = $request->file('gambar_image');
-
-                // Validate image
                 $request->validate([
                     'gambar_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
                 ]);
-
                 try {
                     $client = new \GuzzleHttp\Client();
-
                     $formData = [
                         [
                             'name' => 'image',
@@ -1253,19 +1260,23 @@ class ManajemenPohonBibitController extends Controller
                             'filename' => $image->getClientOriginalName()
                         ]
                     ];
-
                     $imgbbResponse = $client->request('POST', 'https://api.imgbb.com/1/upload', [
                         'multipart' => $formData,
                         'query' => [
                             'key' => '3c2af4d518d6ccc3c2d7d6f86bd7a1dc'
                         ]
                     ]);
-
                     $imgbbData = json_decode($imgbbResponse->getBody(), true);
 
-                    if (isset($imgbbData['data']['url'])) {
+                    if (isset($imgbbData['data']['display_url'])) {
+                        $imageUrl = $imgbbData['data']['display_url'];
+                    } elseif (isset($imgbbData['data']['url'])) {
                         $imageUrl = $imgbbData['data']['url'];
-                        // Store image URL as array in Firestore format
+                    } else {
+                        $imageUrl = null;
+                    }
+
+                    if ($imageUrl) {
                         $fields['gambar_image'] = [
                             'arrayValue' => [
                                 'values' => [
@@ -1280,9 +1291,10 @@ class ManajemenPohonBibitController extends Controller
                         'error' => $e->getMessage()
                     ]);
                 }
+            } else if (isset($existingFields['gambar_image'])) {
+                $fields['gambar_image'] = $existingFields['gambar_image'];
             }
 
-            // Update timestamp
             $fields['updated_at'] = [
                 'mapValue' => [
                     'fields' => [
@@ -1297,7 +1309,6 @@ class ManajemenPohonBibitController extends Controller
                 'fields' => $fields
             ]);
 
-            // Send update to Firestore
             $response = \Illuminate\Support\Facades\Http::withToken($firestore->getAccessToken())
                 ->patch($url, [
                     'fields' => $fields
@@ -1305,10 +1316,16 @@ class ManajemenPohonBibitController extends Controller
 
             Log::info('Update response', ['response' => $response->json()]);
 
+            $newImageUrl = null;
+            if (isset($fields['gambar_image']['arrayValue']['values'][0]['stringValue'])) {
+                $newImageUrl = $fields['gambar_image']['arrayValue']['values'][0]['stringValue'];
+            }
+
             if ($response->successful()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Data kayu berhasil diperbarui'
+                    'message' => 'Data kayu berhasil diperbarui',
+                    'gambar_image' => $newImageUrl
                 ]);
             } else {
                 Log::error('Update failed', [

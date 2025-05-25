@@ -486,7 +486,8 @@
                             <li>Berkontribusi pada pengurangan emisi karbon global</li>
                         </ul>
 
-                        <p><a href="#" class="btn-cta">Install GreenTrack Sekarang</a></p>
+                        <p><a href="https://drive.google.com/drive/u/0/folders/12B4ulz8gZ4cHDSFOsIw2CvSyk_uwJTtg"
+                                class="btn-cta">Install GreenTrack Sekarang</a></p>
                     </div>
                 </div>
             </div>

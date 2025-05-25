@@ -1,3 +1,4 @@
+{{-- filepath: d:\project\laravel_project\PROJECT_WEB_GREENTRACK\resources\views\layouts\profile.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Profile')
@@ -13,10 +14,10 @@
 
         <!-- Foto Profil -->
         <div class="relative flex flex-col items-center">
-            <div class="w-52 h-52 bg-gray-200 rounded-full flex justify-center items-center cursor-not-allowed"
+            <div class="w-52 h-52 bg-gray-200 rounded-full flex justify-center items-center cursor-pointer"
                 id="imageContainer">
-                <img id="profileImage" src="{{ session('profile_image') ?: 'https://via.placeholder.com/200' }}" alt="Profile"
-                    class="w-48 h-48 rounded-full object-cover">
+                <img id="profileImage" src="{{ asset('assets/images/profile.jpg') }}" alt="Profile"
+                    class="w-52 h-52 object-cover rounded-full">
                 <input type="file" id="profileImageInput" accept="image/*" class="hidden">
             </div>
             <h2 class="text-2xl font-bold mt-6">{{ session('user_nama') }}</h2>
@@ -44,69 +45,11 @@
                     value="{{ session('role') }}" readonly>
             </div>
         </div>
-
-        <!-- Tombol -->
-        <div class="w-full mt-8 flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 justify-center items-center">
-            <button class="bg-green-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-green-700 w-full md:w-auto"
-                id="saveButton" disabled>Simpan</button>
-            <button class="bg-gray-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-gray-600 w-full md:w-auto"
-                id="editButton">Edit</button>
-            <form action="{{ route('login') }}" method="POST">
-                @csrf
-                <button type="submit"
-                    class="bg-red-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-red-700 w-full md:w-auto"
-                    id="logoutButton">Keluar</button>
-            </form>
-        </div>
     </div>
 @endsection
 
 @push('scripts')
     <script>
-        let editMode = false;
-
-        // Toggle edit mode
-        document.getElementById('editButton').addEventListener('click', function() {
-            editMode = true;
-
-            document.querySelectorAll('.editable-input').forEach(input => {
-                input.removeAttribute('readonly');
-                input.removeAttribute('disabled');
-                input.classList.remove('text-gray-500');
-                input.classList.add('text-gray-900');
-            });
-
-            document.getElementById('saveButton').removeAttribute('disabled');
-
-            // Enable image change
-            const imageContainer = document.getElementById('imageContainer');
-            imageContainer.classList.remove('cursor-not-allowed');
-            imageContainer.classList.add('cursor-pointer');
-
-            imageContainer.addEventListener('click', function() {
-                if (editMode) {
-                    document.getElementById('profileImageInput').click();
-                }
-            });
-        });
-
-        // Handle profile image change
-        document.getElementById('profileImageInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profileImage').src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Logout action - handled via form submit
-        document.getElementById('logoutButton').addEventListener('click', function() {
-            // This is handled via a form submission now
-        });
-
         // Close profile
         function closeProfile() {
             window.history.back();
