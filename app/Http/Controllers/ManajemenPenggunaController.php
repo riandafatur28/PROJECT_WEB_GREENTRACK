@@ -214,10 +214,10 @@ class ManajemenPenggunaController extends Controller
         try {
             // Redirect the request to the registerAdmin endpoint
             $response = app(FirestoreController::class)->registerAdmin($request, app(FirestoreService::class));
-            
+
             // Return the response directly
             return $response;
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
