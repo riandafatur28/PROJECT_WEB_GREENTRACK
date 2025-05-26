@@ -59,6 +59,15 @@ class AuthController extends Controller
                 $isSuperAdmin = true;
                 $fields = $matchingUser['fields'];
                 
+                // Debug log untuk super admin
+                Log::debug('Super Admin Login Details:', [
+                    'email' => $fields['email']['stringValue'],
+                    'nama' => $fields['nama_lengkap']['stringValue'] ?? '(Tidak diketahui)',
+                    'role' => $fields['role']['stringValue'] ?? 'super admin',
+                    'firebase_uid' => $uid,
+                    'all_fields' => $fields // Log semua field untuk debugging
+                ]);
+                
                 // Simpan data user ke session
                 session([
                     'email' => $fields['email']['stringValue'],
@@ -99,7 +108,11 @@ class AuthController extends Controller
             // 3. Jika bukan super admin, cek di koleksi akun (admin biasa)
             $adminUsers = $firestore->getCollection('akun');
             $matchingAdmin = collect($adminUsers['documents'] ?? [])->first(function ($doc) use ($uid) {
-                return $doc['name'] === "projects/green-track-firebase/databases/(default)/documents/akun/{$uid}";
+                if (!isset($doc['fields'])) return false;
+                
+                $fields = $doc['fields'];
+                return isset($fields['firebase_uid']['stringValue']) && 
+                       $fields['firebase_uid']['stringValue'] === $uid;
             });
             
             if (!$matchingAdmin) {
@@ -112,16 +125,70 @@ class AuthController extends Controller
             
             // Admin biasa ditemukan
             $fields = $matchingAdmin['fields'];
-            $roleArray = $fields['role']['arrayValue']['values'] ?? [];
-            $roleName = !empty($roleArray) ? $roleArray[0]['stringValue'] : 'admin';
+            
+            // Debug log untuk data mentah
+            Log::debug('Raw Admin Fields:', [
+                'all_fields' => $fields
+            ]);
+            
+            // Cek role dengan benar
+            $role = null;
+            if (isset($fields['role']['stringValue'])) {
+                $role = $fields['role']['stringValue'];
+            } elseif (isset($fields['role']['arrayValue']['values'])) {
+                $roleArray = $fields['role']['arrayValue']['values'];
+                $role = !empty($roleArray) ? $roleArray[0]['stringValue'] : null;
+            }
+            
+            // Validasi role yang diizinkan
+            if (!in_array($role, ['admin_penyemaian', 'admin_tpk'])) {
+                Log::warning('Invalid admin role:', [
+                    'email' => $request->email,
+                    'role' => $role
+                ]);
+                return back()->withErrors(['email' => 'Anda tidak memiliki akses yang sesuai.']);
+            }
+            
+            // Debug log untuk admin
+            Log::debug('Admin Login Details:', [
+                'email' => $fields['email']['stringValue'],
+                'nama' => $fields['nama_lengkap']['stringValue'] ?? '(Tidak diketahui)',
+                'role' => $role,
+                'firebase_uid' => $uid
+            ]);
             
             session([
                 'email' => $fields['email']['stringValue'],
                 'user_nama' => $fields['nama_lengkap']['stringValue'] ?? '(Tidak diketahui)',
-                'role' => $roleName,
+                'role' => $role,
                 'firebase_uid' => $uid,
                 'firebase_token' => $authData['idToken']
             ]);
+            
+            // Update last_login untuk admin
+            if (isset($matchingAdmin['name'])) {
+                $documentPath = $matchingAdmin['name'];
+                $pathParts = explode('/', $documentPath);
+                $documentId = end($pathParts);
+                
+                // Ambil data existing fields
+                $existingFields = $matchingAdmin['fields'];
+                
+                // Update hanya last_login dan last_login_ip
+                $existingFields['last_login'] = [
+                    'timestampValue' => Carbon::now()->toRfc3339String()
+                ];
+                $existingFields['last_login_ip'] = [
+                    'stringValue' => $request->ip()
+                ];
+                
+                $updateData = [
+                    'fields' => $existingFields
+                ];
+                
+                // Format dokumen untuk update
+                $firestore->updateDocument('akun', $documentId, $updateData);
+            }
             
             return redirect('/dashboard');
         }
