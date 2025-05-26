@@ -53,37 +53,46 @@ if (isset($bibitResponse['documents'])) {
 
         $activities = [];
 
-        // Get total kayu count and process kayu data
-        $kayuResponse = $firestore->getCollection('kayu');
-        $totalKayu = 0;
-        $kayuData = [
-            'tersedia' => 0,
-            'terjual' => 0,
-            'rusak' => 0
-        ];
 
-        if (isset($kayuResponse['documents'])) {
-            foreach ($kayuResponse['documents'] as $document) {
-                $fields = $document['fields'] ?? [];
-                $jumlahStok = $fields['jumlah_stok']['integerValue'] ?? 0;
-                $totalKayu += $jumlahStok;
 
-                // Assuming status is stored in the document, if not, you might need to adjust this
-                $status = $fields['status']['stringValue'] ?? 'tersedia';
+$kayuResponse = $firestore->getCollection('kayu');
+$totalKayu = 0;
+$kayuData = [
+    'tersedia' => 0,
+    'terjual' => 0,
+    'rusak' => 0
+];
 
-                switch (strtolower($status)) {
-                    case 'terjual':
-                        $kayuData['terjual'] += $jumlahStok;
-                        break;
-                    case 'rusak':
-                        $kayuData['rusak'] += $jumlahStok;
-                        break;
-                    default:
-                        $kayuData['tersedia'] += $jumlahStok;
-                        break;
-                }
-            }
+if (isset($kayuResponse['documents'])) {
+    foreach ($kayuResponse['documents'] as $document) {
+        $fields = $document['fields'] ?? [];
+
+        // Get jumlah_stok value with proper type checking
+        $jumlahStok = 0;
+        if (isset($fields['jumlah_stok']['integerValue'])) {
+            $jumlahStok = (int)$fields['jumlah_stok']['integerValue'];
+        } elseif (isset($fields['jumlah_stok']['numberValue'])) {
+            $jumlahStok = (int)$fields['jumlah_stok']['numberValue'];
         }
+
+        // Add to total
+        $totalKayu += $jumlahStok;
+
+        // Categorize by status
+        $status = $fields['status']['stringValue'] ?? 'tersedia';
+        switch (strtolower($status)) {
+            case 'terjual':
+                $kayuData['terjual'] += $jumlahStok;
+                break;
+            case 'rusak':
+                $kayuData['rusak'] += $jumlahStok;
+                break;
+            default:
+                $kayuData['tersedia'] += $jumlahStok;
+                break;
+        }
+    }
+}
 
         // Process activities data
         if (isset($response['documents'])) {
