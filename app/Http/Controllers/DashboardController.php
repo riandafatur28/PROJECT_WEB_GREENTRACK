@@ -76,7 +76,7 @@ if (isset($kayuResponse['documents'])) {
         }
 
         // Add to total
-        $totalKayu += $jumlahStok;
+         $totalKayu += $jumlahStok;
 
         // Categorize by status
         $status = $fields['status']['stringValue'] ?? 'tersedia';

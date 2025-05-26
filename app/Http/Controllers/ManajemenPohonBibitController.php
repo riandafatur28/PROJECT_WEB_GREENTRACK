@@ -252,15 +252,10 @@ class ManajemenPohonBibitController extends Controller
             }
         }
 
-        // Get kayu data & total stok kayu
-        $kayuResponse = $firestore->getCollection('kayu');
-        $kayu = [];
-        $totalKayuStok = 0;
 
 // Get kayu data & total stok kayu
             $kayuResponse = $firestore->getCollection('kayu');
         $totalKayu = 0;
-            $kayu = [];
             $totalKayuStok = 0;
 
             if (isset($kayuResponse['documents'])) {
@@ -369,7 +364,8 @@ if (!empty($search)) {
         }
 
         $totalBibit = count($bibit);
-        $totalKayu = count($kayu);
+         $totalKayu += $jumlahStok;
+
 
         // Pagination
         $offsetBibit = ($page - 1) * $perPage;
