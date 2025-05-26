@@ -17,7 +17,7 @@ class FirestoreService
 
     public function __construct()
     {
-        $this->projectId = 'green-track-firebase';
+        $this->projectId = 'greentrack-cadangan';
         $this->keyFile = storage_path('app/firebase-key.json');
     }
 
