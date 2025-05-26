@@ -180,7 +180,7 @@ class ManajemenPohonBibitController extends Controller
         }
     }
 
-   public function index(Request $request, FirestoreService $firestore)
+public function index(Request $request, FirestoreService $firestore)
 {
     $search = $request->input('search', ''); // Ambil input pencarian
     $sort = $request->input('sort', 'terbaru'); // Ambil input untuk pengurutan
@@ -252,94 +252,79 @@ class ManajemenPohonBibitController extends Controller
             }
         }
 
-        // Get kayu data & total stok kayu
+        // Mengambil data kayu dan menghitung total stok kayu
         $kayuResponse = $firestore->getCollection('kayu');
         $kayu = [];
         $totalKayuStok = 0;
 
-// Get kayu data & total stok kayu
-            $kayuResponse = $firestore->getCollection('kayu');
-        $totalKayu = 0;
-            $kayu = [];
-            $totalKayuStok = 0;
-
-            if (isset($kayuResponse['documents'])) {
-                foreach ($kayuResponse['documents'] as $document) {
-                   $fields = $document['fields'] ?? [];
+        if (isset($kayuResponse['documents'])) {
+            foreach ($kayuResponse['documents'] as $document) {
+                $fields = $document['fields'] ?? [];
                 $jumlahStok = $fields['jumlah_stok']['integerValue'] ?? 0;
-                $totalKayu += $jumlahStok;
-                    $fields = $document['fields'] ?? [];
-                    $id = basename($document['name']);
-                    $jumlahStok = 0;
-                    if (isset($fields['jumlah_stok']['integerValue'])) {
-                        $jumlahStok = (int)$fields['jumlah_stok']['integerValue'];
-                    } elseif (isset($fields['jumlah_stok']['numberValue'])) {
-                        $jumlahStok = (int)$fields['jumlah_stok']['numberValue'];
-                    }
-                    $totalKayuStok += $jumlahStok;
+                $totalKayuStok += $jumlahStok; // Menjumlahkan total stok kayu
 
-        $gambarUrl = $this->extractImageUrl($fields['gambar_image'] ?? null);
-        $lokasi = $this->extractNestedLocation($fields['lokasi_tanam'] ?? []);
-        $tinggiValue = isset($fields['tinggi']['integerValue'])
-            ? (string)$fields['tinggi']['integerValue']
-            : (isset($fields['tinggi']['numberValue']) ? (string)$fields['tinggi']['numberValue'] : '0');
-        if ($tinggiValue === '0') {
-            $tinggiValue = isset($fields['panjang']['integerValue'])
-                ? (string)$fields['panjang']['integerValue']
-                : (isset($fields['panjang']['numberValue']) ? (string)$fields['panjang']['numberValue'] : '10');
-        }
-        $jumlahStokValue = (string)$jumlahStok;
-        $usiaValue = isset($fields['usia']['integerValue'])
-            ? (string)$fields['usia']['integerValue']
-            : (isset($fields['usia']['numberValue']) ? (string)$fields['usia']['numberValue'] : '0');
-        $tanggalLahirPohon = 'Tidak tersedia';
-        if (isset($fields['tanggal_lahir_pohon']['integerValue'])) {
-            $tanggalLahirPohon = $this->formatTimestamp($fields['tanggal_lahir_pohon']['integerValue']);
-        } elseif (isset($fields['tanggal_lahir_pohon']['numberValue'])) {
-            $tanggalLahirPohon = $this->formatTimestamp($fields['tanggal_lahir_pohon']['numberValue']);
-        } elseif (isset($fields['tanggal_lahir_pohon']['timestampValue'])) {
-            $tanggalLahirPohon = $this->formatTimestamp($fields['tanggal_lahir_pohon']['timestampValue']);
-        }
-        $tanggalPanen = 'Tidak tersedia';
-        if (isset($fields['tanggal_panen']['timestampValue'])) {
-            $tanggalPanen = $this->formatTimestamp($fields['tanggal_panen']['timestampValue']);
-        }
-        $createdAt = isset($fields['created_at']['timestampValue']) ?
-            strtotime($fields['created_at']['timestampValue']) : 0;
-        $namaKayu = $fields['nama_kayu']['stringValue'] ?? 'Tidak tersedia';
-        $jenisKayu = $fields['jenis_kayu']['stringValue'] ?? 'Tidak tersedia';
-        $idKayu = $fields['id_kayu']['stringValue'] ?? 'Tidak tersedia';
+                $id = basename($document['name']);
+                $gambarUrl = $this->extractImageUrl($fields['gambar_image'] ?? null);
+                $lokasi = $this->extractNestedLocation($fields['lokasi_tanam'] ?? []);
+                $tinggiValue = isset($fields['tinggi']['integerValue'])
+                    ? (string)$fields['tinggi']['integerValue']
+                    : (isset($fields['tinggi']['numberValue']) ? (string)$fields['tinggi']['numberValue'] : '0');
+                if ($tinggiValue === '0') {
+                    $tinggiValue = isset($fields['panjang']['integerValue'])
+                        ? (string)$fields['panjang']['integerValue']
+                        : (isset($fields['panjang']['numberValue']) ? (string)$fields['panjang']['numberValue'] : '10');
+                }
+                $jumlahStokValue = (string)$jumlahStok;
+                $usiaValue = isset($fields['usia']['integerValue'])
+                    ? (string)$fields['usia']['integerValue']
+                    : (isset($fields['usia']['numberValue']) ? (string)$fields['usia']['numberValue'] : '0');
+                $tanggalLahirPohon = 'Tidak tersedia';
+                if (isset($fields['tanggal_lahir_pohon']['integerValue'])) {
+                    $tanggalLahirPohon = $this->formatTimestamp($fields['tanggal_lahir_pohon']['integerValue']);
+                } elseif (isset($fields['tanggal_lahir_pohon']['numberValue'])) {
+                    $tanggalLahirPohon = $this->formatTimestamp($fields['tanggal_lahir_pohon']['numberValue']);
+                } elseif (isset($fields['tanggal_lahir_pohon']['timestampValue'])) {
+                    $tanggalLahirPohon = $this->formatTimestamp($fields['tanggal_lahir_pohon']['timestampValue']);
+                }
+                $tanggalPanen = 'Tidak tersedia';
+                if (isset($fields['tanggal_panen']['timestampValue'])) {
+                    $tanggalPanen = $this->formatTimestamp($fields['tanggal_panen']['timestampValue']);
+                }
+                $createdAt = isset($fields['created_at']['timestampValue']) ? strtotime($fields['created_at']['timestampValue']) : 0;
+                $namaKayu = $fields['nama_kayu']['stringValue'] ?? 'Tidak tersedia';
+                $jenisKayu = $fields['jenis_kayu']['stringValue'] ?? 'Tidak tersedia';
+                $idKayu = $fields['id_kayu']['stringValue'] ?? 'Tidak tersedia';
 
-        $kayu[] = [
-            'id' => $id,
-            'id_kayu' => $idKayu,
-            'nama_kayu' => $namaKayu,
-            'jenis_kayu' => $jenisKayu,
-            'barcode' => $fields['barcode']['stringValue'] ?? 'Tidak tersedia',
-            'status' => $jumlahStokValue > '0' ? 'Tersedia' : 'Kosong',
-            'lokasi' => $lokasi,
-            'tinggi' => $tinggiValue,
-            'gambar_image' => $gambarUrl,
-            'batch_panen' => $fields['batch_panen']['stringValue'] ?? 'Tidak tersedia',
-            'varietas' => $fields['varietas']['stringValue'] ?? 'Tidak tersedia',
-            'tanggal_panen' => $tanggalPanen,
-            'tanggal_lahir_pohon' => $tanggalLahirPohon,
-            'jumlah_stok' => $jumlahStokValue,
-            'usia' => $usiaValue,
-            'catatan' => $fields['catatan']['stringValue'] ?? 'Tidak tersedia',
-            'created_at' => isset($fields['created_at']['timestampValue']) ?
-                $this->formatTimestamp($fields['created_at']['timestampValue']) : 'Tidak tersedia',
-            'updated_at' => isset($fields['updated_at']['timestampValue']) ?
-                $this->formatTimestamp($fields['updated_at']['timestampValue']) : 'Tidak tersedia',
-            'id_user' => $fields['id_user']['stringValue'] ?? 'Tidak tersedia',
-            'raw_gambar' => $fields['gambar_image'] ?? null,
-            'created_at_timestamp' => $createdAt,
-        ];
-    }
-}
+                $kayu[] = [
+                    'id' => $id,
+                    'id_kayu' => $idKayu,
+                    'nama_kayu' => $namaKayu,
+                    'jenis_kayu' => $jenisKayu,
+                    'barcode' => $fields['barcode']['stringValue'] ?? 'Tidak tersedia',
+                    'status' => $jumlahStokValue > '0' ? 'Tersedia' : 'Kosong',
+                    'lokasi' => $lokasi,
+                    'tinggi' => $tinggiValue,
+                    'gambar_image' => $gambarUrl,
+                    'batch_panen' => $fields['batch_panen']['stringValue'] ?? 'Tidak tersedia',
+                    'varietas' => $fields['varietas']['stringValue'] ?? 'Tidak tersedia',
+                    'tanggal_panen' => $tanggalPanen,
+                    'tanggal_lahir_pohon' => $tanggalLahirPohon,
+                    'jumlah_stok' => $jumlahStokValue,
+                    'usia' => $usiaValue,
+                    'catatan' => $fields['catatan']['stringValue'] ?? 'Tidak tersedia',
+                    'created_at' => isset($fields['created_at']['timestampValue']) ?
+                        $this->formatTimestamp($fields['created_at']['timestampValue']) : 'Tidak tersedia',
+                    'updated_at' => isset($fields['updated_at']['timestampValue']) ?
+                        $this->formatTimestamp($fields['updated_at']['timestampValue']) : 'Tidak tersedia',
+                    'id_user' => $fields['id_user']['stringValue'] ?? 'Tidak tersedia',
+                    'raw_gambar' => $fields['gambar_image'] ?? null,
+                    'created_at_timestamp' => $createdAt,
+                ];
+            }
+        }
 
-// Apply search filter after collecting data
-if (!empty($search)) {
+        // Apply search filter after collecting data
+        if (!empty($search)) {
             $bibit = array_filter($bibit, function($item) use ($search) {
                 return stripos($item['nama_bibit'], $search) !== false
                     || stripos($item['id_bibit'], $search) !== false
@@ -369,7 +354,6 @@ if (!empty($search)) {
         }
 
         $totalBibit = count($bibit);
-        $totalKayu = count($kayu);
 
         // Pagination
         $offsetBibit = ($page - 1) * $perPage;
@@ -378,35 +362,35 @@ if (!empty($search)) {
         $paginatedKayu = array_slice($kayu, $offsetKayu, $perPage);
 
         // Calculate pagination info
-        $lastPage = ceil(max($totalBibit, $totalKayu) / $perPage);
+        $lastPage = ceil(max($totalBibit, $totalKayuStok) / $perPage);
         $lastPage = max(1, $lastPage);
 
-            return view('layouts.manajemenkayubibit', [
-                'bibit' => $paginatedBibit,
-                'kayu' => $paginatedKayu,
-                'totalBibit' => $totalBibit,
-                'totalKayu' => $totalKayu,
-                'totalActiveAdmin' => $this->countActiveAdmin($firestore),
-                'currentPage' => $page,
-                'perPage' => $perPage,
-                'lastPage' => $lastPage,
-                'search' => $search,
-                'sort' => $sort,
-                'tab' => $tab,
-                    'errorMessage' => $errorMessage,
-                ]);
-            } catch (ConnectException $e) {
-                Log::error('Gagal terhubung ke Firestore: ' . $e->getMessage());
-                $errorMessage = 'Gagal terhubung ke Firestore. Silakan coba lagi nanti.';
-            } catch (RequestException $e) {
-                Log::error('Error saat mengambil data dari Firestore: ' . $e->getMessage());
-                $errorMessage = 'Terjadi kesalahan saat mengambil data. Silakan coba lagi nanti.';
-            } catch (Exception $e) {
-                Log::error('Error tidak terduga: ' . $e->getMessage());
-                $errorMessage = 'Terjadi kesalahan tidak terduga. Silakan coba lagi nanti.';
-            }
-
+        return view('layouts.manajemenkayubibit', [
+            'bibit' => $paginatedBibit,
+            'kayu' => $paginatedKayu,
+            'totalBibit' => $totalBibit,
+            'totalKayu' => $totalKayuStok, // Tampilkan total stok kayu yang dihitung
+            'totalActiveAdmin' => $this->countActiveAdmin($firestore),
+            'currentPage' => $page,
+            'perPage' => $perPage,
+            'lastPage' => $lastPage,
+            'search' => $search,
+            'sort' => $sort,
+            'tab' => $tab,
+            'errorMessage' => $errorMessage,
+        ]);
+    } catch (ConnectException $e) {
+        Log::error('Gagal terhubung ke Firestore: ' . $e->getMessage());
+        $errorMessage = 'Gagal terhubung ke Firestore. Silakan coba lagi nanti.';
+    } catch (RequestException $e) {
+        Log::error('Error saat mengambil data dari Firestore: ' . $e->getMessage());
+        $errorMessage = 'Terjadi kesalahan saat mengambil data. Silakan coba lagi nanti.';
+    } catch (Exception $e) {
+        Log::error('Error tidak terduga: ' . $e->getMessage());
+        $errorMessage = 'Terjadi kesalahan tidak terduga. Silakan coba lagi nanti.';
+    }
 }
+
 
     /**
      * Fungsi helper untuk mengekstrak URL gambar dari berbagai kemungkinan struktur data
