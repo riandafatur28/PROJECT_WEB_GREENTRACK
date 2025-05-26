@@ -1253,14 +1253,21 @@
                 });
             });
 
-            function updateBackground(selectElement) {
-                const value = selectElement.value;
-                if (value === "Tersedia" || value === "Siap Tanam") {
-                    selectElement.style.backgroundColor = "#4ade80"; // Green
-                } else if (value === "Kosong" || value === "Penyemaian") {
-                    selectElement.style.backgroundColor = "#f87171"; // Red
-                }
-            }
+           function updateBackground(selectElement) {
+    const value = selectElement.value;
+
+    // Reset background color to default before applying new one
+    selectElement.style.backgroundColor = '';
+
+    if (value === "Tersedia" || value === "Siap Tanam") {
+        selectElement.style.backgroundColor = "#4ade80"; // Green
+    } else if (value === "Penyemaian") {
+        selectElement.style.backgroundColor = "#fbbf24"; // Yellow
+    } else if (value === "Kosong") {
+        selectElement.style.backgroundColor = "#f87171"; // Red
+    }
+}
+
 
             // Initialize background colors for all status dropdowns
             document.addEventListener('DOMContentLoaded', function() {

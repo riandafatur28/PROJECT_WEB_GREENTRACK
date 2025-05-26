@@ -190,23 +190,75 @@ class ManajemenPenggunaController extends Controller
     }
 
     // Fungsi untuk mengupdate status admin
-    public function updateStatus(Request $request, FirestoreService $firestore)
-    {
+
+public function updateStatus(Request $request, FirestoreService $firestore)
+{
+    try {
         $id = $request->input('id');
         $status = $request->input('status');
 
-        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}?updateMask.fieldPaths=status";
+        // Validate inputs
+        if (empty($id) || empty($status)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ID dan status harus diisi'
+            ], 400);
+        }
+
+        // Validate status value
+        if (!in_array($status, ['Aktif', 'Nonaktif'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Status tidak valid'
+            ], 400);
+        }
+
+        $url = "https://firestore.googleapis.com/v1/projects/{$firestore->getProjectId()}/databases/(default)/documents/akun/{$id}?updateMask.fieldPaths=status&updateMask.fieldPaths=updated_at";
+
+        $now = now();
         $payload = [
             'fields' => [
-                'status' => ['stringValue' => $status]
+                'status' => ['stringValue' => $status],
+                'updated_at' => ['timestampValue' => $now->toRfc3339String()]
             ]
         ];
+
+        Log::info('Updating admin status:', [
+            'id' => $id,
+            'status' => $status,
+            'url' => $url
+        ]);
 
         $response = Http::withToken($firestore->getAccessToken())
             ->patch($url, $payload);
 
-        return response()->json(['success' => $response->successful()]);
+        if (!$response->successful()) {
+            Log::error('Failed to update admin status:', [
+                'error' => $response->body(),
+                'status' => $response->status()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengubah status admin'
+            ], $response->status());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status admin berhasil diperbarui'
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Error updating admin status:', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+        ], 500);
     }
+}
 
     // Fungsi untuk menambah data admin baru dengan password
     public function store(Request $request)

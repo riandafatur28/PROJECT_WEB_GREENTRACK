@@ -72,16 +72,13 @@
                     </button>
                 </div>
 
-
                 <div class="mt-6">
-                    <a href="{{ url('/') }}">
+                    <a href="{{ route('landingpage') }}">
                         <button
                             class="w-full bg-white text-green-600 py-2 rounded-md border border-green-600 hover:bg-green-200">
                             Kembali
                         </button>
                     </a>
-
-
                 </div>
             </form>
         </div>

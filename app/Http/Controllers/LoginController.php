@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -9,19 +8,19 @@ class LoginController extends Controller
 {
     public function login(Request $request)
     {
-        // Validate the login input
+        // Validasi input login
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // Check credentials
+        // Memeriksa kredensial
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            // Successful login
-            return redirect()->route('dashboard'); // Redirect to the dashboard
+            // Jika login berhasil, arahkan ke halaman yang sebelumnya diminta
+            return redirect()->intended(route('dashboard')); // Atau arahkan ke dashboard atau halaman yang sudah diinginkan
         } else {
-            // Failed login
-            return back()->with('error', 'Invalid email or password!');
+            // Jika login gagal
+            return back()->with('error', 'Email atau password tidak valid!');
         }
     }
 }

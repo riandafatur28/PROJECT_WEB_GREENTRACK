@@ -282,6 +282,46 @@
             }
         }
 
+        function updateStatus(select) {
+            const status = select.value;
+            const adminId = select.getAttribute('data-id'); // Get the admin ID from the dropdown
+
+            // Update background color based on the selected status
+            if (status === 'Nonaktif') {
+                select.classList.remove('bg-green-300'); // Remove green background if it was previously set
+                select.classList.add('bg-red-300'); // Add red background for "Nonaktif"
+            } else {
+                select.classList.remove('bg-red-300'); // Remove red background if it was previously set
+                select.classList.add('bg-green-300'); // Add green background for "Aktif"
+            }
+
+            // Send the status update to the server via AJAX
+            fetch('/update-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // CSRF token for Laravel
+                    },
+                    body: JSON.stringify({
+                        id: adminId, // Pass the admin ID to identify the record
+                        status: status, // New status value (Aktif/Nonaktif)
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                    } else {
+                        alert('Gagal memperbarui status.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat memperbarui status.');
+                });
+        }
+
+
         // Helper function to handle API response
         function handleResponse(response) {
             return response.json().then(data => {
