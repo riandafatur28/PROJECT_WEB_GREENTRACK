@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class FirestoreController extends Controller
 {
-    private $apiKey = 'AIzaSyAqFuhrg16_t6qeY-0YgqLf_LSgWBPOIzA'; // Your Firebase Web API Key
+    private $apiKey = 'AIzaSyCNNPj9B7mBAZu0TucGaSIdjzOMbQWYh_4'; // Your Firebase Web API Key
 
     public function index(FirestoreService $firestore)
     {

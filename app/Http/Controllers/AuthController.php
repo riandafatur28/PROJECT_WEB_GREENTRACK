@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 class AuthController extends Controller
 {
-    private $apiKey = 'AIzaSyAqFuhrg16_t6qeY-0YgqLf_LSgWBPOIzA'; // Firebase Web API Key
+    private $apiKey = 'AIzaSyCNNPj9B7mBAZu0TucGaSIdjzOMbQWYh_4'; // Firebase Web API Key
     
     public function handleLogin(Request $request, FirestoreService $firestore)
     {
