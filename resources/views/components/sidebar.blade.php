@@ -64,9 +64,8 @@
         <div class="mt-4 flex flex-col pb-4">
             <div class="flex flex-col md:flex-col-reverse">
                 <!-- Logout Button -->
-                <!-- Logout Button - Update the container and form classes -->
                 <div class="flex justify-center order-last md:order-first w-full px-4">
-                    <form action="{{ route('login') }}" method="GET" id="logout-form" class="w-full">
+                    <form action="{{ route('logout') }}" method="GET" id="logout-form" class="w-full">
                         @csrf
                         <button type="submit" id="logoutButton"
                             class="bg-red-600 text-white px-3 py-2.5 rounded-lg text-lg hover:bg-red-700 w-full flex items-center justify-center gap-4">

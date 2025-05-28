@@ -39,7 +39,10 @@ Route::post('/reset-password', [AuthController::class, 'handlePasswordReset'])->
 
 // === Dashboard & Profile ===
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/profile', fn() => view('layouts.profile'))->name('profile');
+Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+Route::get('/logout', [ProfileController::class, 'logout'])->name('logout');
+
 
 // === Manajemen Pengguna ===
 Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemenpengguna.index');
@@ -100,3 +103,4 @@ Route::get('/test-firebase', function () {
 
     return 'Firebase credentials file not found!';
 });
+Route::get('/test-firebase-config', [FirestoreController::class, 'testFirebaseConfig'])->name('test.firebase.config');

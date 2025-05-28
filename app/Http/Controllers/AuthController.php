@@ -204,47 +204,67 @@ class AuthController extends Controller
     /**
      * Mengirim email untuk reset password
      */
-    public function forgotPassword(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
+
+public function forgotPassword(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+    ]);
+
+    try {
+        // 1. Cek email di Firestore (akun_superadmin dan akun)
+        $firestore = app(\App\Services\FirestoreService::class);
+
+        // Cek di akun_superadmin
+        $superAdmins = $firestore->getCollection('akun_superadmin');
+        $found = collect($superAdmins['documents'] ?? [])->first(function ($doc) use ($request) {
+            $fields = $doc['fields'] ?? [];
+            return isset($fields['email']['stringValue']) && $fields['email']['stringValue'] === $request->email;
+        });
+
+        // Jika tidak ditemukan di superadmin, cek di akun
+        if (!$found) {
+            $admins = $firestore->getCollection('akun');
+            $found = collect($admins['documents'] ?? [])->first(function ($doc) use ($request) {
+                $fields = $doc['fields'] ?? [];
+                return isset($fields['email']['stringValue']) && $fields['email']['stringValue'] === $request->email;
+            });
+        }
+
+        if (!$found) {
+            // Email tidak ditemukan di Firestore
+            return back()->withErrors(['email' => 'Email tidak terdaftar dalam sistem.']);
+        }
+
+        // 2. Kirim permintaan reset password ke Firebase Auth
+        $response = Http::withHeaders([
+            'X-Firebase-Client' => 'greentrack-web-app',
+            'Content-Type' => 'application/json'
+        ])->post("https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" . $this->apiKey, [
+            'email' => $request->email,
+            'requestType' => 'PASSWORD_RESET',
         ]);
 
-        try {
-            // Kirim permintaan reset password ke Firebase Auth
-            $response = Http::withHeaders([
-                'X-Firebase-Client' => 'greentrack-web-app',
-                'Content-Type' => 'application/json'
-            ])->post("https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" . $this->apiKey, [
-                'email' => $request->email,
-                'requestType' => 'PASSWORD_RESET',
+        if (!$response->successful()) {
+            $errorMessage = $response->json()['error']['message'] ?? 'Unknown error';
+            Log::error('Firebase Auth Forgot Password Error:', [
+                'error' => $errorMessage,
+                'email' => $request->email
             ]);
-
-            if (!$response->successful()) {
-                $errorMessage = $response->json()['error']['message'] ?? 'Unknown error';
-                Log::error('Firebase Auth Forgot Password Error:', [
-                    'error' => $errorMessage,
-                    'email' => $request->email
-                ]);
-
-                if ($errorMessage === 'EMAIL_NOT_FOUND') {
-                    return back()->withErrors(['email' => 'Email tidak terdaftar dalam sistem.']);
-                }
-
-                return back()->withErrors(['email' => 'Gagal mengirim email reset password: ' . $errorMessage]);
-            }
-
-            // Email telah terkirim - redirect ke halaman konfirmasi
-            return redirect()->route('resendotp')->with('success', 'Tautan reset password telah dikirim ke email Anda.');
-
-        } catch (\Exception $e) {
-            Log::error('Forgot Password Error:', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return back()->withErrors(['email' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            return back()->withErrors(['email' => 'Gagal mengirim email reset password: ' . $errorMessage]);
         }
+
+        // Email telah terkirim - redirect ke halaman konfirmasi
+        return redirect()->route('resendotp')->with('success', 'Tautan reset password telah dikirim ke email Anda.');
+
+    } catch (\Exception $e) {
+        Log::error('Forgot Password Error:', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        return back()->withErrors(['email' => 'Terjadi kesalahan: ' . $e->getMessage()]);
     }
+}
 
     /**
      * Menangani reset password setelah menerima kode OTP
